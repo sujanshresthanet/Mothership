@@ -5,6 +5,7 @@ use GoodForm;
 use Messages;
 use Request;
 use Redirect;
+use Session;
 use URL;
 use Validator;
 use View;
@@ -84,6 +85,12 @@ class MothershipResourceController extends MothershipController {
             $field->value = $this->resource->{$name};
             $form->add($field);
         }
+        
+        $errors = Session::get('errors');
+        if ( $errors )
+        {
+            $form->addErrors($errors->getMessages());
+        }
 
         $formAttr = [
             'action'    => URL::to('admin/'.$controller),
@@ -121,7 +128,7 @@ class MothershipResourceController extends MothershipController {
 
         $validation = Validator::make(Input::all(), $rules);
 
-        if ($validation->fails())
+        if ( $validation->fails() )
         {
             //Log::error(print_r($messages->all(), 1));
             $messages = $validation->messages();
@@ -185,8 +192,8 @@ class MothershipResourceController extends MothershipController {
    /*
     * Construct a form view to update a resource in the database
     */
-   public function edit($id)
-   {
+    public function edit($id)
+    {
         $class      = static::$model;
         $controller = Request::segment(2);
 
@@ -210,6 +217,12 @@ class MothershipResourceController extends MothershipController {
             $form->add($field);
         }
 
+        $errors = Session::get('errors');
+        if ( $errors )
+        {
+            $form->addErrors($errors->getMessages());
+        }
+
         $formAttr = [
             'action'    => URL::to('admin/'.$controller.'/'.$id),
             'class'     => 'form-horizontal',
@@ -231,7 +244,56 @@ class MothershipResourceController extends MothershipController {
         return View::make('mothership::resource.form')
             ->with($data)
             ->with($this->getTemplateData());
-   }
+    }
+
+    public function delete($id)
+    {
+        $class      = static::$model;
+        $controller = Request::segment(2);
+
+        $plural     = $this->resource->plural();
+        $singular   = $this->resource->singular();
+
+        $this->resource = $class::find($id);
+
+        $this->redirectIfDontExist($this->resource, $singular);
+
+        $title      = 'Delete '.$singular.':'.$this->resource;
+
+        $this->breadcrumbs['active'] = 'Create';
+
+        $form   = new GoodForm();
+
+        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE']);
+        $form->add(['label' => 'Confirm Delete', 'type' => 'checkbox', 'name' => '_delete', 'value' => $id]);
+
+        $errors = Session::get('errors');
+        if ( $errors )
+        {
+            $form->addErrors($errors->getMessages());
+        }
+
+        $formAttr = [
+            'action'    => URL::to('admin/'.$controller.'/'.$id),
+            'class'     => 'form-horizontal',
+            'method'    => 'POST',
+        ];
+        $form->attr($formAttr);
+
+        $data   = [
+            'create'        => false,
+            'controller'    => $controller,
+            'form'          => $form,
+            'resource'      => $this->resource,
+            'plural'        => $plural,
+            'singular'      => $singular,
+            'title'         => $title,
+        ];
+
+        return View::make('mothership::resource.form')
+            ->with($data)
+            ->with($this->getTemplateData());
+    }
 
    /*
     * Attempt to update a resource from the database
@@ -255,11 +317,10 @@ class MothershipResourceController extends MothershipController {
 
         $validation = Validator::make(Input::all(), $rules);
         
-        if ($validation->fails())
+        if ( $validation->fails() )
         {
             $messages = $validation->messages();
-            Messages::add('error', 'Please correct form errors.');
-            
+            Messages::add('error', 'Please correct form errors.');  
             return Redirect::to($redirect)
                 ->withInput()
                 ->withErrors($validation);
@@ -270,13 +331,61 @@ class MothershipResourceController extends MothershipController {
             {
                 $this->resource->$field = Input::get($field);
             }
-            if ($this->resource->save())
+            if ( $this->resource->save() )
             {
                 Messages::add('success', 'Updated '.$singular.':'.$this->resource);
                 return Redirect::to($redirect);
             }
             return Redirect::to($redirect)->withInput();
         }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        $class      = static::$model;
+        $controller = Request::segment(2);
+
+        $plural     = $this->resource->plural();
+        $singular   = $this->resource->singular();
+
+        $this->resource = $class::find($id);
+
+        $this->redirectIfDontExist($this->resource, $singular);
+
+        $redirect = 'admin/'.$controller.'/'.$id.'/delete';
+
+        $rules = ['_delete' => ['required', 'in:'.$id]];
+
+        $validation = Validator::make(Input::all(), $rules);
+
+        if ( $validation->fails() )
+        {
+            Messages::add('error', 'Please correct form errors.');  
+            return Redirect::to($redirect)->withErrors($validation);
+        }
+        else
+        {
+            if ( $this->resource->delete() )
+            {
+                Messages::add('error', $singular.' Deleted.');  
+                return Redirect::to('admin/'.$controller);
+            }
+            Message::add('error', 'Error deleting '.$singular);
+            return Redirect::to($redirect); 
+        }
+        
+        $redirect = 'admin/'.$controller.'/'.$id.'/edit';
+    }
+
+    public function missingMethod($parameters)
+    {
+        //
+        return 'Missing method';
     }
 
    /*
