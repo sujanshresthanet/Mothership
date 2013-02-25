@@ -93,11 +93,11 @@ class MothershipResourceController extends MothershipController {
         $form->attr($formAttr);
 
         $data   = [
-            'create'        => TRUE,
+            'create'        => true,
             'controller'    => $controller,
             'fields'        => $fields,
             'form'          => $form,
-            'obj'           => $this->resource,
+            'resource'      => $this->resource,
             'plural'        => $plural,
             'singular'      => $singular,
             'title'         => $title,
@@ -148,7 +148,42 @@ class MothershipResourceController extends MothershipController {
     }
 
    /*
-    * Construct a form view to update a resource from the database
+    * Construct a readonly view of a resource in the database
+    */
+   public function show($id)
+   {
+        $class      = static::$model;
+        $controller = Request::segment(2);
+
+        $plural     = $this->resource->plural();
+        $singular   = $this->resource->singular();
+
+        $this->resource = $class::find($id);
+
+        $this->redirectIfDontExist($this->resource, $singular);
+
+        $fields     = $this->resource->getFields();
+        $title      = 'Update '.$singular.':'.$this->resource;
+
+        $this->breadcrumbs['active'] = 'View';
+
+        $data   = [
+            'create'        => false,
+            'controller'    => $controller,
+            'fields'        => $fields,
+            'resource'      => $this->resource,
+            'plural'        => $plural,
+            'singular'      => $singular,
+            'title'         => $title,
+        ];
+
+        return View::make('mothership::resource.view')
+            ->with($data)
+            ->with($this->getTemplateData());
+   }
+
+   /*
+    * Construct a form view to update a resource in the database
     */
    public function edit($id)
    {
@@ -160,14 +195,10 @@ class MothershipResourceController extends MothershipController {
 
         $this->resource = $class::find($id);
 
-        if( !$this->resource )
-        {
-            Messages::add('warning', $singular.' with id '.$id.' not found.');
-            return Redirect::to('admin/'.$controller);
-        }
+        $this->redirectIfDontExist($this->resource, $singular);
 
         $fields     = $this->resource->getFields();
-        $title      = 'Update '.$singular.':'.$this->resource;
+        $title      = 'Edit '.$singular.':'.$this->resource;
 
         $this->breadcrumbs['active'] = 'Create';
 
@@ -187,11 +218,11 @@ class MothershipResourceController extends MothershipController {
         $form->attr($formAttr);
 
         $data   = [
-            'create'        => TRUE,
+            'create'        => false,
             'controller'    => $controller,
             'fields'        => $fields,
             'form'          => $form,
-            'obj'           => $this->resource,
+            'resource'      => $this->resource,
             'plural'        => $plural,
             'singular'      => $singular,
             'title'         => $title,
@@ -215,11 +246,7 @@ class MothershipResourceController extends MothershipController {
 
         $this->resource = $class::find($id);
 
-        if( !$this->resource )
-        {
-            Messages::add('warning', $singular.' with id '.$id.' not found.');
-            return Redirect::to('admin/'.$controller);
-        }
+        $this->redirectIfDontExist($this->resource, $singular);
 
         $fields = $this->resource->getFields();
         $rules  = $this->resource->getRules();
@@ -249,6 +276,22 @@ class MothershipResourceController extends MothershipController {
                 return Redirect::to($redirect);
             }
             return Redirect::to($redirect)->withInput();
+        }
+    }
+
+   /*
+    * Redirects to listing page if the resource does not exists
+    *
+    * @param object $resource
+    * @param string $singular
+    */
+    public function redirectIfDontExist($resource, $singular)
+    {
+        if( !$this->resource )
+        {
+            $controller = Request::segment(2);
+            Messages::add('warning', $singular.' with id '.$id.' not found.');
+            return Redirect::to('admin/'.$controller);
         }
     }
 }
