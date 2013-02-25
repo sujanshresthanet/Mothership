@@ -189,6 +189,38 @@ class MothershipResourceController extends MothershipController {
             ->with($this->getTemplateData());
    }
 
+   public function meta($id)
+   {
+        $class      = static::$model;
+        $controller = Request::segment(2);
+
+        $plural     = $this->resource->plural();
+        $singular   = $this->resource->singular();
+
+        $this->resource = $class::find($id);
+
+        $this->redirectIfDontExist($this->resource, $singular);
+
+        $fields     = $this->resource->getFields();
+        $title      = 'Meta '.$singular.':'.$this->resource;
+
+        $this->breadcrumbs['active'] = 'View';
+
+        $data   = [
+            'create'        => false,
+            'controller'    => $controller,
+            'fields'        => $fields,
+            'resource'      => $this->resource,
+            'plural'        => $plural,
+            'singular'      => $singular,
+            'title'         => $title,
+        ];
+
+        return View::make('mothership::resource.meta')
+            ->with($data)
+            ->with($this->getTemplateData());
+   }
+
    /*
     * Construct a form view to update a resource in the database
     */
