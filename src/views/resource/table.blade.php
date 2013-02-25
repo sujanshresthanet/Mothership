@@ -1,7 +1,7 @@
-@extends('admin.layouts.main')
+@extends('mothership::layouts.main')
 
 @section('title')
-Table
+{{ $title }}
 @stop
 
 
