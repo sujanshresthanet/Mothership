@@ -315,6 +315,8 @@ class MothershipResourceController extends MothershipController {
         
         $redirect = 'admin/'.$controller.'/'.$id.'/edit';
 
+        Log::error(print_r($rules,1));
+
         $validation = Validator::make(Input::all(), $rules);
         
         if ( $validation->fails() )
