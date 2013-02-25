@@ -30,3 +30,33 @@ Next you need to alias Mothership's facade. Find the aliases key which should be
     'Mothership'      => 'Stwt\Mothership\Mothership',
 
 Finally, run __composer dump-autoload__ to updated your autoload class map
+
+## Creating your first Mothership
+
+### Models
+
+Any models to be used in the mothship should extend the **MothershipModel** class.
+
+    use Stwt\Mothership\MothershipModel as MothershipModel;
+
+    class Thing extends MothershipModel {
+        //...
+    }
+
+### Controllers
+
+Resource controllers should extends the **MothershipResourceController** class. 
+
+    use Stwt\Mothership\MothershipResourceController as MothershipResourceController;
+
+    class ThingController extends MothershipResourceController {
+        //...
+    }
+
+### Routes
+
+Add the new resource controller to your __app/routes.php__ file.
+
+    Route::resource('admin/things', 'ThingController');
+
+**Done.**
