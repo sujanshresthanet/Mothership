@@ -4,6 +4,8 @@ use Auth;
 use Controller;
 use Config;
 use Input;
+use Messages;
+use Redirect;
 use View;
 use URI;
 
@@ -21,9 +23,15 @@ class MothershipController extends Controller {
 
         $data['breadcrumbs'] = $this->breadcrumbs;
         $data['navigation']  = Config::get('mothership.primaryNavigation');
-
+        
+        if (Auth::check())
+        {
+            $data['user'] = Auth::user();
+        }
         return $data;
     }
+
+
 
     public function getIndex() 
     {
@@ -35,8 +43,22 @@ class MothershipController extends Controller {
         return View::make('mothership::home.login')->with($this->getTemplateData());
     }
 
+    public function postLogin()
+    {
+        $credentials = ['email' => Input::get('email'), 'password' => Input::get('password')];
+
+        if (Auth::attempt($credentials)) {
+            Messages::add('success', 'You are now logged in');
+            return Redirect::to('admin');
+        }
+        Messages::add('error', 'Login incorrect, please try again');
+        return Redirect::to('admin/login');
+    }
+
     public function getLogout()
     {
-        return 'Logout';
+        Auth::logout();
+        Messages::add('success', 'You have been logged out');
+        return Redirect::to('admin/login');
     }
 }
