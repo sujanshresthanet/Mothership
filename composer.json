@@ -12,8 +12,10 @@
         "illuminate/support": "4.0.x"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
+        "classmap": [            
+            "src/controllers",
+            "src/migrations",            
+            "src/models"
         ],
         "psr-0": {
             "Stwt\\Mothership": "src/"
