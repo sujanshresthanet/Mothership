@@ -8,6 +8,8 @@ use Stwt\Mothership\MothershipModelField as MothershipModelField;
 class MothershipModel extends Eloquent {
 
     protected $properties   = [];
+    protected $hidden       = ['password'];
+
     protected $columns      = null;
     protected $fields       = null;
 
@@ -101,16 +103,23 @@ class MothershipModel extends Eloquent {
         return $this->getProperties($subset);
     }
 
+   /*
+    * Returns an array of property objects. Define property
+    * keys in $subset to return a selection of objects.
+    *
+    * If $subset is null all properties will be returned 
+    * _except_ those in the models $hidden array.
+    *
+    * @param    array   $subset
+    * @return   array
+    */
     public function getProperties($subset=null)
     {
-        if (!$subset)
-        {
-            return $this->properties;
-        }
+        $subset     = ( $subset ?: array_diff(array_keys($this->properties), $this->hidden) );
         $properties = [];
         foreach ($this->properties as $n => $v)
         {
-            if (in_array($n, $subset))
+            if ( in_array($n, $subset) )
             {
                 $properties[$n] = $v;
             }
