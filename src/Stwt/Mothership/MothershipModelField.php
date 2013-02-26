@@ -106,7 +106,7 @@ class MothershipModelField {
         if( $this->key == 'PRI' )
         {
             $this->type = 'hidden';
-            //$this->validation[] = 'unique:'.$this->table;
+            $this->validation[] = 'unique:'.$this->table;
         }
 
         if( $this->key == 'UNI' )
@@ -349,6 +349,19 @@ class MothershipModelField {
         $constraint;
         preg_match_all('/\(([A-Za-z0-9,\' ]+?)\)/', $type, $constraint);
         return current(end($constraint));
+    }
+
+    public function getValidation($create=true)
+    {
+        $rules = [];
+        foreach ($this->validation as $rule)
+        {
+            if (! $this->startsWith($rule, 'unique:'))
+            {
+                $rules[] = $rule;
+            }
+        }
+        return $rules;
     }
 
    /**

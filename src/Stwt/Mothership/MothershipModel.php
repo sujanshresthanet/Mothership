@@ -110,7 +110,6 @@ class MothershipModel extends Eloquent {
         $properties = [];
         foreach ($this->properties as $n => $v)
         {
-            Log::error('check for '.$n);
             if (in_array($n, $subset))
             {
                 $properties[$n] = $v;
@@ -130,5 +129,17 @@ class MothershipModel extends Eloquent {
             $rules[$name] = $property->validation;
         }
         return $rules;
+    }
+
+   /*
+    * Returns true if $name is a database property
+    * in this model
+    *
+    * @param    string  $name
+    * @return   boolean
+    */
+    public function isProperty($name)
+    {
+        return ( isset($properties) ?: false );
     }
 }

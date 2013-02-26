@@ -346,7 +346,9 @@ class MothershipResourceController extends MothershipController {
         
         $redirect = 'admin/'.$controller.'/'.$id.'/edit';
 
-        $validation = Validator::make(Input::all(), $rules);
+        $inputData = $this->getInputData(Input::all(), $this->resource);
+
+        $validation = Validator::make($inputData, $rules);
         
         if ( $validation->fails() )
         {
@@ -360,6 +362,7 @@ class MothershipResourceController extends MothershipController {
         {
             foreach ($fields as $field => $spec)
             {
+                // only update field if it has changed
                 $this->resource->$field = Input::get($field);
             }
             if ( $this->resource->save() )
@@ -433,5 +436,31 @@ class MothershipResourceController extends MothershipController {
             Messages::add('warning', $singular.' with id '.$id.' not found.');
             return Redirect::to('admin/'.$controller);
         }
+    }
+
+   /*
+    * Returns and associative array of values in $input
+    * that were changed and are properties/columns of the
+    * $resource database table.
+    *
+    * If we just try to update all posted fields the 'unique'
+    * validation rules will kick off.
+    *
+    * @param    object  $input
+    * @param    object  $resource
+    * @return   array
+    */
+    protected function getInputData($input, $resource)
+    {
+        $data = [];
+        foreach ($input as $k => $v)
+        {
+            if ( $resource->$k != $v AND $resource->isProperty($k))
+            {
+                // only update field if it has changed
+                $inputData[$k] = $v;
+            }
+        }
+        return $data;
     }
 }
