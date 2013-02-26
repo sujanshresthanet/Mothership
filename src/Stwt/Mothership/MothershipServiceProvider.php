@@ -19,6 +19,8 @@ class MothershipServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		$this->package('stwt/mothership');
+
+		include __DIR__.'/routes.php';
 	}
 
 	/**
