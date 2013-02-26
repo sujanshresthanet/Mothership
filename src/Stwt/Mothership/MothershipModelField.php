@@ -1,5 +1,7 @@
 <?php namespace Stwt\Mothership;
 
+use Log;
+
 class MothershipModelField {
 
     public $name;
@@ -28,6 +30,7 @@ class MothershipModelField {
     public function __construct($row=null, $table=null, $spec=[]) {
 
         if ( $row ) {
+
             foreach ($spec as $k => $v)
                 $this->$k = $v;
 
@@ -100,11 +103,16 @@ class MothershipModelField {
             $this->$k = $v;
         }
 
-
         if( $this->key == 'PRI' )
         {
             $this->type = 'hidden';
             //$this->validation[] = 'unique:'.$this->table;
+        }
+
+        if( $this->key == 'UNI' )
+        {
+            // column must contain unique values
+            $this->validation[] = 'unique:'.$this->table;
         }
 
         if( $this->null === TRUE )

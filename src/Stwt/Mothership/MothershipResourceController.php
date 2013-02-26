@@ -130,7 +130,6 @@ class MothershipResourceController extends MothershipController {
 
         if ( $validation->fails() )
         {
-            //Log::error(print_r($messages->all(), 1));
             $messages = $validation->messages();
             Messages::add('error', 'Please correct form errors.');
             
@@ -346,8 +345,6 @@ class MothershipResourceController extends MothershipController {
         $rules  = $this->resource->getRules();
         
         $redirect = 'admin/'.$controller.'/'.$id.'/edit';
-
-        Log::error(print_r($rules,1));
 
         $validation = Validator::make(Input::all(), $rules);
         

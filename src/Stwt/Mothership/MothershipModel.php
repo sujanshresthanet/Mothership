@@ -61,14 +61,11 @@ class MothershipModel extends Eloquent {
     * @return   void
     */
     public function loadColumns() {
-        Log::error('loadColumns');
         $columns = DB::select('show columns from '.$this->table);
         $properties = [];
         foreach ($columns as $column) {
             $name = $column->Field;
-            Log::error('load '.$name);
             $existing = (isset($this->properties[$name]) ? $this->properties[$name] : []);
-            Log::error(print_r($existing,1));
             $properties[$name] = new MothershipModelField($column, $this->table, $existing);
         }
         $this->properties = $properties;
