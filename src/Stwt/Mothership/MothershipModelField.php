@@ -393,60 +393,6 @@ class MothershipModelField {
     }
 
    /**
-    * Sets some validation rules based on column type and length
-    *
-    * @access   public
-    * @return   void
-    */
-    public function setValidation()
-    {
-        $dataType = $this->dataType;
-        // extract any existing rules defined in the class
-        // convert pipe separated rules into array
-        if ($this->validation AND is_string($this->validation)) {
-            $this->validation = explode('|', $this->validation);
-        }
-
-        // rules for primary keys
-        if ($this->key == 'PRI') {
-            $this->validation[] = 'required';
-            $this->validation[] = 'exists:'.$this->table;
-        }
-
-        // check if unsigned
-        if (static::endsWith($dataType, 'unsigned')) {
-            $this->unsigned = TRUE;
-            // remove from string
-            $dataType = str_replace(' unsigned', '', $dataType);
-        }
-
-        // rules for scalar like columns (have length)
-        $length = '';
-        preg_match_all('/\(([A-Za-z0-9 ]+?)\)/', $dataType, $length);
-        $length = current(end($length));
-        if ($length) {
-            $this->validation[] = 'max:'.$length;
-            if ($this->isScalar()) {
-                $this->max = $length;
-                if ($this->unsigned)
-                    $this->min = 0;
-                else
-                    $this->min = -$length;
-            }
-        }
-
-        // date
-        if ($dataType == 'date') {
-            $this->validation[] = 'date_format:Y-m-d';
-        }
-
-        // timestamp
-        if ($dataType == 'timestamp') {
-            $this->validation[] = 'date_format:Y-m-d H:i:s';
-        }
-    }
-
-   /**
     * Read only access to fields sql type
     *
     * @access   public
