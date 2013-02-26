@@ -238,7 +238,7 @@ class MothershipResourceController extends MothershipController {
         $fields     = $this->resource->getFields();
         $title      = 'Edit '.$singular.':'.$this->resource;
 
-        $this->breadcrumbs['active'] = 'Create';
+        $this->breadcrumbs['active'] = 'Update';
 
         $form   = new GoodForm();
         $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'PUT']);
@@ -291,7 +291,7 @@ class MothershipResourceController extends MothershipController {
 
         $title      = 'Delete '.$singular.':'.$this->resource;
 
-        $this->breadcrumbs['active'] = 'Create';
+        $this->breadcrumbs['active'] = 'Delete';
 
         $form   = new GoodForm();
 
