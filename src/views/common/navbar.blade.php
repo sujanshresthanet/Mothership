@@ -7,6 +7,7 @@
                             <span class="icon-bar"></span>
                         </a>
                         <a class="brand" href="#">Mothership</a>
+                        @if (Auth::check())
                         <div class="nav-collapse collapse">
                              <ul class="nav">
                             @foreach ($navigation as $uri => $label)
@@ -30,6 +31,7 @@
                                 <input type="text" class="search-query" placeholder="Search">
                             </form>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

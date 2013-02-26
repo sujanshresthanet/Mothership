@@ -31,8 +31,6 @@ class MothershipController extends Controller {
         return $data;
     }
 
-
-
     public function getIndex() 
     {
         return View::make('mothership::home.index')->with($this->getTemplateData());
