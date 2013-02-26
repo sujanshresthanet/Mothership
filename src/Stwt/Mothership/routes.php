@@ -28,5 +28,6 @@ Route::group(array('prefix' => 'admin', 'before' => 'auth'), function()
     {
         Route::resource($path, $class);
         Route::get($path.'/{id}/delete',  $class.'@delete');
+        Route::get($path.'/{id}/meta',  $class.'@meta');
     }
 });
