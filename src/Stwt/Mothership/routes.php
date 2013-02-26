@@ -29,17 +29,4 @@ Route::group(array('prefix' => 'admin', 'before' => 'auth'), function()
         Route::resource($path, $class);
         Route::get($path.'/{id}/delete',  $class.'@delete');
     }
-/*
-    Route::resource('projects',   'ProjectController');
-    Route::resource('things',     'ThingController');
-    Route::resource('users',      'UserController');
-
-    Route::get('projects/{id}/meta',    'ProjectController@meta');
-    Route::get('things/{id}/meta',      'ThingController@meta');
-    Route::get('users/{id}/meta',       'UserController@meta');
-
-    Route::get('projects/{id}/delete',  'ProjectController@delete');
-    Route::get('things/{id}/delete',    'ThingController@delete');
-    Route::get('users/{id}/delete',     'UserController@delete');
-*/
 });
