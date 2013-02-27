@@ -9,7 +9,8 @@ use Redirect;
 use View;
 use URI;
 
-class MothershipController extends Controller {
+class MothershipController extends Controller
+{
     
     protected $breadcrumbs;
 
@@ -17,6 +18,11 @@ class MothershipController extends Controller {
         $this->breadcrumbs  = ['/'  => 'Home'];
     }
 
+   /*
+    * Sets up common data required for the layout views
+    *
+    * @return array 
+    */
     protected function getTemplateData()
     {
         $data = [];
@@ -24,8 +30,7 @@ class MothershipController extends Controller {
         $data['breadcrumbs'] = $this->breadcrumbs;
         $data['navigation']  = Config::get('mothership.primaryNavigation');
         
-        if (Auth::check())
-        {
+        if (Auth::check()) {
             $data['user'] = Auth::user();
         }
         return $data;
