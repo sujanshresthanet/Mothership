@@ -1,4 +1,17 @@
-<?php namespace Stwt\Mothership;
+<?php
+/**
+ * MothershipResourceController.php
+ *
+ * PHP version 5.4.x
+ *
+ * @category MothershipResourceController
+ * @package  Mothership
+ * @author   Jim Wardlaw <jim@stwt.co>
+ * @license  http://www.wtfpl.net/txt/copying/ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ * @link     http://stwt.co/
+ */
+
+namespace Stwt\Mothership;
 
 use Input;
 use GoodForm;
@@ -11,14 +24,30 @@ use Validator;
 use View;
 use Log;
 
-class MothershipResourceController extends MothershipController {
-
-    static $model;
+/**
+ * MothershipResourceController
+ *
+ * The resource controller handles all the common CRUD actions in the mothership.
+ *
+ * @category Controller
+ * @package  Mothership
+ * @author   Jim Wardlaw <jim@stwt.co>
+ * @license  http://www.wtfpl.net/txt/copying/ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ * @link     http://stwt.co/
+ */
+class MothershipResourceController extends MothershipController
+{
+    public static $model;
 
     protected $resource;
 
     public $columns;
 
+    /*
+     * Construct the class, initialise the global resource instance
+     *
+     * @return   void
+     **/
     public function __construct()
     {
         parent::__construct();
@@ -26,15 +55,16 @@ class MothershipResourceController extends MothershipController {
         $class = static::$model;
         $this->resource = new $class;
 
-        if ( Request::segment(3) != 'index' AND Request::segment(3) )
-        {
+        if (Request::segment(3) != 'index' AND Request::segment(3)) {
             $this->breadcrumbs[Request::segment(2)] = $this->resource->plural();
         }
     }
 
-   /*
-    * Construct a paginated table of all resources in the database
-    */
+    /**
+     * Construct a paginated table of all resources in the database
+     *
+     * @return  view
+     **/
     public function index()
     {
         $resource   = $this->resource->paginate(15);
@@ -46,7 +76,8 @@ class MothershipResourceController extends MothershipController {
 
         $this->breadcrumbs['active'] = $this->resource->plural();
 
-        $createButton = '<a class="btn btn-success pull-right" href="'.URL::to('admin/'.$controller.'/create').'"><i class="icon-white icon-plus"></i> '.$singular.'</a>';
+        $createUri    = 'admin/'.$controller.'/create';
+        $createButton = Mothership::button($createUri, $singular, 'create');
 
         $data = [
             'breadcrumbs'    => $this->breadcrumbs,
@@ -64,9 +95,11 @@ class MothershipResourceController extends MothershipController {
             ->with($this->getTemplateData());
     }
 
-   /*
-    * Construct a form view to add a new resource to the database
-    */
+    /**
+     * Construct a form view to add a new resource to the database
+     *
+     * @return  view
+     **/
     public function create()
     {
         $fields     = $this->resource->getFields();
@@ -87,8 +120,7 @@ class MothershipResourceController extends MothershipController {
         }
         
         $errors = Session::get('errors');
-        if ( $errors )
-        {
+        if ($errors) {
             $form->addErrors($errors->getMessages());
         }
 
@@ -115,9 +147,11 @@ class MothershipResourceController extends MothershipController {
             ->with($this->getTemplateData());
     }
 
-   /*
-    * Attempt to store a new resource in the database
-    */
+    /**
+     * Attempt to store a new resource in the database
+     *
+     * @return void (redirects)
+     **/
     public function store()
     {
         $fields = $this->resource->getFields();
@@ -128,23 +162,18 @@ class MothershipResourceController extends MothershipController {
 
         $validation = Validator::make(Input::all(), $rules);
 
-        if ( $validation->fails() )
-        {
+        if ($validation->fails()) {
             $messages = $validation->messages();
             Messages::add('error', 'Please correct form errors.');
             
             return Redirect::to('admin/'.$controller.'/create')
                 ->withInput()
                 ->withErrors($validation);
-        }
-        else 
-        {
-            foreach ($fields as $field => $spec)
-            {
+        } else {
+            foreach ($fields as $field => $spec) {
                 $this->resource->$field = Input::get($field);
             }
-            if ($this->resource->save())
-            {
+            if ($this->resource->save()) {
                 Messages::add('success', 'Created '.$singular);
                 return Redirect::to('admin/'.$controller);
             }
@@ -153,11 +182,15 @@ class MothershipResourceController extends MothershipController {
         }
     }
 
-   /*
-    * Construct a readonly view of a resource in the database
-    */
-   public function show($id)
-   {
+    /**
+     * Construct a readonly view of a resource in the database
+     *
+     * @param int $id the resource id
+     *
+     * @return  view
+     **/
+    public function show($id)
+    {
         $class      = static::$model;
         $controller = Request::segment(2);
 
@@ -186,10 +219,17 @@ class MothershipResourceController extends MothershipController {
         return View::make('mothership::resource.view')
             ->with($data)
             ->with($this->getTemplateData());
-   }
+    }
 
-   public function meta($id)
-   {
+    /**
+     * Return a view containing all the meta data for this model
+     *
+     * @param int $id the resource id
+     *
+     * @return view
+     **/
+    public function meta($id)
+    {
         $class      = static::$model;
         $controller = Request::segment(2);
 
@@ -218,11 +258,15 @@ class MothershipResourceController extends MothershipController {
         return View::make('mothership::resource.meta')
             ->with($data)
             ->with($this->getTemplateData());
-   }
+    }
 
-   /*
-    * Construct a form view to update a resource in the database
-    */
+    /**
+     * Construct a form view to update a resource in the database
+     *
+     * @param int $id the resource id
+     *
+     * @return  view
+     **/
     public function edit($id)
     {
         $class      = static::$model;
@@ -249,8 +293,7 @@ class MothershipResourceController extends MothershipController {
         }
 
         $errors = Session::get('errors');
-        if ( $errors )
-        {
+        if ($errors) {
             $form->addErrors($errors->getMessages());
         }
 
@@ -277,6 +320,13 @@ class MothershipResourceController extends MothershipController {
             ->with($this->getTemplateData());
     }
 
+    /**
+     * Create a confirm delete view
+     *
+     * @param int $id the resource id
+     *
+     * @return   void    (redirect) 
+     **/
     public function delete($id)
     {
         $class      = static::$model;
@@ -289,18 +339,30 @@ class MothershipResourceController extends MothershipController {
 
         $this->redirectIfDontExist($this->resource, $singular);
 
-        $title      = 'Delete '.$singular.':'.$this->resource;
+        $title = 'Delete '.$singular.':'.$this->resource;
 
         $this->breadcrumbs['active'] = 'Delete';
 
-        $form   = new GoodForm();
+        $form = new GoodForm();
 
-        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE']);
-        $form->add(['label' => 'Confirm Delete', 'type' => 'checkbox', 'name' => '_delete', 'value' => $id]);
+        $form->add(
+            [
+                'type'  => 'hidden',
+                'name'  => '_method',
+                'value' => 'DELETE',
+            ]
+        );
+        $form->add(
+            [
+                'label' => 'Confirm Delete',
+                'type'  => 'checkbox',
+                'name'  => '_delete',
+                'value' => $id,
+            ]
+        );
 
         $errors = Session::get('errors');
-        if ( $errors )
-        {
+        if ($errors) {
             $form->addErrors($errors->getMessages());
         }
 
@@ -326,9 +388,13 @@ class MothershipResourceController extends MothershipController {
             ->with($this->getTemplateData());
     }
 
-   /*
-    * Attempt to update a resource from the database
-    */
+    /**
+     * Attempt to update a resource from the database
+     *
+     * @param int $id the resource id
+     *
+     * @return   void    (redirect) 
+     **/
     public function update($id)
     {
         $class      = static::$model;
@@ -350,23 +416,18 @@ class MothershipResourceController extends MothershipController {
 
         $validation = Validator::make($inputData, $rules);
         
-        if ( $validation->fails() )
-        {
+        if ($validation->fails()) {
             $messages = $validation->messages();
-            Messages::add('error', 'Please correct form errors.');  
+            Messages::add('error', 'Please correct form errors.');
             return Redirect::to($redirect)
                 ->withInput()
                 ->withErrors($validation);
-        }
-        else 
-        {
-            foreach ($fields as $field => $spec)
-            {
+        } else {
+            foreach ($fields as $field => $spec) {
                 // only update field if it has changed
                 $this->resource->$field = Input::get($field);
             }
-            if ( $this->resource->save() )
-            {
+            if ($this->resource->save()) {
                 Messages::add('success', 'Updated '.$singular.':'.$this->resource);
                 return Redirect::to($redirect);
             }
@@ -377,8 +438,10 @@ class MothershipResourceController extends MothershipController {
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
-     */
+     * @param int $id the resource id
+     *
+     * @return  void    (redirect)
+     **/
     public function destroy($id)
     {
         $class      = static::$model;
@@ -397,66 +460,69 @@ class MothershipResourceController extends MothershipController {
 
         $validation = Validator::make(Input::all(), $rules);
 
-        if ( $validation->fails() )
-        {
-            Messages::add('error', 'Please correct form errors.');  
+        if ($validation->fails()) {
+            Messages::add('error', 'Please correct form errors.');
             return Redirect::to($redirect)->withErrors($validation);
-        }
-        else
-        {
-            if ( $this->resource->delete() )
-            {
-                Messages::add('error', $singular.' Deleted.');  
+        } else {
+            if ($this->resource->delete()) {
+                Messages::add('error', $singular.' Deleted.');
                 return Redirect::to('admin/'.$controller);
             }
             Message::add('error', 'Error deleting '.$singular);
-            return Redirect::to($redirect); 
+            return Redirect::to($redirect);
         }
         
         $redirect = 'admin/'.$controller.'/'.$id.'/edit';
     }
 
+    /**
+     * Called by router when requested method does 
+     * not exist in the class
+     *
+     * @param array $parameters of requested methods arguments
+     *
+     * @return string
+     **/
     public function missingMethod($parameters)
     {
-        //
         return 'Missing method';
     }
 
-   /*
-    * Redirects to listing page if the resource does not exists
-    *
-    * @param object $resource
-    * @param string $singular
-    */
+    /**
+     * Redirects to listing page if the resource does not exists
+     *
+     * @param object $resource the object instance to check
+     * @param string $singular singular object name for message
+     *
+     * @return  void
+     **/
     public function redirectIfDontExist($resource, $singular)
     {
-        if( !$this->resource )
-        {
+        if (!$this->resource) {
             $controller = Request::segment(2);
             Messages::add('warning', $singular.' with id '.$id.' not found.');
             return Redirect::to('admin/'.$controller);
         }
     }
 
-   /*
-    * Returns and associative array of values in $input
-    * that were changed and are properties/columns of the
-    * $resource database table.
-    *
-    * If we just try to update all posted fields the 'unique'
-    * validation rules will kick off.
-    *
-    * @param    object  $input
-    * @param    object  $resource
-    * @return   array
-    */
+    /**
+     * Returns and associative array of values in $input
+     * that were changed and are properties/columns of the
+     * $resource database table.
+     *
+     * If we just try to update all posted fields the 'unique'
+     * validation rules will kick off.
+     *
+     * @param object $input    associative array of input data
+     * @param object $resource the resource to update
+     *
+     * @return   array
+     **/
     protected function getInputData($input, $resource)
     {
         $data = [];
-        foreach ($input as $k => $v)
-        {
-            if ( $resource->$k != $v AND $resource->isProperty($k))
-            {
+        foreach ($input as $k => $v) {
+            if ($resource->$k != $v AND $resource->isProperty($k)) {
                 // only update field if it has changed
                 $inputData[$k] = $v;
             }
