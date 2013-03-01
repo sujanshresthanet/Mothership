@@ -10,12 +10,14 @@
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": "4.0.x",
-        "stwt/good-form": "dev-development"
+        //"stwt/good-form": "dev-development",
+        "codeguy/upload": "*",
+        "sybio/image-workshop": "dev-master"
     },
     "autoload": {
-        "classmap": [            
+        "classmap": [
             "src/controllers",
-            "src/migrations",            
+            "src/migrations",
             "src/models"
         ],
         "psr-0": {
