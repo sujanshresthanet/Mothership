@@ -117,11 +117,12 @@ class MothershipModel extends Eloquent {
     {
         $subset     = ( $subset ?: array_diff(array_keys($this->properties), $this->hidden) );
         $properties = [];
-        foreach ($this->properties as $n => $v)
+        foreach ($subset as $k => $v)
         {
-            if ( in_array($n, $subset) )
-            {
-                $properties[$n] = $v;
+            if (is_callable($v)) {
+                $properties[$k] = $v;
+            } elseif (is_string($v) AND isset($this->properties[$v])) {
+                $properties[$v] = $this->properties[$v];
             }
         }
         return $properties;
