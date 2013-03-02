@@ -28,6 +28,16 @@ Route::group(
             Route::resource($path, $class);
             Route::get($path.'/{id}/delete', $class.'@delete');
             Route::get($path.'/{id}/meta', $class.'@meta');
+            error_log($class);
+            // related 
+            Route::get(
+                $path.'/{model}/{id}',
+                function ($model, $id) use ($class) {
+                    error_log($class);
+                    $controller = new $class ();
+                    return $controller->index($model, $id);
+                }
+            );
         }
     }
 );

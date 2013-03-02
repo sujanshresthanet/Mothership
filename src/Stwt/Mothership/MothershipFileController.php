@@ -53,6 +53,7 @@ class MothershipFileController extends MothershipResourceController
 
         return View::make('mothership::resource.form')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 }

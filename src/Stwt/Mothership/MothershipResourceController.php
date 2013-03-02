@@ -565,7 +565,7 @@ class MothershipResourceController extends MothershipController
     protected function getTabs()
     {
         $array = [];
-        foreach ($this->getActions(['update', 'create']) as $route => $action) {
+        foreach ($this->getActions(['update', 'related', 'create']) as $route => $action) {
             
             if ($this->resource->id) {
                 $uri = str_replace('{id}', $this->resource->id, $route);
@@ -574,7 +574,7 @@ class MothershipResourceController extends MothershipController
             }
 
             if ($uri) {
-                $uri = 'admin/'.Request::segment(2).'/'.$uri;
+                $uri = 'admin/'.$uri;
             }
 
             // add classes
