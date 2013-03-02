@@ -43,7 +43,27 @@ class MothershipResourceController extends MothershipController
 
     public $columns;
 
-    public $actions;
+    public $actions = [
+        'update' => [
+            '{id}' => [
+                'label' => 'View',
+            ],
+            '{id}/edit'  => [
+                'label' => 'Edit',
+            ],
+            '{id}/meta'  => [
+                'label' => 'Meta',
+            ],
+            '{id}/delete'  => [
+                'label' => 'Delete',
+            ],
+        ],
+        'create' => [
+            'create' => [
+                'label' => 'Create',
+            ],
+        ]
+    ];
 
     /*
      * Construct the class, initialise the global resource instance
