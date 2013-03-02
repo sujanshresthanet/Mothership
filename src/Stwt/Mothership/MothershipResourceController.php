@@ -43,6 +43,8 @@ class MothershipResourceController extends MothershipController
 
     public $columns;
 
+    public $actions;
+
     /*
      * Construct the class, initialise the global resource instance
      *
@@ -65,8 +67,9 @@ class MothershipResourceController extends MothershipController
      *
      * @return  view
      **/
-    public function index()
+    public function index($model = null, $modelId = null)
     {
+        error_log($model.' '.$modelId);
         $resource   = $this->resource->paginate(15);
         $columns    = $this->resource->getColumns($this->columns);
 
@@ -115,7 +118,6 @@ class MothershipResourceController extends MothershipController
         $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'POST']);
 
         foreach ($fields as $name => $field) {
-            $field->value = $this->resource->{$name};
             $form->add($field);
         }
         
@@ -144,7 +146,8 @@ class MothershipResourceController extends MothershipController
 
         return View::make('mothership::resource.form')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 
     /**
@@ -218,7 +221,8 @@ class MothershipResourceController extends MothershipController
 
         return View::make('mothership::resource.view')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 
     /**
@@ -257,7 +261,8 @@ class MothershipResourceController extends MothershipController
 
         return View::make('mothership::resource.meta')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 
     /**
@@ -317,7 +322,8 @@ class MothershipResourceController extends MothershipController
 
         return View::make('mothership::resource.form')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 
     /**
@@ -385,7 +391,8 @@ class MothershipResourceController extends MothershipController
 
         return View::make('mothership::resource.form')
             ->with($data)
-            ->with($this->getTemplateData());
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
     }
 
     /**
@@ -528,5 +535,72 @@ class MothershipResourceController extends MothershipController
             }
         }
         return $data;
+    }
+
+    /**
+     * Prepares the action navigation tabs for view rendering
+     *
+     * @return array
+     */
+    protected function getTabs()
+    {
+        $array = [];
+        foreach ($this->getActions(['update', 'create']) as $route => $action) {
+            
+            if ($this->resource->id) {
+                $uri = str_replace('{id}', $this->resource->id, $route);
+            } else {
+                $uri = (strpos($route, '{id}') === false ? $route : null);
+            }
+
+            if ($uri) {
+                $uri = 'admin/'.Request::segment(2).'/'.$uri;
+            }
+
+            // add classes
+            if (!isset($action['class'])) {
+                $action['class'] = [];
+            }
+            if (Request::is($uri)) {
+                $action['class'][] = 'active';
+            }
+            if (!$uri) {
+                $action['class'][] = 'disabled';
+            }
+
+            $action['class'] = implode(' ', $action['class']);
+
+            if ($uri) {
+                $action['link'] = '<a href="'.URL::to($uri).'">'.$action['label'].'</a>';
+            } else {
+                $action['link'] = '<a>'.$action['label'].'</a>';
+            }
+
+            $array[$route] = $action;
+        }
+        return $array;
+    }
+
+    /**
+     * Returns array of actions specified in this controller.
+     * $type can either be a action group (string) or multiple
+     * groups (array). Common action groups are as follows:
+     * - update
+     * - create
+     *
+     * @param string/array $type
+     * @return array
+     */
+    protected function getActions($type)
+    {
+        if (is_string($type)) {
+            return (isset($this->actions[$type]) ? $this->actions[$type] : []);
+        } else {
+            $actions = [];
+            foreach ($type as $t) {
+                $actions = array_merge($actions, $this->getActions($t));
+            }
+            return $actions;
+        }
     }
 }

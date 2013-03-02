@@ -1,4 +1,10 @@
 <ul class="nav nav-tabs">
+@foreach($action_tabs as $uri => $action)
+    <li class="{{ $action['class'] }}">
+        {{ $action['link'] }}
+    </li>
+@endforeach
+<!--
     <li class="{{ ($create ? 'disabled' : '') }}">
         <a href="{{ ($create ? '#' : URL::to('admin/'.$controller.'/'.$resource->id)) }}">View</a>
     </li>
@@ -11,4 +17,5 @@
     <li>
         <a href="{{URL::to('admin/'.$controller.'/create')}}">Create</a>
     </li>
+-->
 </ul>

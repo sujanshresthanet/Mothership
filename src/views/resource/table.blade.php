@@ -46,6 +46,6 @@
 </table>
 </table>
 <div class="pagination pagination-centered">
-    {{{ $resource->links() }}}
+    {{ $resource->links() }}
 </div>
 @stop
