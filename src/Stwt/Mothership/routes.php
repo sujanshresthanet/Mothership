@@ -25,19 +25,68 @@ Route::group(
         $controllers = Config::get('mothership.controllers');
         
         foreach ($controllers as $path => $class) {
-            Route::resource($path, $class);
-            Route::get($path.'/{id}/delete', $class.'@delete');
-            Route::get($path.'/{id}/meta', $class.'@meta');
-            error_log($class);
-            // related 
+            //Route::resource($path, $class);
+            
+            // GET REQUESTS
+            // ------------
+            // index
+            Route::get($path, $class.'@index');
+            // create
+            Route::get($path.'/create', $class.'@create');
+            // view
             Route::get(
-                $path.'/{model}/{id}',
+                $path.'/{id}',
+                function ($id) use ($class) {
+                     $controller = new $class ();
+                    return $controller->show($id);
+                }
+            );
+            // edit
+            Route::get(
+                $path.'/{id}/{edit}',
+                function ($id, $edit) use ($class) {
+                    error_log('edit');
+                    $controller = new $class ();
+                    return $controller->{$edit}($id);
+                }
+            );
+            // related index
+            Route::get(
+                $path.'/index/{model}/{id}',
                 function ($model, $id) use ($class) {
-                    error_log($class);
+                    error_log('related index');
                     $controller = new $class ();
                     return $controller->index($model, $id);
                 }
             );
+            // create related
+            Route::get(
+                $path.'/create/{model}/{id}',
+                function ($model, $id) use ($class) {
+                    $controller = new $class ();
+                    return $controller->create($model, $id);
+                }
+            );
+            // POST REQUESTS
+            // -------------
+            // store
+            Route::post($path, $class.'@store');
+            Route::post(
+                $path.'/{model}/{id}',
+                function ($model, $id) use ($class) {
+                    error_log('create related');
+                    $controller = new $class ();
+                    return $controller->store($model, $id);
+                }
+            );
+            // PUT REQUESTS
+            // ------------
+            // update
+            Route::put($path.'/{id}', $class.'@update');
+            // DELETE REQUESTS
+            // ---------------
+            // destroy
+            Route::delete($path.'/{id}', $class.'@destroy');
         }
     }
 );

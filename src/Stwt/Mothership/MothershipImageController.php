@@ -1,14 +1,18 @@
 <?php namespace Stwt\Mothership;
 
-
 use Hash;
+use Messages;
 use Redirect;
 use Request;
 
 class MothershipImageController extends MothershipFileController
 {
-    public function store()
+    public function store($relatedModel = null, $relatedId = null)
     {
+        if ($relatedModel && $relatedId) {
+            $this->related[$relatedModel] = $relatedId;
+            $relatedResource = $relatedModel::find($relatedId);
+        }
         $controller = Request::segment(2);
         $path       = $this->resource->getPath();
         $storage    = new \Upload\Storage\FileSystem($path);
@@ -36,7 +40,27 @@ class MothershipImageController extends MothershipFileController
         $this->renameUploadedFile($file);
 
         if (!$this->resource->save()) {
-            return Redirect::to('admin/'.$controller.'/create');
+            Messages::add('error', 'Error saving record.');
+            $uri = $this->getResourceUri($controller.'/create');
+            Redirect::to($uri);
+        } else {
+            if (isset($relatedResource)) {
+                $plural = $this->resource->plural(false);
+                if ($relatedResource->$plural()->save($this->resource)) {
+                    Messages::add('success', 'New related record created.');
+
+                    $uri = $this->getResourceUri($controller.'/index');
+                    return Redirect::to($uri);
+                } else {
+                    Messages::add('error', 'Error creating related record');
+                    $uri = $this->getResourceUri($controller.'/create');
+                    Redirect::to($uri);
+                }
+            } else {
+                $uri = $this->getResourceUri($controller);
+                Messages::add('success', 'New record created.');
+                return Redirect::to($uri);
+            }
         }
 
         return Redirect::to('admin/'.$controller);
@@ -63,8 +87,6 @@ class MothershipImageController extends MothershipFileController
         $this->resource->filename   = $newName;
         $this->resource->extension  = $ext;
         //$this->resource->mime_type  = $file->getMimetype();
-
-
 
         return rename($path.'/'.$oldName.'.'.$ext, $path.'/'.$newName.'.'.$ext);
     }

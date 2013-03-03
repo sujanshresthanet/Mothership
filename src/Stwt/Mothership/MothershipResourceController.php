@@ -41,29 +41,11 @@ class MothershipResourceController extends MothershipController
 
     protected $resource;
 
+    protected $related;
+
     public $columns;
 
-    public $actions = [
-        'update' => [
-            '{id}' => [
-                'label' => 'View',
-            ],
-            '{id}/edit'  => [
-                'label' => 'Edit',
-            ],
-            '{id}/meta'  => [
-                'label' => 'Meta',
-            ],
-            '{id}/delete'  => [
-                'label' => 'Delete',
-            ],
-        ],
-        'create' => [
-            'create' => [
-                'label' => 'Create',
-            ],
-        ]
-    ];
+    public $actions = null;
 
     /*
      * Construct the class, initialise the global resource instance
@@ -73,6 +55,10 @@ class MothershipResourceController extends MothershipController
     public function __construct()
     {
         parent::__construct();
+
+        if (!$this->actions) {
+            $this->actions = $this->setDefaultActions();
+        }
 
         $class = static::$model;
         $this->resource = new $class;
@@ -89,8 +75,12 @@ class MothershipResourceController extends MothershipController
      **/
     public function index($model = null, $modelId = null)
     {
-        error_log($model.' '.$modelId);
-        $resource   = $this->resource->paginate(15);
+        if ($model && $modelId) {
+            $resource = $model::find($modelId)->images()->paginate();
+            $this->related[$model] = $modelId;
+        } else {
+            $resource   = $this->resource->paginate(15);
+        }
         $columns    = $this->resource->getColumns($this->columns);
 
         $controller = Request::segment(2);
@@ -100,6 +90,11 @@ class MothershipResourceController extends MothershipController
         $this->breadcrumbs['active'] = $this->resource->plural();
 
         $createUri    = 'admin/'.$controller.'/create';
+        if ($this->related) {
+            foreach ($this->related as $relatedModel => $relatedId) {
+                $createUri .= '/'.$relatedModel.'/'.$relatedId;
+            }
+        }
         $createButton = Mothership::button($createUri, $singular, 'create');
 
         $data = [
@@ -123,9 +118,15 @@ class MothershipResourceController extends MothershipController
      *
      * @return  view
      **/
-    public function create()
+    public function create($model = null, $modelId = null)
     {
-        $fields     = $this->resource->getFields();
+        if ($model && $modelId) {
+            $this->related[$model] = $modelId;
+        }
+
+        $action = $this->getAction('create', 'create');
+        $fields = (isset($action['fields']) ? $action['fields'] : []);
+        $fields = $this->resource->getFields($fields);
 
         $controller = Request::segment(2);
         $plural     = $this->resource->plural();
@@ -147,7 +148,7 @@ class MothershipResourceController extends MothershipController
         }
 
         $formAttr = [
-            'action'    => URL::to('admin/'.$controller),
+            'action'    => $this->getResourceUrl($controller),
             'class'     => 'form-horizontal',
             'method'    => 'POST',
         ];
@@ -175,8 +176,11 @@ class MothershipResourceController extends MothershipController
      *
      * @return void (redirects)
      **/
-    public function store()
+    public function store($model = null, $modelId = null)
     {
+        if ($model && $modelId) {
+            $this->related[$model] = $modelId;
+        }
         $fields = $this->resource->getFields();
         $rules  = $this->resource->getRules();
         
@@ -565,7 +569,8 @@ class MothershipResourceController extends MothershipController
     protected function getTabs()
     {
         $array = [];
-        foreach ($this->getActions(['update', 'related', 'create']) as $route => $action) {
+        foreach ($this->getActions(['update', 'related', 'create']) as $key => $action) {
+            $route = $action['uri'];
             
             if ($this->resource->id) {
                 $uri = str_replace('{id}', $this->resource->id, $route);
@@ -622,5 +627,92 @@ class MothershipResourceController extends MothershipController
             }
             return $actions;
         }
+    }
+
+    /**
+     * Return an action array by key and group. If either
+     * the key or group does not exist, an empty array is returned
+     * i.e. getAction('view', 'update');
+     *
+     * @param string $key
+     * @param string $group
+     *
+     * @return array
+     */
+    public function getAction($key, $group)
+    {
+        if (isset($this->actions[$group]) && isset($this->actions[$group][$key])) {
+            return $this->actions[$group][$key];
+        }
+        return [];
+    }
+
+    /*
+     * Returns the full url to a resource action.
+     *
+     * @param string $uri
+     *
+     * @return string
+     */
+    public function getResourceUrl($uri)
+    {
+        return URL::to($this->getResourceUri($uri));
+    }
+
+    /*
+     * Returns the uri to a resource action.
+     *
+     * Takes a simple uri like controller/{id}/edit.
+     * Suffixes the admin base uri and prefixes any related
+     * uri information.
+     *
+     * @param string $uri
+     *
+     * @return string
+     */
+    protected function getResourceUri($uri)
+    {
+        $uri = 'admin/'.$uri;
+        if ($this->related) {
+            foreach ($this->related as $relatedModel => $relatedId) {
+                $uri .= '/'.$relatedModel.'/'.$relatedId;
+            }
+        }
+        return $uri;
+    }
+
+    /**
+     * Returns the default set of controller actions
+     *
+     * @return array
+     */
+    private function setDefaultActions()
+    {
+        error_log('setDefaultActions');
+        $controller = Request::segment(2);
+        return [
+            'update' => [
+                'view' => [
+                    'label' => 'View',
+                    'uri' => $controller.'/{id}',
+                ],
+                'edit' => [
+                    'label' => 'Edit',
+                    'uri' => $controller.'/{id}/edit',
+                ],
+                'delete'  => [
+                    'label' => 'Delete',
+                    'uri' => $controller.'/{id}/delete',
+                ],
+            ],
+            'related' => [
+            ],
+            'create' => [
+                'create' => [
+                    'label' => 'Create',
+                    'uri' => $controller.'/create',
+                ],
+            ],
+        ];
     }
 }
