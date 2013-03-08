@@ -15,8 +15,17 @@ Config::get('mothership.controllers');
 Route::get('admin/login', 'AdminHomeController@getLogin');
 Route::post('admin/login', 'AdminHomeController@postLogin');
 
+Route::filter(
+    'mothership',
+    function () {
+        if (Auth::guest()) {
+            return Redirect::to('admin/login');
+        }
+    }
+);
+
 Route::group(
-    array('prefix' => 'admin', 'before' => 'auth'),
+    array('prefix' => 'admin', 'before' => 'mothership'),
     function () {
         Route::get('/', 'AdminHomeController@getIndex');
         Route::get('home', 'AdminHomeController@getIndex');
