@@ -23,7 +23,7 @@ Update your packages with __composer update__ or install with __composer install
 
 Once Composer has installed or updated your packages you need to register the Mothership with Laravel. Open up app/config/app.php and add the following to the providers key.
 
-    'Stwt\StwtServiceProvider',
+    'Stwt\Mothership\MothershipServiceProvider',
 
 Next you need to alias Mothership's facade. Find the aliases key which should be below the providers key.
 
