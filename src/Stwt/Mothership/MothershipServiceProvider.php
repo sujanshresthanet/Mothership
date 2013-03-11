@@ -2,8 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class MothershipServiceProvider extends ServiceProvider {
-
+class MothershipServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -21,6 +21,7 @@ class MothershipServiceProvider extends ServiceProvider {
         $this->package('stwt/mothership');
 
         include __DIR__.'/routes.php';
+        include __DIR__.'/filters.php';
     }
 
     /**
