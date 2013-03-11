@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
         <?=Basset\Facades\Basset::show('mothership.css'); ?>
+        <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+        <!--[if lt IE 9]>
+          <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
     </head>
     <body>
         <header class="app-header" id="app-header">
@@ -17,7 +21,6 @@
                 @yield('content')
             </div>
         </div>
-        <script src="http://code.jquery.com/jquery.js"></script>
-        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+        <?=Basset\Facades\Basset::show('mothership-footer.js'); ?>
     </body>
 </html>
