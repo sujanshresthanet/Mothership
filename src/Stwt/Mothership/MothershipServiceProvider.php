@@ -1,4 +1,4 @@
-<?php namespace Stwt\Stwt\Mothership;
+<?php namespace Stwt\Mothership;
 
 use Illuminate\Support\ServiceProvider;
 
