@@ -41,20 +41,26 @@ Route::group(
                     return $controller->show($id);
                 }
             );
-            // edit
+            /*
+             * /{id}/{edit}
+             * Route to an edit view/form on a specific model.
+             * If the {method} method does not exist in the controller
+             * the request will be handled by edit($id);
+             */
             Route::get(
-                $path.'/{id}/{edit}',
-                function ($id, $edit) use ($class) {
-                    error_log('edit');
+                $path.'/{id}/{method}',
+                function ($id, $method) use ($class) {
                     $controller = new $class ();
-                    return $controller->{$edit}($id);
+                    if (method_exists($controller, $method)) {
+                        return $controller->{$method}($id);
+                    }
+                    return $controller->edit($id);
                 }
             );
             // related index
             Route::get(
                 $path.'/index/{model}/{id}',
                 function ($model, $id) use ($class) {
-                    error_log('related index');
                     $controller = new $class ();
                     return $controller->index($model, $id);
                 }
