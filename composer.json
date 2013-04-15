@@ -11,7 +11,8 @@
         "php": ">=5.3.0",
         "illuminate/support": "4.0.x",
         "stwt/good-form": "dev-development",
-        "codeguy/upload": "*"
+        "codeguy/upload": "*",
+        "venturecraft/revisionable": "1.*"
     },
     "autoload": {
         "classmap": [
