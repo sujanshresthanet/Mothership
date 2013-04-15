@@ -68,6 +68,19 @@ class MothershipResourceController extends MothershipController
         }
     }
 
+    /*
+     * Called if method does not exist
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        error_log($method.' called');
+        throw new NotFoundHttpException;
+    }
+
     /**
      * Construct a paginated table of all resources in the database
      *
@@ -345,6 +358,47 @@ class MothershipResourceController extends MothershipController
         ];
 
         return View::make('mothership::resource.form')
+            ->with($data)
+            ->with($this->getTemplateData())
+            ->with('action_tabs', $this->getTabs());
+    }
+
+    /**
+     * Construct a view displaying the resources update history
+     *
+     * @param int $id the resource id
+     *
+     * @return  view
+     **/
+    public function history($id)
+    {
+        
+        $class      = static::$model;
+        $controller = Request::segment(2);
+
+        $plural     = $this->resource->plural();
+        $singular   = $this->resource->singular();
+
+        $this->resource = $class::find($id);
+
+        $this->redirectIfDontExist($this->resource, $singular);
+
+        $fields     = $this->resource->getFields();
+        $title      = 'View '.$singular.' History:'.$this->resource;
+
+        $this->breadcrumbs['active'] = 'History';
+
+        $data   = [
+            'create'        => false,
+            'controller'    => $controller,
+            'fields'        => $fields,
+            'resource'      => $this->resource,
+            'plural'        => $plural,
+            'singular'      => $singular,
+            'title'         => $title,
+        ];
+
+        return View::make('mothership::resource.history')
             ->with($data)
             ->with($this->getTemplateData())
             ->with('action_tabs', $this->getTabs());
@@ -699,6 +753,10 @@ class MothershipResourceController extends MothershipController
                 'edit' => [
                     'label' => 'Edit',
                     'uri' => $controller.'/{id}/edit',
+                ],
+                'history' => [
+                    'label' => 'History',
+                    'uri' => $controller.'/{id}/history',
                 ],
                 'delete'  => [
                     'label' => 'Delete',

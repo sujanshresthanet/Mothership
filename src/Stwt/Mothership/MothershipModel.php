@@ -15,6 +15,11 @@ class MothershipModel extends Revisionable
 
     protected $table;
 
+    protected $dontKeepRevisionOf = [
+        'updated_at',
+        'created_at',
+    ];
+
     public function __construct()
     {
         parent::__construct();
