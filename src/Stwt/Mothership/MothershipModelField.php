@@ -1,6 +1,7 @@
 <?php namespace Stwt\Mothership;
 
 use Log;
+use Str;
 
 class MothershipModelField {
 
@@ -15,6 +16,7 @@ class MothershipModelField {
     public $tooltip;
     public $options;
     public $unsigned;
+    public $model;
 
     protected $table;
     protected $dataType;
@@ -27,7 +29,7 @@ class MothershipModelField {
     * @param    array
     * @return   void
     */
-    public function __construct($row=null, $table=null, $spec=[]) {
+    public function __construct($row = null, $table = null, $spec = []) {
 
         if ( $row ) {
 
@@ -140,6 +142,7 @@ class MothershipModelField {
     * - check if it's unsigned
     * - set the max and min values
     * - add any validation rules
+    * - check if the integer is a secondary key to a related model
     *
     * @access   private
     * @param    void
@@ -163,6 +166,17 @@ class MothershipModelField {
         $this->max          = $max;
         $this->min          = ($this->unsigned ? 0 : -$max);
         $this->step         = 1;
+
+        // check if this integer is a relationship
+        if (Str::endsWith($this->name, '_id')) {
+            $relatedModel = substr($this->name, 0, strlen($this->name) - 3);
+            if (class_exists($relatedModel)) {
+                error_log('yes!');
+                $this->type = 'select';
+                $this->options = [];
+                $this->model = $relatedModel;
+            }
+        }
     }
 
    /**
