@@ -53,6 +53,19 @@ class MothershipModel extends Revisionable
         return 'null';
     }
 
+    /**
+     * Return a string representation of this instance for
+     * use in the revision history
+     *
+     * @access   public
+     * @param    void
+     * @return   void
+     */
+    public function identifiableName()
+    {
+        return $this->__toString();
+    }
+
     public function plural($uppercase = true)
     {
         return ($uppercase ? ucwords($this->table) : $this->table);
