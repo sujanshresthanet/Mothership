@@ -15,7 +15,6 @@ namespace Stwt\Mothership;
 
 use Input;
 use GoodForm;
-use Messages;
 use Request;
 use Redirect;
 use Session;
