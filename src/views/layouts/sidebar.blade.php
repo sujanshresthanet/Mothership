@@ -12,7 +12,7 @@
         </header>
         <div class="container" id="container">
             @include('mothership::common.breadcrumbs')
-            <?=Messages::get_html()?>
+            {{ Stwt\Mothership\Messages::getHtml() }}
             <div class="app-content row" id="app-content">
                 <section class="span8">
                     @yield('content')

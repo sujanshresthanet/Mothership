@@ -10,7 +10,7 @@
         <header class="app-header" id="app-header">
             @include('mothership::common.navbar')
         </header>
-        <?=Messages::get_html()?>
+        {{ Stwt\Mothership\Messages::getHtml() }}
         @yield('content')
         <script src="http://code.jquery.com/jquery.js"></script>
         <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>

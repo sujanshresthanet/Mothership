@@ -4,7 +4,6 @@ use Auth;
 use Controller;
 use Config;
 use Input;
-use Messages;
 use Redirect;
 use View;
 use URI;
@@ -14,15 +13,16 @@ class MothershipController extends Controller
     
     protected $breadcrumbs;
 
-    function __construct () {
+    public function __construct ()
+    {
         $this->breadcrumbs  = ['/'  => 'Home'];
     }
 
-   /*
-    * Sets up common data required for the layout views
-    *
-    * @return array 
-    */
+    /*
+     * Sets up common data required for the layout views
+     *
+     * @return array 
+     */
     protected function getTemplateData()
     {
         $data = [];
@@ -36,7 +36,7 @@ class MothershipController extends Controller
         return $data;
     }
 
-    public function getIndex() 
+    public function getIndex()
     {
         return View::make('mothership::home.index')->with($this->getTemplateData());
     }
