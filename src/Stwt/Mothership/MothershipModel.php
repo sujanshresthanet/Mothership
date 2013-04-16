@@ -42,15 +42,14 @@ class MothershipModel extends Revisionable
      * Return a string representation of this instance
      *
      * @access   public
-     * @param    void
-     * @return   void
+     * @return   string
      */
     public function __toString()
     {
         if ($this->id) {
             return get_class($this).': '.$this->id;
         }
-        return 'null';
+        return null;
     }
 
     /**
@@ -58,12 +57,14 @@ class MothershipModel extends Revisionable
      * use in the revision history
      *
      * @access   public
-     * @param    void
-     * @return   void
+     * @return   string
      */
     public function identifiableName()
     {
-        return $this->__toString();
+        if ($this->id) {
+            return $this->__toString();
+        }
+        return 'null';
     }
 
     public function plural($uppercase = true)
