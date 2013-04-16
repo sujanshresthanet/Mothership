@@ -48,7 +48,7 @@ class MothershipModel extends Revisionable
     public function __toString()
     {
         if ($this->id) {
-            return $this->id;
+            return get_class($this).': '.$this->id;
         }
         return 'null';
     }
