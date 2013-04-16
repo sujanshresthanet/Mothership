@@ -3,8 +3,8 @@
 use Log;
 use Str;
 
-class MothershipModelField {
-
+class MothershipModelField
+{
     public $name;
     public $null;
     public $default;
@@ -21,26 +21,25 @@ class MothershipModelField {
     protected $table;
     protected $dataType;
 
-   /**
-    * Create a new Field Specification from a sql row
-    *
-    * @param    object
-    * @param    table
-    * @param    array
-    * @return   void
-    */
-    public function __construct($row = null, $table = null, $spec = []) {
-
-        if ( $row ) {
-
-            foreach ($spec as $k => $v)
+    /**
+     * Create a new Field Specification from a sql row
+     *
+     * @param    object
+     * @param    table
+     * @param    array
+     * @return   void
+     */
+    public function __construct($row = null, $table = null, $spec = [])
+    {
+        if ($row) {
+            foreach ($spec as $k => $v) {
                 $this->$k = $v;
-
+            }
             $this->table    = $table;
 
             $this->name     = $row->Field;
             $this->dataType = $row->Type;
-            $this->null     = ($row->Null == 'YES' ? TRUE : FALSE);
+            $this->null     = ($row->Null == 'YES' ? true : false);
             $this->key      = $row->Key;
             $this->default  = $row->Default;
             $this->extra    = $row->Extra;
@@ -49,113 +48,109 @@ class MothershipModelField {
         }
     }
 
-   /**
-    * Initialise the db column depending on it's type
-    *
-    * @access   public
-    * @return   void
-    */
+    /**
+     * Initialise the db column depending on it's type
+     *
+     * @access   public
+     * @return   void
+     */
     public function init($spec)
     {
         $type = $this->dataType;
-        
         $this->initField($spec);
-
-        //Log::error($type);
         if (static::startsWith($type, 'int')) {
             $this->initInt();
-        } else if (static::startsWith($type, 'varchar')) {
+        } elseif (static::startsWith($type, 'varchar')) {
             $this->initVarchar();
-        } else if (static::startsWith($type, 'float')) {
+        } elseif (static::startsWith($type, 'float')) {
             $this->initFloat();
-        } else if (static::startsWith($type, 'decimal')) {
+        } elseif (static::startsWith($type, 'decimal')) {
             $this->initDecimal();
-        } else if (static::startsWith($type, 'tinyint')) {
+        } elseif (static::startsWith($type, 'tinyint')) {
             $this->initTinyint();
-        } else if (static::startsWith($type, 'datetime')) {
+        } elseif (static::startsWith($type, 'datetime')) {
             $this->initDatetime();
-        } else if (static::startsWith($type, 'date')) {
+        } elseif (static::startsWith($type, 'date')) {
             $this->initDate();
-        } else if (static::startsWith($type, 'timestamp')) {
+        } elseif (static::startsWith($type, 'timestamp')) {
             $this->initDatetime();
-        } else if (static::startsWith($type, 'time')) {
+        } elseif (static::startsWith($type, 'time')) {
             $this->initTime();
-        } else if (static::startsWith($type, 'enum')) {
+        } elseif (static::startsWith($type, 'enum')) {
             $this->initEnum();
-        } else if (static::startsWith($type, 'text')) {
+        } elseif (static::startsWith($type, 'text')) {
             $this->initText();
-        } else if (static::startsWith($type, 'blob')) {
+        } elseif (static::startsWith($type, 'blob')) {
             $this->initText();
         } else {
             Log::error($type.' not initialised');
         }
     }
 
-   /**
-    * Set the fields default rules
-    *
-    * @access   public
-    * @param    array
-    * @return   void
-    */
-    public function initField($spec=[])
+    /**
+     * Set the fields default rules
+     *
+     * @access   public
+     * @param    array
+     * @return   void
+     */
+    public function initField($spec = [])
     {
-        foreach ($spec as $k => $v)
-        {
+        foreach ($spec as $k => $v) {
             $this->$k = $v;
         }
 
-        if( $this->key == 'PRI' )
-        {
+        if ($this->key == 'PRI') {
             $this->type = 'hidden';
             $this->validation[] = 'unique:'.$this->table;
         }
 
-        if( $this->key == 'UNI' )
-        {
+        if ($this->key == 'UNI') {
             // column must contain unique values
             $this->validation[] = 'unique:'.$this->table;
         }
 
-        if( $this->null === TRUE )
-        {
+        if ($this->null === true) {
             $this->validation[] = 'required';
         }
         $this->setLabel();
     }
 
-   /**
-    * Set the fields label if not already defined
-    *
-    * @return   void
-    */
-    public function setLabel() 
+    /**
+     * Set the fields label if not already defined
+     *
+     * @return   void
+     */
+    public function setLabel()
     {
-        if ($this->label)
+        if ($this->label) {
             return;
+        }
         $this->label = static::humanize($this->name);
     }
 
-   /**
-    * Initialise a integer column
-    *
-    * - check if it's unsigned
-    * - set the max and min values
-    * - add any validation rules
-    * - check if the integer is a secondary key to a related model
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initInt() 
+    /**
+     * Initialise a integer column
+     *
+     * - check if it's unsigned
+     * - set the max and min values
+     * - add any validation rules
+     * - check if the integer is a secondary key to a related model
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initInt()
     {
         $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'number';
+        if (!$this->type) {
+            $this->type = 'number';
+        }
         // check if unsigned
         if (static::endsWith($type, 'unsigned')) {
-            $this->unsigned = TRUE;
+            $this->unsigned = true;
             $type = str_replace(' unsigned', '', $type);
         }
         $length = $this->getConstraint($type);
@@ -167,33 +162,38 @@ class MothershipModelField {
         $this->min          = ($this->unsigned ? 0 : -$max);
         $this->step         = 1;
 
-        // check if this integer is a relationship
+        // check if this integer is a foreign key to a valid object
+        // 
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = substr($this->name, 0, strlen($this->name) - 3);
             if (class_exists($relatedModel)) {
-                error_log('yes!');
                 $this->type = 'select';
                 $this->options = [];
                 $this->model = $relatedModel;
+                if (Str::endsWith($this->label, ' Id')) {
+                    $this->label = substr($this->label, 0, strlen($this->label) - 3);
+                }
             }
         }
     }
 
-   /**
-    * Initialise a integer column
-    *
-    * - set the max and min values
-    * - add any validation rules
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initFloat() 
+    /**
+     * Initialise a integer column
+     *
+     * - set the max and min values
+     * - add any validation rules
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initFloat()
     {
         $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'number';
+        if (!$this->type) {
+            $this->type = 'number';
+        }
 
         $length = $this->getConstraint($type);
         list($digits, $decimal) = explode(',', $length);
@@ -208,22 +208,23 @@ class MothershipModelField {
         $this->step         = '.'.str_repeat('0', ($decimal-1)).'1';
     }
 
-   /**
-    * Initialise a decimal column
-    *
-    * - set the max and min values
-    * - add any validation rules
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initDecimal() 
+    /**
+     * Initialise a decimal column
+     *
+     * - set the max and min values
+     * - add any validation rules
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initDecimal()
     {
         $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'number';
-
+        if (!$this->type) {
+            $this->type = 'number';
+        }
         $length = $this->getConstraint($type);
         list($digits, $decimal) = explode(',', $length);
         
@@ -237,157 +238,171 @@ class MothershipModelField {
         $this->step         = '.'.str_repeat('0', ($decimal-1)).'1';
     }
 
-   /**
-    * Initialise a tinyint column
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initTinyint() 
+    /**
+     * Initialise a tinyint column
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initTinyint()
     {
         $type = $this->dataType;
-        if (!$this->type) $this->type = 'checkbox_bool';
+        if (!$this->type) {
+            $this->type = 'checkbox_bool';
+        }
     }
 
-   /**
-    * Initialise a datetime column
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initDatetime() 
+    /**
+     * Initialise a datetime column
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initDatetime()
     {
         $type = $this->dataType;
-        if (!$this->type) $this->type = 'datetime';
+        if (!$this->type) {
+            $this->type = 'datetime';
+        }
         $this->validation[] = 'date_format:Y-m-d H:i:s';
     }
 
-   /**
-    * Initialise a date column
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initDate() 
+    /**
+     * Initialise a date column
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initDate()
     {
         $type = $this->dataType;
-        if (!$this->type) $this->type = 'date';
+        if (!$this->type) {
+            $this->type = 'date';
+        }
         $this->validation[] = 'date_format:Y-m-d';
     }
 
-   /**
-    * Initialise a date column
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initTime() 
+    /**
+     * Initialise a date column
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initTime()
     {
         $type = $this->dataType;
-        if (!$this->type) $this->type = 'time';
+        if (!$this->type) {
+            $this->type = 'time';
+        }
         $this->validation[] = 'date_format:H:i:s';
     }
 
-   /**
-    * Initialise a varchar column
-    *
-    * - set the max length
-    * - add any validation rules
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
+    /**
+     * Initialise a varchar column
+     *
+     * - set the max length
+     * - add any validation rules
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
     private function initVarchar()
     {
-        $type = $this->dataType; 
+        $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'text';
-
+        if (!$this->type) {
+            $this->type = 'text';
+        }
         $length             = $this->getConstraint($type);
         $this->validation[] = 'max:'.$length;
     }
 
-   /**
-    * Initialise an enum column
-    *
-    * - set the field options
-    * - set validation rules
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
+    /**
+     * Initialise an enum column
+     *
+     * - set the field options
+     * - set validation rules
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
     private function initEnum()
     {
-        $type = $this->dataType; 
+        $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'select';
+        if (!$this->type) {
+            $this->type = 'select';
+        }
         $options            = $this->getConstraint($type);
         $optionString       = str_replace('\'', '', $options);
         $this->validation[] = 'in:'.$optionString;
         $options            = explode(',', $optionString);
         $labels             = [];
-        foreach ($options as $o)
+        foreach ($options as $o) {
             $labels[] = static::humanize($o);
+        }
         $options        = array_combine($labels, $options);
-        $this->options = ($this->null ? array_merge(['-- None --' => NULL], $options) : $options);
+        $this->options = ($this->null ? array_merge(['-- None --' => null], $options) : $options);
     }
 
-   /**
-    * Initialise a text column
-    *
-    * @access   private
-    * @param    void
-    * @return   void
-    */
-    private function initText() {
-        $type = $this->dataType; 
+    /**
+     * Initialise a text column
+     *
+     * @access   private
+     * @param    void
+     * @return   void
+     */
+    private function initText()
+    {
+        $type = $this->dataType;
         // set default type
-        if (!$this->type) $this->type = 'textarea';
+        if (!$this->type) {
+            $this->type = 'textarea';
+        }
     }
 
-   /**
-    * Return constraint defined in the column
-    *
-    * @access   private
-    * @param    string
-    * @return   int
-    */
-    private function getConstraint($type) 
+    /**
+     * Return constraint defined in the column
+     *
+     * @access   private
+     * @param    string
+     * @return   int
+     */
+    private function getConstraint($type)
     {
         $constraint;
         preg_match_all('/\(([A-Za-z0-9,\' ]+?)\)/', $type, $constraint);
         return current(end($constraint));
     }
 
-    public function getValidation($create=true)
+    public function getValidation($create = true)
     {
         $rules = [];
-        foreach ($this->validation as $rule)
-        {
-            if (! $this->startsWith($rule, 'unique:'))
-            {
+        foreach ($this->validation as $rule) {
+            if (!$this->startsWith($rule, 'unique:')) {
                 $rules[] = $rule;
             }
         }
         return $rules;
     }
 
-   /**
-    * Extract the type of form field this column will user
-    * from the SQL column type.
-    *
-    * @return   void
-    */
-    public function setForm() 
+    /**
+     * Extract the type of form field this column will user
+     * from the SQL column type.
+     *
+     * @return   void
+     */
+    public function setForm()
     {
-        if ($this->type) return;
-
+        if ($this->type) {
+            return;
+        }
         $type = current(explode("(", $this->dataType));
         if ($this->key == 'PRI') {
             $this->type = 'hidden';
@@ -419,63 +434,64 @@ class MothershipModelField {
         }
     }
 
-   /**
-    * Read only access to fields sql type
-    *
-    * @access   public
-    * @return   string
-    */
-    public function dataType() 
+    /**
+     * Read only access to fields sql type
+     *
+     * @access   public
+     * @return   string
+     */
+    public function dataType()
     {
         return $this->dataType;
     }
 
-   /**
-    * Returns true if the type of this field is a 
-    * scalar type e.g. a number
-    *
-    * @access   protected
-    * @return   boolean
-    */
-    protected function isScalar() 
+    /**
+     * Returns true if the type of this field is a 
+     * scalar type e.g. a number
+     *
+     * @access   protected
+     * @return   boolean
+     */
+    protected function isScalar()
     {
         return in_array($this->type, ['number', 'double', 'integer']);
     }
 
-   /**
-    * Returns true if string starts with another string
-    *
-    * @access   protected
-    * @param    string
-    * @param    string
-    * @return   boolean
-    */
+    /**
+     * Returns true if string starts with another string
+     *
+     * @access   protected
+     * @param    string
+     * @param    string
+     * @return   boolean
+     */
     protected static function startsWith($haystack, $needle)
     {
         return !strncmp($haystack, $needle, strlen($needle));
     }
 
-   /**
-    * Returns true if string ends with another string
-    *
-    * @access   protected
-    * @param    string
-    * @param    string
-    * @return   boolean
-    */
+    /**
+     * Returns true if string ends with another string
+     *
+     * @access   protected
+     * @param    string
+     * @param    string
+     * @return   boolean
+     */
     protected static function endsWith($haystack, $needle)
     {
         return (substr($haystack, -strlen($needle)) === $needle);
     }
 
-   /**
-    * takes an underscored string and humanizes it
-    *
-    * @access   protected
-    * @param    string
-    * @return   string
-    */
-    protected function humanize($string) {
+    /**
+     * takes an underscored string and humanizes it
+     *
+     * @access   protected
+     * @param    string
+     * @return   string
+     */
+    protected function humanize($string)
+    {
         return  ucwords(str_replace('_', ' ', $string));
     }
 }
