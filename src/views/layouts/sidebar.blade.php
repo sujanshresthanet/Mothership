@@ -24,5 +24,6 @@
         </div>
         <script src="http://code.jquery.com/jquery.js"></script>
         <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+        <script src="{{ URL::to('packages/stwt/mothership/scripts/js/mothership.min.js') }}"></script>
     </body>
 </html>
