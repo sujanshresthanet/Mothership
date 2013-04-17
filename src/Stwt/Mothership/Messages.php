@@ -16,16 +16,15 @@ class Messages
        */
     public static function add($type = 'info', $message = false)
     {
-        error_log('Add message '.$message);
         if (!$message) {
             return false;
         }
         if (is_array($message)) {
             foreach ($message as $msg) {
-                static::$msgss[$type][] = $msg;
+                static::$msgss[] = [$type => $msg];
             }
         } else {
-            static::$msgss[$type][] = $message;
+            static::$msgss[] = [$type => $message];
         }
         Session::flash('messages', static::$msgss);
     }
@@ -46,13 +45,11 @@ class Messages
     public static function getHtml()
     {
         $messages = Session::get('messages');
-        $output = false;
+        error_log(print_r($messages, 1));
+        $output = '';
         if ($messages) {
-            foreach ($messages as $type => $msgs) {
-                $output .= '<div class="alert alert-'.$type.'"><a class="close" data-dismiss="alert">×</a>';
-                foreach ($msgs as $msg) {
-                    $output .= $msg.'</br>';
-                }
+            foreach ($messages as $t => $m) {
+                $output .= '<div class="alert alert-'.$t.'"><a class="close" data-dismiss="alert">×</a>'.$m;
                 $output .= '</div>';
             }
         }
