@@ -368,6 +368,22 @@ class MothershipModelField
     }
 
     /**
+     * Returns the $instance value for this field
+     * formatted for a table
+     *
+     * @param object $instance
+     *
+     * @return string
+     */
+    public function getTable($instance)
+    {
+        if ($this->model) {
+            return $instance->{$this->model};
+        }
+        return $instance->{$this->name};
+    }
+
+    /**
      * Return constraint defined in the column
      *
      * @access   private

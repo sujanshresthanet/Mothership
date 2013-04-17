@@ -31,7 +31,7 @@
             <td><input id="row-{{ $r->id }}" name="ids[]" type="checkbox" value="{{ $r->id }}"/></td>
         @foreach ($columns as $k => $v)
             @if (is_object($v) && !($v instanceof Closure))
-                <td><label for="row-{{ $r->id }}">{{ $r->{$v->name} }}</label></td>
+                <td><label for="row-{{ $r->id }}">{{ $v->getTable($r) }}</label></td>
             @else
             <td><label for="row-{{ $r->id }}">{{ call_user_func($v, $r) }}</label></td>
             @endif
