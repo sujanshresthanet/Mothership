@@ -14,7 +14,7 @@
 namespace Stwt\Mothership;
 
 use Input;
-use GoodForm;
+use Stwt\GoodForm\GoodForm as GoodForm;
 use Request;
 use Redirect;
 use Session;
