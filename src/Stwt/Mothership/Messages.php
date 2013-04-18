@@ -45,11 +45,14 @@ class Messages
     public static function getHtml()
     {
         $messages = Session::get('messages');
+        error_log(print_r($messages, 1));
         $output = '';
         if ($messages) {
-            foreach ($messages as $t => $m) {
-                $output .= '<div class="alert alert-'.$t.'"><a class="close" data-dismiss="alert">×</a>'.$m;
-                $output .= '</div>';
+            foreach ($messages as $message) {
+                foreach ($message as $t => $m) {
+                    $output .= '<div class="alert alert-'.$t.'"><a class="close" data-dismiss="alert">×</a>'.$m;
+                    $output .= '</div>';
+                }
             }
         }
         return $output;
