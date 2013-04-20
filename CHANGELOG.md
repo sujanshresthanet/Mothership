@@ -1,5 +1,9 @@
 # Change Log
 
+## 19th April 2013
+
+* Fixed logic for guessing if a field is required. Mothership will now set fields as required if the column does not allow NULL values, is not the primary key or a '$canBeNull' field like created_at and updated_at.
+
 ## 17th April 2013
 
 * Added getTable() to the MothershipModelField class. This is used to return related models as a string at the moment. In future it can be used to return other fields formatted for tables

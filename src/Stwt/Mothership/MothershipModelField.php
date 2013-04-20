@@ -21,6 +21,9 @@ class MothershipModelField
     protected $table;
     protected $dataType;
 
+    // special fields that can be null - will not trigger required rule
+    protected $canBeNull = ['created_at', 'updated_at'];
+
     /**
      * Create a new Field Specification from a sql row
      *
@@ -110,7 +113,7 @@ class MothershipModelField
             $this->validation[] = 'unique:'.$this->table;
         }
 
-        if ($this->null === true) {
+        if ($this->isRequiredField()) {
             $this->validation[] = 'required';
         }
         $this->setLabel();
@@ -127,6 +130,33 @@ class MothershipModelField
             return;
         }
         $this->label = static::humanize($this->name);
+    }
+
+    /**
+     * This method attempts to guess if this field is
+     * required. If this method returns true a 'required'
+     * rule will be added to the fields validation rules.
+     *
+     * A Field will be treated as required if the database
+     * column does not allow 'null' values.
+     *
+     * There are a few exceptions to this rule:
+     * - The field is the tables primary key e.g. 'the id'
+     * - The field name is in the $canBeNull property e.g. 'created_at'
+     *
+     * @return boolean
+     */
+    protected function isRequiredField()
+    {
+        if ($this->key === 'PRI') {
+            return false;
+        }
+        if (in_array($this->name, $this->canBeNull)) {
+            return false;
+        }
+        if ($this->null === false) {
+            return true;
+        }
     }
 
     /**
@@ -163,7 +193,6 @@ class MothershipModelField
         $this->step         = 1;
 
         // check if this integer is a foreign key to a valid object
-        // 
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = substr($this->name, 0, strlen($this->name) - 3);
             if (class_exists($relatedModel)) {
