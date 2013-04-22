@@ -3,6 +3,7 @@
 ## 22nd April 2013
 
 * Fixed bug in code that detects foreign keys. Now makes sure the class name is in StudlyCase so the class name will be found on case sensitive systems.
+* Updated the 'update' method. It will now validate fields posted to the form that have changed value OR that are empty. This picks up any required fields that were not entered.
 
 ## 20th April 2013
 

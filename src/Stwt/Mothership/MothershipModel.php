@@ -149,15 +149,24 @@ class MothershipModel extends Revisionable
     }
 
     /**
-     * Return an array of each fields validation rules
+     * Return an array of each fields validation rules.
+     * Supply and array of keys to return a subset of rules
+     *
+     * @param   array $fields
      *
      * @return   array
      */
-    public function getRules()
+    public function getRules($fields = [])
     {
         $rules = [];
-        foreach ($this->properties as $name => $property) {
-            $rules[$name] = $property->validation;
+        if ($fields) {
+            foreach ($fields as $name) {
+                $rules[$name] = $this->properties[$name]->validation;
+            }
+        } else {
+            foreach ($this->properties as $name => $property) {
+                $rules[$name] = $property->validation;
+            }
         }
         return $rules;
     }
@@ -171,6 +180,6 @@ class MothershipModel extends Revisionable
      */
     public function isProperty($name)
     {
-        return ( isset($properties) ?: false );
+        return ( isset($this->properties[$name]) ?: false );
     }
 }

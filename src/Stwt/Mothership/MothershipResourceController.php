@@ -490,13 +490,12 @@ class MothershipResourceController extends MothershipController
         $this->resource = $class::find($id);
 
         $this->redirectIfDontExist($this->resource, $singular);
-
-        $fields = $this->resource->getFields();
-        $rules  = $this->resource->getRules();
         
         $redirect = 'admin/'.$controller.'/'.$id.'/edit';
 
-        $inputData = $this->getInputData(Input::all(), $this->resource);
+        $inputData  = $this->getInputData(Input::all(), $this->resource);
+        $fields     = $this->resource->getFields();
+        $rules      = ($inputData ? $this->resource->getRules(array_keys($inputData)) : []);
 
         $validation = Validator::make($inputData, $rules);
         
@@ -591,8 +590,8 @@ class MothershipResourceController extends MothershipController
 
     /**
      * Returns and associative array of values in $input
-     * that were changed and are properties/columns of the
-     * $resource database table.
+     * that are empty or have changed and are properties/columns 
+     * of the $resource database table.
      *
      * If we just try to update all posted fields the 'unique'
      * validation rules will kick off.
@@ -606,9 +605,10 @@ class MothershipResourceController extends MothershipController
     {
         $data = [];
         foreach ($input as $k => $v) {
-            if ($resource->$k != $v AND $resource->isProperty($k)) {
+            // add if $v is empty or has changed value
+            if ((!$v OR $resource->$k != $v) AND $resource->isProperty($k)) {
                 // only update field if it has changed
-                $inputData[$k] = $v;
+                $data[$k] = $v;
             }
         }
         return $data;
