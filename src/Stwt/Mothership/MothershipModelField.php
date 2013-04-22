@@ -191,7 +191,7 @@ class MothershipModelField
 
         // check if this integer is a foreign key to a valid object
         if (Str::endsWith($this->name, '_id')) {
-            $relatedModel = substr($this->name, 0, strlen($this->name) - 3);
+            $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
             if (class_exists($relatedModel)) {
                 $this->type = 'select';
                 $this->options = [];

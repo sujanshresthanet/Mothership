@@ -1,5 +1,9 @@
 # Change Log
 
+## 22nd April 2013
+
+* Fixed bug in code that detects foreign keys. Now makes sure the class name is in StudlyCase so the class name will be found on case sensitive systems.
+
 ## 20th April 2013
 
 * Removed the $canBeNull property as no longer needed. We now check if a column has a default value set. If it has, there's no need to set it as required automatically.
