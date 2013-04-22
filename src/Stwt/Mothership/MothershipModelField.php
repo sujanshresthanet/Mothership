@@ -21,9 +21,6 @@ class MothershipModelField
     protected $table;
     protected $dataType;
 
-    // special fields that can be null - will not trigger required rule
-    protected $canBeNull = ['created_at', 'updated_at'];
-
     /**
      * Create a new Field Specification from a sql row
      *
@@ -142,7 +139,7 @@ class MothershipModelField
      *
      * There are a few exceptions to this rule:
      * - The field is the tables primary key e.g. 'the id'
-     * - The field name is in the $canBeNull property e.g. 'created_at'
+     * - The field has a default value
      *
      * @return boolean
      */
@@ -151,7 +148,7 @@ class MothershipModelField
         if ($this->key === 'PRI') {
             return false;
         }
-        if (in_array($this->name, $this->canBeNull)) {
+        if ($this->default) {
             return false;
         }
         if ($this->null === false) {

@@ -1,5 +1,9 @@
 # Change Log
 
+## 20th April 2013
+
+* Removed the $canBeNull property as no longer needed. We now check if a column has a default value set. If it has, there's no need to set it as required automatically.
+
 ## 19th April 2013
 
 * Fixed logic for guessing if a field is required. Mothership will now set fields as required if the column does not allow NULL values, is not the primary key or a '$canBeNull' field like created_at and updated_at.
