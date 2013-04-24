@@ -44,7 +44,42 @@ class MothershipResourceController extends MothershipController
 
     public $columns;
 
-    public $actions = null;
+    /**
+     * Default Actions in this controller
+     */
+    public $actions = [
+        'update' => [
+            'view' => [
+                'label' => 'View',
+                'uri' => '{controller}/{id}',
+            ],
+            'edit' => [
+                'label' => 'Edit',
+                'uri' => '{controller}/{id}/edit',
+            ],
+            'password' => [
+                'label' => 'Password',
+                'uri' => '{controller}/{id}/password',
+            ],
+            'history' => [
+                'label' => 'History',
+                'uri' => '{controller}/{id}/history',
+            ],
+            'delete'  => [
+                'label' => 'Delete',
+                'uri' => '{controller}/{id}/delete',
+            ],
+        ],
+        'related' => [
+        ],
+        'create' => [
+            'create' => [
+                'label' => 'Add User',
+                'uri' => '{controller}/create',
+            ],
+        ],
+    ];
+
 
     /*
      * Construct the class, initialise the global resource instance
@@ -54,10 +89,6 @@ class MothershipResourceController extends MothershipController
     public function __construct()
     {
         parent::__construct();
-
-        if (!$this->actions) {
-            $this->actions = $this->setDefaultActions();
-        }
 
         $class = static::$model;
         $this->resource = new $class;
@@ -191,8 +222,10 @@ class MothershipResourceController extends MothershipController
         if ($model && $modelId) {
             $this->related[$model] = $modelId;
         }
-        $fields = $this->resource->getFields();
-        $rules  = $this->resource->getRules();
+
+        $inputData  = $this->getInputData(Input::all(), $this->resource);
+        $fields     = $this->resource->getFields();
+        $rules      = ($inputData ? $this->resource->getRules(array_keys($inputData)) : []);
         
         $controller = Request::segment(2);
         $singular   = $this->resource->singular();
@@ -614,18 +647,25 @@ class MothershipResourceController extends MothershipController
 
     /**
      * Prepares the action navigation tabs for view rendering
+     * We replace placeholder strings like {controller} & {id}
+     * with their proper values
      *
      * @return array
      */
     protected function getTabs()
     {
         $array = [];
-        foreach ($this->getActions(['update', 'related', 'create']) as $key => $action) {
+        $actions = $this->getActions(['update', 'related', 'create']);
+        foreach ($actions as $key => $action) {
             $route = $action['uri'];
+            // replace {controller} with current controller uri segment
+            $uri = str_replace('{controller}', Request::segment(2), $route);
             
             if ($this->resource->id) {
+                // replace {id} with current resource id
                 $uri = str_replace('{id}', $this->resource->id, $route);
             } else {
+                // if this action has no current resource disable the action
                 $uri = (strpos($route, '{id}') === false ? $route : null);
             }
 
@@ -730,44 +770,5 @@ class MothershipResourceController extends MothershipController
             }
         }
         return $uri;
-    }
-
-    /**
-     * Returns the default set of controller actions
-     *
-     * @return array
-     */
-    private function setDefaultActions()
-    {
-        error_log('setDefaultActions');
-        $controller = Request::segment(2);
-        return [
-            'update' => [
-                'view' => [
-                    'label' => 'View',
-                    'uri' => $controller.'/{id}',
-                ],
-                'edit' => [
-                    'label' => 'Edit',
-                    'uri' => $controller.'/{id}/edit',
-                ],
-                'history' => [
-                    'label' => 'History',
-                    'uri' => $controller.'/{id}/history',
-                ],
-                'delete'  => [
-                    'label' => 'Delete',
-                    'uri' => $controller.'/{id}/delete',
-                ],
-            ],
-            'related' => [
-            ],
-            'create' => [
-                'create' => [
-                    'label' => 'Create',
-                    'uri' => $controller.'/create',
-                ],
-            ],
-        ];
     }
 }
