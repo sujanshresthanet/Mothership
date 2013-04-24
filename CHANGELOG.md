@@ -1,5 +1,9 @@
 # Change Log
 
+## 24th April 2013
+
+* Fixed bug where foreign keys would be detected if "any" class existed with that name. Now we check that it's a class that extends from Mothership Model
+
 ## 22nd April 2013
 
 * Fixed bug in code that detects foreign keys. Now makes sure the class name is in StudlyCase so the class name will be found on case sensitive systems.

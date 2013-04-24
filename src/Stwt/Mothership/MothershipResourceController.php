@@ -135,7 +135,6 @@ class MothershipResourceController extends MothershipController
         if ($model && $modelId) {
             $this->related[$model] = $modelId;
         }
-
         $action = $this->getAction('create', 'create');
         $fields = (isset($action['fields']) ? $action['fields'] : []);
         $fields = $this->resource->getFields($fields);
@@ -176,7 +175,6 @@ class MothershipResourceController extends MothershipController
             'singular'      => $singular,
             'title'         => $title,
         ];
-
         return View::make('mothership::resource.form')
             ->with($data)
             ->with($this->getTemplateData())
