@@ -7,6 +7,11 @@ return array(
             'error'   => 'There was a problem saving the :singular <b>:resource</b>.
                           Please correct errors in the form.',
         ],
+        'delete' => [
+            'success' => ':singular succesfully <b>deleted</b>.',
+            'error'   => 'There was a problem <b>deleting</b> the :singular <b>:resource</b>.
+                          Please correct errors in the form.',
+        ],
         'edit' => [
             'success' => ':singular <b>:resource</b> updated succesfully.',
             'error'   => 'There was a problem saving the :singular <b>:resource</b>.

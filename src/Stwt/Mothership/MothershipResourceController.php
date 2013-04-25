@@ -495,23 +495,44 @@ class MothershipResourceController extends MothershipController
         $form   = new GoodForm();
         
         // add field to store request type
-        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE'];
-        $form->add($methodField);
-        
+        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE']);
         // add field to store url to redirect back to
-        $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
-        $form->add($redirectField);
-
+        $form->add(
+            [
+                'type' => 'hidden',
+                'name' => '_redirect',
+                'value' => Request::url(),
+            ]
+        );
+        // add field to store url to redirect to on success
+        $form->add(
+            [
+                'type' => 'hidden',
+                'name' => '_redirect_success',
+                'value' => URL::to('admin/'.$this->controller),
+            ]
+        );
         // add field to store the method that submitted the form
-        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
-        $form->add($redirectField);
+        $form->add(['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method]);
 
+        // Confirm delete checkbox
         $form->add(
             [
                 'label' => 'Confirm Delete',
                 'type'  => 'checkbox',
                 'name'  => '_delete',
                 'value' => $id,
+            ]
+        );
+
+        // Add form actions
+        $form->addAction(
+            [
+                'class' => 'btn btn-danger',
+                'form'  => 'button',
+                'name'  => '_save',
+                'type'  => 'submit',
+                'value' => Arr::e($config, 'submitText', 'Delete'),
             ]
         );
 
@@ -546,18 +567,15 @@ class MothershipResourceController extends MothershipController
     /**
      * Attempt to update a resource from the database
      *
-     * @param int   $id the resource id
-     * @param array $id override default handling of form
+     * @param int   $id     the resource id
+     * @param array $config override default update of form
      *
      * @return   void    (redirect) 
      **/
     public function update($id, $config = [])
     {
-        Log::debug('-------------');
-        Log::debug('update('.$id.')');
         $plural   = $this->resource->plural();
         $singular = $this->resource->singular();
-        $redirect = Input::get('_redirect');
 
         $this->resource = $this->getResource($id);
         $data   = Input::all();
@@ -571,7 +589,7 @@ class MothershipResourceController extends MothershipController
             $messages = $validation->messages();
             $message = $this->getAlert($this->resource, 'error', $config);
             Messages::add('error', $message);
-            return Redirect::to($redirect)
+            return Redirect::to(Input::get('_redirect'))
                 ->withInput()
                 ->withErrors($validation);
         } else {
@@ -592,48 +610,38 @@ class MothershipResourceController extends MothershipController
                 $callback = Arr::e($config, 'afterSave');
                 $callback($this->resource);
             }
-            return Redirect::to($redirect)->withInput();
+            return Redirect::to(Input::get('_redirect_success'));
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id the resource id
+     * @param int   $id     the resource id
+     * @param array $config override default destroying of resource
      *
      * @return  void    (redirect)
      **/
-    public function destroy($id)
+    public function destroy($id, $config = [])
     {
-        $class      = static::$model;
-        $controller = Request::segment(2);
-
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
-
-        $this->resource = $class::find($id);
-
-        $this->redirectIfDontExist($this->resource, $singular);
-
-        $redirect = 'admin/'.$controller.'/'.$id.'/delete';
-
-        $rules = ['_delete' => ['required', 'in:'.$id]];
-
-        $validation = Validator::make(Input::all(), $rules);
+        $this->resource = $this->getResource($id);
+        // custom rules for confirm delete checkbox
+        $rules = [
+            '_delete' => ['required', 'in:'.$id]
+        ];
+        $messages = ['required' => 'Please check the box to confirm you want to delete this record.'];
+        $validation = Validator::make(Input::all(), $rules, $messages);
 
         if ($validation->fails()) {
-            Messages::add('error', 'Please correct form errors.');
-            return Redirect::to($redirect)->withErrors($validation);
+            $message = $this->getAlert($this->resource, 'error', $config);
+            Messages::add('error', $message);
+            return Redirect::to(Input::get('_redirect'))->withErrors($validation);
         } else {
-            if ($this->resource->delete()) {
-                Messages::add('error', $singular.' Deleted.');
-                return Redirect::to('admin/'.$controller);
-            }
-            Message::add('error', 'Error deleting '.$singular);
-            return Redirect::to($redirect);
+            $this->resource->delete();
+            $message = $this->getAlert($this->resource, 'success', $config);
+            Messages::add('success', $message);
+            return Redirect::to(Input::get('_redirect_success'));
         }
-        
-        $redirect = 'admin/'.$controller.'/'.$id.'/edit';
     }
 
     /**
