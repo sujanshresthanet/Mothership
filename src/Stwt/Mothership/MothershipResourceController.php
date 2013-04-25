@@ -354,7 +354,7 @@ class MothershipResourceController extends MothershipController
         $this->resource = $this->getResource($id);
 
         $fields = $this->getFields($this->resource, $config);
-        $title  = $this->getTitle('Edit {singular}: {resource}', $config);
+        $title  = $this->getTitle($this->resource, $this->method, $config);
 
         $this->breadcrumbs['active'] = Arr::e($config, 'breadcrumb', ucfirst($this->method));
 
@@ -549,10 +549,6 @@ class MothershipResourceController extends MothershipController
         $rules  = $this->getRules($this->resource, $fields, $config);
         $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
         
-        Log::debug("Update these fields:\n".print_r($fields, 1));
-        Log::debug("Validate the following fields:\n".print_r($data, 1));
-        Log::debug("to these rules:\n".print_r($rules, 1));
-        
         $validation = Validator::make($data, $rules);
         
         if ($validation->fails()) {
@@ -571,7 +567,6 @@ class MothershipResourceController extends MothershipController
             if (Arr::e($config, 'beforeSave')) {
                 $callback = Arr::e($config, 'beforeSave');
                 $callback($this->resource);
-                Log::debug('callback before save');
             }
             if ($this->resource->save()) {
                 $message = $this->getAlert($this->resource, 'success', $config);
@@ -580,7 +575,6 @@ class MothershipResourceController extends MothershipController
             if (Arr::e($config, 'afterSave')) {
                 $callback = Arr::e($config, 'afterSave');
                 $callback($this->resource);
-                Log::debug('callback after save');
             }
             return Redirect::to($redirect)->withInput();
         }
@@ -684,23 +678,49 @@ class MothershipResourceController extends MothershipController
     }
 
     /**
-     * Returns the action title
+     * Returns a localized string that will be used as the page and
+     * browser title.
      *
-     * @param string $title
+     * Strings are defined in the mothership language file.
+     * There are a number of ways to define which string is returned.
+     *
+     * Custom:
+     * In the $config array. Add the language path to $config['title']
+     *
+     * Auto:
+     * If you have a custom edit page controller/{id}/password
+     * this method will look to see if the language line
+     * titles.password exists and return that.
+     *
+     * Generic:
+     * The default option is to return one of the generic alert messages.
+     * These are defined in the language line titles.{fallback}
+     *
+     * @param object $resource
+     * @param string $page
      * @param array  $config
+     * @param string $fallback
      *
      * @return string
      */
-    protected function getTitle($title, $config = [])
+    protected function getTitle($resource, $page, $config = [], $fallback = 'edit')
     {
         $prefix = 'mothership.';
-        $title = Arr::e($config, 'title', $title);
-
-        return $title;
+        // look for custom language key in the config
+        $key = Arr::e($config, 'title');
+        if (!$key) {
+            // then look for a language item based on the current page
+            $key = 'titles.'.$page;
+        }
+        if (!Lang::has($prefix.$key)) {
+            // finally fallback to a generic message [update or create]
+            $key = 'titles.'.$fallback;
+        }
+        return $this->getLang($prefix.$key, $resource);
     }
 
     /**
-     * Returns a localized alert string that will be displayed to the
+     * Returns a localized string that will be displayed to the
      * user after they have completed an action.
      *
      * Strings are defined in the mothership language file.
@@ -713,7 +733,7 @@ class MothershipResourceController extends MothershipController
      * Auto:
      * If you have a custom edit page controller/{id}/details
      * this method will look to see if the language line
-     * alerts.details.{type}
+     * alerts.details.{type} exists and return that.
      *
      * Generic:
      * The default option is to return one of the generic alert messages.
@@ -730,23 +750,35 @@ class MothershipResourceController extends MothershipController
     {
         $prefix = 'mothership.';
         // look for custom language key in the config
-        $langKey = Arr::e($config, $type.'Alert');
-
-        if (!$langKey) {
+        $key = Arr::e($config, $type.'Alert');
+        if (!$key) {
             // then look for a language item based on the requesting (get) method
-            $langKey = 'alerts.'.$this->requestor.'.'.$type;
+            $key = 'alerts.'.$this->requestor.'.'.$type;
         }
-        if (!Lang::has($prefix.$langKey)) {
+        if (!Lang::has($prefix.$key)) {
             // finally fallback to a generic message [update or create]
-            $langKey = 'alerts.'.$fallback.'.'.$type;
+            $key = 'alerts.'.$fallback.'.'.$type;
         }
+        return $this->getLang($prefix.$key, $resource);
+    }
 
+    /**
+     * Returns a language line replacing any place-holder
+     * strings with $resource specific values
+     *
+     * @param string $key
+     * @param object $resource
+     *
+     * @return string
+     */
+    private function getLang($key, $resource)
+    {
         $placeHolders = [
             'singular'  => $resource->singular(),
             'plural'    => $resource->plural(),
             'resource'  => $resource->__toString(),
         ];
-        return Lang::get($prefix.$langKey, $placeHolders);
+        return Lang::get($key, $placeHolders);
     }
 
     /**
