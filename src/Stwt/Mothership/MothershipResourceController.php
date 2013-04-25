@@ -316,7 +316,7 @@ class MothershipResourceController extends MothershipController
         $fields     = $this->resource->getFields();
         $title      = 'Meta '.$singular.':'.$this->resource;
 
-        $this->breadcrumbs['active'] = 'View';
+        $this->breadcrumbs['active'] = 'Meta';
 
         $data   = [
             'create'        => false,
@@ -349,7 +349,7 @@ class MothershipResourceController extends MothershipController
         $fields = $this->getFields($this->resource, $config);
         $title  = $this->getTitle($this->resource, $config);
 
-        $this->breadcrumbs['active'] = Arr::e($config, 'breadcrumb', ucfirst($this->method));
+        $this->breadcrumbs['active'] = 'Edit';
 
         // start building the form
         $form   = new GoodForm();
