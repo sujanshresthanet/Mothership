@@ -38,6 +38,9 @@ class MothershipResourceController extends MothershipController
 {
     public static $model;
 
+    protected $controller;
+    protected $method;
+
     protected $resource;
 
     protected $related;
@@ -89,12 +92,14 @@ class MothershipResourceController extends MothershipController
     public function __construct()
     {
         parent::__construct();
-
         $class = static::$model;
         $this->resource = new $class;
 
+        $this->controller = Request::segment(2);
+        $this->method     = Request::segment(4);
+        
         if (Request::segment(3) != 'index' AND Request::segment(3)) {
-            $this->breadcrumbs[Request::segment(2)] = $this->resource->plural();
+            $this->breadcrumbs[$this->controller] = $this->resource->plural();
         }
     }
 
@@ -107,7 +112,6 @@ class MothershipResourceController extends MothershipController
      */
     public function __call($method, $parameters)
     {
-        error_log($method.' called');
         throw new NotFoundHttpException;
     }
 
@@ -260,8 +264,7 @@ class MothershipResourceController extends MothershipController
      * @return  view
      **/
     public function show($id)
-    {
-        $class      = static::$model;
+    {        $class      = static::$model;
         $controller = Request::segment(2);
 
         $plural     = $this->resource->plural();
@@ -335,32 +338,40 @@ class MothershipResourceController extends MothershipController
     /**
      * Construct a form view to update a resource in the database
      *
-     * @param int $id the resource id
+     * @param int   $id     the resource id
+     * @param array $config override defaults in the edit view
      *
      * @return  view
      **/
-    public function edit($id)
+    public function edit($id, $config = [])
     {
-        $class      = static::$model;
-        $controller = Request::segment(2);
+        $plural   = $this->resource->plural();
+        $singular = $this->resource->singular();
 
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
+        $this->resource = $this->getResource($id);
 
-        $this->resource = $class::find($id);
+        $fields = $this->getFields($this->resource, $config);
+        $title  = $this->getTitle('Edit {singular}: {resource}', $config);
 
-        $this->redirectIfDontExist($this->resource, $singular);
+        $this->breadcrumbs['active'] = Arr::e($config, 'breadcrumb', ucfirst($this->method));
 
-        $fields     = $this->resource->getFields();
-        $title      = 'Edit '.$singular.':'.$this->resource;
-
-        $this->breadcrumbs['active'] = 'Update';
-
+        Log::debug("=========");
+        Log::debug("edit($id)");
+        Log::debug("Build form with the following fields ".implode(", ", array_keys($fields)));
+        // start building the form
         $form   = new GoodForm();
-        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'PUT']);
+        // add field to store request type
+        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'PUT'];
+        $form->add($methodField);
+        // add field to store url to redirect back to
+        $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
+        $form->add($redirectField);
 
         foreach ($fields as $name => $field) {
-            $field->value = $this->resource->{$name};
+            if ($this->resource->hasProperty($name)) {
+                // check if this field is a property
+                $field->value = $this->resource->{$name};
+            }
             $form->add($field);
         }
 
@@ -369,8 +380,11 @@ class MothershipResourceController extends MothershipController
             $form->addErrors($errors->getMessages());
         }
 
+        // generate the form action - default to "admin/controller/id"
+        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller.'/'.$id));
+
         $formAttr = [
-            'action'    => URL::to('admin/'.$controller.'/'.$id),
+            'action'    => $action,
             'class'     => 'form-horizontal',
             'method'    => 'POST',
         ];
@@ -378,7 +392,7 @@ class MothershipResourceController extends MothershipController
 
         $data   = [
             'create'        => false,
-            'controller'    => $controller,
+            'controller'    => $this->controller,
             'fields'        => $fields,
             'form'          => $form,
             'resource'      => $this->resource,
@@ -506,29 +520,30 @@ class MothershipResourceController extends MothershipController
     /**
      * Attempt to update a resource from the database
      *
-     * @param int $id the resource id
+     * @param int   $id the resource id
+     * @param array $id override default handling of form
      *
      * @return   void    (redirect) 
      **/
-    public function update($id)
+    public function update($id, $config = [])
     {
-        $class      = static::$model;
-        $controller = Request::segment(2);
+        Log::debug('-------------');
+        Log::debug('update('.$id.')');
+        $plural   = $this->resource->plural();
+        $singular = $this->resource->singular();
+        $redirect = Input::get('_redirect');
 
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
-
-        $this->resource = $class::find($id);
-
-        $this->redirectIfDontExist($this->resource, $singular);
+        $this->resource = $this->getResource($id);
+        $data   = Input::all();
+        $fields = array_keys($data);
+        $rules  = $this->getRules($this->resource, $fields, $config);
+        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
         
-        $redirect = 'admin/'.$controller.'/'.$id.'/edit';
-
-        $inputData  = $this->getInputData(Input::all(), $this->resource);
-        $fields     = $this->resource->getFields();
-        $rules      = ($inputData ? $this->resource->getRules(array_keys($inputData)) : []);
-
-        $validation = Validator::make($inputData, $rules);
+        Log::debug("Update these fields:\n".print_r($fields, 1));
+        Log::debug("Validate the following fields:\n".print_r($data, 1));
+        Log::debug("to these rules:\n".print_r($rules, 1));
+        
+        $validation = Validator::make($data, $rules);
         
         if ($validation->fails()) {
             $messages = $validation->messages();
@@ -537,9 +552,10 @@ class MothershipResourceController extends MothershipController
                 ->withInput()
                 ->withErrors($validation);
         } else {
-            foreach ($fields as $field => $spec) {
-                // only update field if it has changed
-                $this->resource->$field = Input::get($field);
+            foreach ($fields as $field) {
+                if ($this->resource->hasProperty($field) AND Input::get($field)) {
+                    $this->resource->$field = Input::get($field);
+                }
             }
             if ($this->resource->save()) {
                 Messages::add('success', 'Updated '.$singular.':'.$this->resource);
@@ -590,16 +606,123 @@ class MothershipResourceController extends MothershipController
     }
 
     /**
-     * Called by router when requested method does 
-     * not exist in the class
+     * Loads an instance of the resource model by id. This method will
+     * throw a NotFoundHttpException if no instance is found by default
      *
-     * @param array $parameters of requested methods arguments
+     * @param int     $id
+     * @param boolean $throwExceptionIfNotFound
+     *
+     * @return object
+     */
+    protected function getResource($id, $throwExceptionIfNotFound = true)
+    {
+        $class = static::$model;
+        $resource = $class::find($id);
+        if (!$resource->exists() AND $throwExceptionIfNotFound) {
+            throw new NotFoundHttpException;
+        }
+        return $resource;
+    }
+
+    /**
+     * Returns an array of field models/arrays for a form.
+     * By default the method will return all fields in the
+     * resource. If $config['fields'] is set, these fields
+     * wil be returned instead.
+     *
+     * $config['fields'] can contain an array of field names,
+     * and array of field specifications or both.
+     *
+     * @param object $resource
+     * @param array  $config
+     *
+     * @return array
+     */
+    protected function getFields($resource, $config)
+    {
+        $fields = Arr::e($config, 'fields', null);
+        return $resource->getFields($fields);
+    }
+
+    /**
+     * Returns validation rules for form fields.
+     *
+     * By default, return field rules in the resource for properties
+     * in the $fields paramenter. Rules can be overrided in $config['rules']
+     *
+     * @param object $resource
+     * @param array  $fields
+     * @param array  $config
+     *
+     * @return array
+     */
+    protected function getRules($resource, $fields, $config = [])
+    {
+        $rules = $resource->getRules(Arr::e($config, 'rules', $fields));
+        return $rules;
+    }
+
+    /**
+     * Returns the action title
+     *
+     * Titles can contain the following placeholders:
+     * - {singular}
+     * - {plural}
+     * - {resource}
+     *
+     * @param string $title
+     * @param array  $config
      *
      * @return string
-     **/
-    public function missingMethod($parameters)
+     */
+    public function getTitle($title, $config = [])
     {
-        return 'Missing method';
+        $title = Arr::e($config, 'title', $title);
+
+        $title = str_replace('{singular}', $this->resource->singular(), $title);
+        $title = str_replace('{plural}', $this->resource->plural(), $title);
+        $title = str_replace('{resource}', $this->resource, $title);
+
+        return $title;
+    }
+
+    /**
+     * Returns and associative array of values in $input
+     * that are empty or have changed and are properties/columns 
+     * of the $resource database table.
+     *
+     * If we just try to update all posted fields the 'unique'
+     * validation rules will kick off.
+     *
+     * @param object $resource - resource model instance
+     * @param array  $input    - associative array of input data
+     * @param array  $fields   - form items included in this form may
+     *                           not even be properties of the resouce
+     *
+     * @return   array
+     **/
+    protected function filterInputData($resource, $input, $fields)
+    {
+        $data = [];
+        foreach ($input as $k => $v) {
+            // check if in the field array
+            if (!in_array($k, $fields)) {
+                Log::debug("$k skipped as not in fields array");
+                continue;
+            }
+            $data[$k] = $v;
+            /*if ($resource->hasProperty($k)) {
+                // skip if property has not changed value
+                if ($v AND $resource->$k == $v) {
+                    continue;
+                }
+                // only update field if it has changed
+                $data[$k] = $v;
+            } else {
+                $data[$k] = $v;
+            }*/
+        }
+        return $data;
     }
 
     /**
@@ -620,32 +743,6 @@ class MothershipResourceController extends MothershipController
     }
 
     /**
-     * Returns and associative array of values in $input
-     * that are empty or have changed and are properties/columns 
-     * of the $resource database table.
-     *
-     * If we just try to update all posted fields the 'unique'
-     * validation rules will kick off.
-     *
-     * @param object $input    associative array of input data
-     * @param object $resource the resource to update
-     *
-     * @return   array
-     **/
-    protected function getInputData($input, $resource)
-    {
-        $data = [];
-        foreach ($input as $k => $v) {
-            // add if $v is empty or has changed value
-            if ((!$v OR $resource->$k != $v) AND $resource->isProperty($k)) {
-                // only update field if it has changed
-                $data[$k] = $v;
-            }
-        }
-        return $data;
-    }
-
-    /**
      * Prepares the action navigation tabs for view rendering
      * We replace placeholder strings like {controller} & {id}
      * with their proper values
@@ -660,13 +757,13 @@ class MothershipResourceController extends MothershipController
             $route = $action['uri'];
             // replace {controller} with current controller uri segment
             $uri = str_replace('{controller}', Request::segment(2), $route);
-            
+
             if ($this->resource->id) {
                 // replace {id} with current resource id
-                $uri = str_replace('{id}', $this->resource->id, $route);
+                $uri = str_replace('{id}', $this->resource->id, $uri);
             } else {
                 // if this action has no current resource disable the action
-                $uri = (strpos($route, '{id}') === false ? $route : null);
+                $uri = (strpos($uri, '{id}') === false ? $uri : null);
             }
 
             if ($uri) {

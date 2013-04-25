@@ -18,16 +18,21 @@ class MothershipModelField
     public $unsigned;
     public $model;
 
+    /*
+     * The parent model instance
+     */
+    protected $parent;
     protected $table;
     protected $dataType;
 
     /**
      * Create a new Field Specification from a sql row
      *
-     * @param    object
-     * @param    table
-     * @param    array
-     * @return   void
+     * @param object $row
+     * @param string $table
+     * @param array  $spec
+     *
+     * @return void
      */
     public function __construct($row = null, $table = null, $spec = [])
     {
@@ -99,14 +104,10 @@ class MothershipModelField
         foreach ($spec as $k => $v) {
             $this->$k = $v;
         }
-
         if ($this->key == 'PRI') {
             $this->type = 'hidden';
-            $this->validation[] = 'unique:'.$this->table;
         }
-
-        if ($this->key == 'UNI') {
-            // column must contain unique values
+        if ($this->key == 'PRI' OR $this->key == 'UNI') {
             $this->validation[] = 'unique:'.$this->table;
         }
 

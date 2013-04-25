@@ -1,8 +1,10 @@
 <?php namespace Stwt\Mothership;
 
 use DB;
-use Venturecraft\Revisionable\Revisionable;
+use Log;
 use Stwt\Mothership\MothershipModelField as MothershipModelField;
+use Str;
+use Venturecraft\Revisionable\Revisionable;
 
 class MothershipModel extends Revisionable
 {
@@ -50,6 +52,16 @@ class MothershipModel extends Revisionable
             return get_class($this).': '.$this->id;
         }
         return null;
+    }
+
+    /**
+     * Checks if this instance exists in the db
+     *
+     * @return boolean
+     */
+    public function exists()
+    {
+        return isset($this->id);
     }
 
     /**
@@ -143,6 +155,8 @@ class MothershipModel extends Revisionable
                 $properties[$k] = $v;
             } elseif (is_string($v) AND isset($this->properties[$v])) {
                 $properties[$v] = $this->properties[$v];
+            } else {
+                $properties[$k] = $v;
             }
         }
         return $properties;
@@ -150,25 +164,106 @@ class MothershipModel extends Revisionable
 
     /**
      * Return an array of each fields validation rules.
-     * Supply and array of keys to return a subset of rules
      *
-     * @param   array $fields
+     * First parameter can contain an array of field names to
+     * return rules just for that subset of fields.
+     * e.g. ['first_name', 'last_name', 'email']
      *
-     * @return   array
+     * Alternatively it can contain and array of validation rules 
+     * for each field override the rules in the model. The key should
+     * be the field name and value an array of rules.
+     * e.g. ['first_name' => ['required', 'alpha']]
+     *
+     * $fields may contain a mixture of the above.
+     * 
+     * @param array $fields
+     *
+     * @return array
      */
     public function getRules($fields = [])
     {
+        $field = ($fields ?: array_keys($this->properties));
         $rules = [];
         if ($fields) {
-            foreach ($fields as $name) {
-                $rules[$name] = $this->properties[$name]->validation;
-            }
-        } else {
-            foreach ($this->properties as $name => $property) {
-                $rules[$name] = $property->validation;
+            foreach ($fields as $k => $v) {
+                if (is_string($v) AND $this->hasProperty($v)) {
+                    $rules[$v] = $this->getRule($v);
+                } elseif (is_array($v)) {
+                    $rules[$v] = $this->getRule($k, $v);
+                }
             }
         }
         return $rules;
+    }
+
+    /**
+     * Returns validation rules for a given property. Second parameter
+     * can be passed to override model based rules.
+     *
+     * @paran string
+     * @paran array
+     *
+     * @return array
+     */
+    public function getRule($property, $override = [])
+    {
+        $rules = ($override ?: $this->properties[$property]->validation);
+        $filteredRules = [];
+        // Filter rules, check for the unique rule and append column and id
+        // details if found
+        foreach ($rules as &$rule) {
+            if (Str::startsWith($rule, 'unique')) {
+                // get any params after 'unique:' in the rule
+                $params   = explode(',', (substr($rule, 7) ?: ''));
+                $table    = Arr::e($params, 0, $this->table);
+                $column   = Arr::e($params, 1, $property);
+                $except   = Arr::e($params, 2, $this->id);
+                $idColumn = Arr::e($params, 3, 'id');
+                
+                $params = [$table, $column, $except, $idColumn];
+                $rule = "unique:".implode(',', $params);
+            }
+        }
+        return $rules;
+    }
+
+    /**
+     * Checks if the model has a given property
+     *
+     * @return boolean
+     */
+    public function hasProperty($property)
+    {
+        return isset($this->properties[$property]);
+    }
+
+    /**
+     * Adds a new rule to a property on this instance
+     *
+     * @param string $property
+     * @param string $rule
+     *
+     * @return boolean
+     */
+    public function addRule($property, $rule)
+    {
+        if (!$this->hasProperty($property)) {
+            return false;
+        }
+        $this->properties[$property]->validation[] = $rule;
+        return true;
+    }
+
+    /**
+     * Return a single property object from the class
+     *
+     * @param string $property
+     *
+     * @return object MothershipModelField
+     */
+    public function getPropery($property)
+    {
+        return $this->properties[$property];
     }
 
     /*

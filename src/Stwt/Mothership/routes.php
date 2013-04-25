@@ -37,15 +37,13 @@ if (Config::get('mothership.controllers')) {
                 Route::get(
                     $path.'/{id}',
                     function ($id) use ($class) {
-                         $controller = new $class ();
+                        $controller = new $class ();
                         return $controller->show($id);
                     }
                 );
                 /*
                  * /{id}/{edit}
                  * Route to an edit view/form on a specific model.
-                 * If the {method} method does not exist in the controller
-                 * the request will be handled by edit($id);
                  */
                 Route::get(
                     $path.'/{id}/{method}',
@@ -53,8 +51,10 @@ if (Config::get('mothership.controllers')) {
                         $controller = new $class ();
                         if (method_exists($controller, $method)) {
                             return $controller->{$method}($id);
+                        } else {
+                            throw new HTTPNotFoundException("Controller class does not have the method $method");
+                            exit();
                         }
-                        return $controller->edit($id);
                     }
                 );
                 // related index
@@ -89,6 +89,21 @@ if (Config::get('mothership.controllers')) {
                 // ------------
                 // update
                 Route::put($path.'/{id}', $class.'@update');
+                // custom update routes
+                Route::put(
+                    $path.'/{id}/{method}',
+                    function ($id, $method) use ($class) {
+                        $controller = new $class ();
+                        $method = 'update'.ucfirst($method);
+                        error_log('call '.$method);
+                        if (method_exists($controller, $method)) {
+                            return $controller->{$method}($id);
+                        } else {
+                            throw new HTTPNotFoundException("Controller class does not have the method $method");
+                            exit();
+                        }
+                    }
+                );
                 // DELETE REQUESTS
                 // ---------------
                 // destroy
