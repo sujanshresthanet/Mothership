@@ -3,7 +3,9 @@
 ## 24th April 2013
 
 * Fixed bug where foreign keys would be detected if "any" class existed with that name. Now we check that it's a class that extends from Mothership Model
-* Changed setDefaultActions to getDefaultActions
+* Removed setDefaultActions, actions are now defined in the $actions class property. Added the {controller} placeholder so actions can be used in extended controllers
+* Edit forms now include a _redirect field so we can return to the correct route after updating.
+* Added dataCallback. This returns Input data from a form to be saved to the resource. This is accessed **after** validation. Use Case: hash a password after it has been validated.
 
 ## 22nd April 2013
 
