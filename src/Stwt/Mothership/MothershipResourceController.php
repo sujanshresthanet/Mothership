@@ -99,6 +99,9 @@ class MothershipResourceController extends MothershipController
 
         $this->controller = Request::segment(2);
         $this->method     = Request::segment(4);
+        if (!$this->method) {
+            $this->method = (Request::segment(3) ? 'show' : 'index');
+        }
         $this->requestor  = Input::get('_requestor');
         
         if (Request::segment(3) != 'index' AND Request::segment(3)) {
@@ -262,12 +265,14 @@ class MothershipResourceController extends MothershipController
     /**
      * Construct a readonly view of a resource in the database
      *
-     * @param int $id the resource id
+     * @param int   $id
+     * @param array $config
      *
      * @return  view
      **/
-    public function show($id)
-    {        $class      = static::$model;
+    public function show($id, $config = [])
+    {
+        $class      = static::$model;
         $controller = Request::segment(2);
 
         $plural     = $this->resource->plural();
@@ -277,8 +282,8 @@ class MothershipResourceController extends MothershipController
 
         $this->redirectIfDontExist($this->resource, $singular);
 
-        $fields     = $this->resource->getFields();
-        $title      = 'Update '.$singular.':'.$this->resource;
+        $fields = $this->resource->getFields();
+        $title  = $this->getTitle($this->resource, $config);
 
         $this->breadcrumbs['active'] = 'View';
 
@@ -354,13 +359,9 @@ class MothershipResourceController extends MothershipController
         $this->resource = $this->getResource($id);
 
         $fields = $this->getFields($this->resource, $config);
-        $title  = $this->getTitle($this->resource, $this->method, $config);
+        $title  = $this->getTitle($this->resource, $config);
 
         $this->breadcrumbs['active'] = Arr::e($config, 'breadcrumb', ucfirst($this->method));
-
-        Log::debug("=========");
-        Log::debug("edit($id)");
-        Log::debug("Build form with the following fields ".implode(", ", array_keys($fields)));
 
         // start building the form
         $form   = new GoodForm();
@@ -697,15 +698,15 @@ class MothershipResourceController extends MothershipController
      * These are defined in the language line titles.{fallback}
      *
      * @param object $resource
-     * @param string $page
      * @param array  $config
      * @param string $fallback
      *
      * @return string
      */
-    protected function getTitle($resource, $page, $config = [], $fallback = 'edit')
+    protected function getTitle($resource, $config = [], $fallback = 'edit')
     {
         $prefix = 'mothership.';
+        $page   = $this->method;
         // look for custom language key in the config
         $key = Arr::e($config, 'title');
         if (!$key) {
