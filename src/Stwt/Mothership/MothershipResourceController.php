@@ -53,7 +53,14 @@ class MothershipResourceController extends MothershipController
      * Default Actions in this controller
      */
     public $actions = [
-        'update' => [
+        'collection' => [],
+        'single' => [
+            'create' => [
+                'label' => 'Add User',
+                'uri' => '{controller}/create',
+            ],
+        ],
+        'resource' => [
             'view' => [
                 'label' => 'View',
                 'uri' => '{controller}/{id}',
@@ -76,12 +83,6 @@ class MothershipResourceController extends MothershipController
             ],
         ],
         'related' => [
-        ],
-        'create' => [
-            'create' => [
-                'label' => 'Add User',
-                'uri' => '{controller}/create',
-            ],
         ],
     ];
 
@@ -161,7 +162,7 @@ class MothershipResourceController extends MothershipController
      *
      * @return  view
      **/
-    public function create($model = null, $modelId = null)
+    public function create($config = [])
     {
         if ($model && $modelId) {
             $this->related[$model] = $modelId;
@@ -873,7 +874,7 @@ class MothershipResourceController extends MothershipController
     protected function getTabs()
     {
         $array = [];
-        $actions = $this->getActions(['update', 'related', 'create']);
+        $actions = $this->getActions(['resource', 'related', 'single']);
         foreach ($actions as $key => $action) {
             $route = $action['uri'];
             // replace {controller} with current controller uri segment
@@ -919,8 +920,10 @@ class MothershipResourceController extends MothershipController
      * Returns array of actions specified in this controller.
      * $type can either be a action group (string) or multiple
      * groups (array). Common action groups are as follows:
-     * - update
-     * - create
+     * - collections
+     * - single
+     * - resource
+     * - related
      *
      * @param string/array $type
      * @return array
@@ -941,7 +944,7 @@ class MothershipResourceController extends MothershipController
     /**
      * Return an action array by key and group. If either
      * the key or group does not exist, an empty array is returned
-     * i.e. getAction('view', 'update');
+     * i.e. getAction('view', 'resource');
      *
      * @param string $key
      * @param string $group

@@ -17,7 +17,8 @@ class MothershipUserController extends MothershipResourceController
      * The User controller comes complete with an extra password action
      */
     public $actions = [
-        'update' => [
+        'collection' => [],
+        'resource' => [
             'view' => [
                 'label' => 'View',
                 'uri' => '{controller}/{id}',
@@ -41,7 +42,7 @@ class MothershipUserController extends MothershipResourceController
         ],
         'related' => [
         ],
-        'create' => [
+        'single' => [
             'create' => [
                 'label' => 'Add User',
                 'uri' => '{controller}/create',
