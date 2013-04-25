@@ -10,6 +10,7 @@ class MothershipModelField
     public $default;
     public $key;
     public $extra;
+    public $form;
     public $label;
     public $type;
     public $validation = [];
@@ -177,7 +178,7 @@ class MothershipModelField
             $this->type = 'number';
         }
         // check if unsigned
-        if (static::endsWith($type, 'unsigned')) {
+        if (Str::endsWith($type, 'unsigned')) {
             $this->unsigned = true;
             $type = str_replace(' unsigned', '', $type);
         }
@@ -363,8 +364,8 @@ class MothershipModelField
     {
         $type = $this->dataType;
         // set default type
-        if (!$this->type) {
-            $this->type = 'select';
+        if (!$this->form) {
+            $this->form = 'select';
         }
         $options            = $this->getConstraint($type);
         $optionString       = str_replace('\'', '', $options);
@@ -389,8 +390,8 @@ class MothershipModelField
     {
         $type = $this->dataType;
         // set default type
-        if (!$this->type) {
-            $this->type = 'textarea';
+        if (!$this->form) {
+            $this->form = 'textarea';
         }
     }
 
@@ -424,24 +425,13 @@ class MothershipModelField
         return current(end($constraint));
     }
 
-    public function getValidation($create = true)
-    {
-        $rules = [];
-        foreach ($this->validation as $rule) {
-            if (!$this->startsWith($rule, 'unique:')) {
-                $rules[] = $rule;
-            }
-        }
-        return $rules;
-    }
-
     /**
      * Extract the type of form field this column will user
      * from the SQL column type.
      *
      * @return   void
      */
-    public function setForm()
+    public function setFormDepreciated()
     {
         if ($this->type) {
             return;
@@ -511,19 +501,6 @@ class MothershipModelField
     protected static function startsWith($haystack, $needle)
     {
         return !strncmp($haystack, $needle, strlen($needle));
-    }
-
-    /**
-     * Returns true if string ends with another string
-     *
-     * @access   protected
-     * @param    string
-     * @param    string
-     * @return   boolean
-     */
-    protected static function endsWith($haystack, $needle)
-    {
-        return (substr($haystack, -strlen($needle)) === $needle);
     }
 
     /**

@@ -72,6 +72,9 @@ class MothershipUserController extends MothershipResourceController
         if (!Arr::e($config, 'breadcrumb')) {
             $config['breadcrumb'] = 'Password';
         }
+        if (!Arr::e($config, 'submitText')) {
+            $config['submitText'] = 'Change Password';
+        }
 
         return $this->edit($id, $config);
     }

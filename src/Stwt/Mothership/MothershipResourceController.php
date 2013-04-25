@@ -353,9 +353,6 @@ class MothershipResourceController extends MothershipController
      **/
     public function edit($id, $config = [])
     {
-        $plural   = $this->resource->plural();
-        $singular = $this->resource->singular();
-
         $this->resource = $this->getResource($id);
 
         $fields = $this->getFields($this->resource, $config);
@@ -386,6 +383,26 @@ class MothershipResourceController extends MothershipController
             $form->add($field);
         }
 
+        // Add form actions
+        $form->addAction(
+            [
+                'class' => 'btn btn-primary',
+                'form'  => 'button',
+                'name'  => '_save',
+                'type'  => 'submit',
+                'value' => Arr::e($config, 'submitText', 'Save'),
+            ]
+        );
+        $form->addAction(
+            [
+                'class' => 'btn',
+                'form'  => 'button',
+                'name'  => '_cancel',
+                'type'  => 'reset',
+                'value' => 'Cancel',
+            ]
+        );
+
         $errors = Session::get('errors');
         if ($errors) {
             $form->addErrors($errors->getMessages());
@@ -407,8 +424,6 @@ class MothershipResourceController extends MothershipController
             'fields'        => $fields,
             'form'          => $form,
             'resource'      => $this->resource,
-            'plural'        => $plural,
-            'singular'      => $singular,
             'title'         => $title,
         ];
 
@@ -462,35 +477,35 @@ class MothershipResourceController extends MothershipController
     /**
      * Create a confirm delete view
      *
-     * @param int $id the resource id
+     * @param int   $id the resource id
+     * @param array $config override defaults in the edit view
      *
      * @return   void    (redirect) 
      **/
-    public function delete($id)
+    public function delete($id, $config = [])
     {
-        $class      = static::$model;
-        $controller = Request::segment(2);
+        
+        $this->resource = $this->getResource($id);
 
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
-
-        $this->resource = $class::find($id);
-
-        $this->redirectIfDontExist($this->resource, $singular);
-
-        $title = 'Delete '.$singular.':'.$this->resource;
+        $title  = $this->getTitle($this->resource, $config);
 
         $this->breadcrumbs['active'] = 'Delete';
 
-        $form = new GoodForm();
+        // start building the form
+        $form   = new GoodForm();
+        
+        // add field to store request type
+        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE'];
+        $form->add($methodField);
+        
+        // add field to store url to redirect back to
+        $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
+        $form->add($redirectField);
 
-        $form->add(
-            [
-                'type'  => 'hidden',
-                'name'  => '_method',
-                'value' => 'DELETE',
-            ]
-        );
+        // add field to store the method that submitted the form
+        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
+        $form->add($redirectField);
+
         $form->add(
             [
                 'label' => 'Confirm Delete',
@@ -505,8 +520,11 @@ class MothershipResourceController extends MothershipController
             $form->addErrors($errors->getMessages());
         }
 
+        // generate the form action - default to "admin/controller/id"
+        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller.'/'.$id));
+
         $formAttr = [
-            'action'    => URL::to('admin/'.$controller.'/'.$id),
+            'action'    => $action,
             'class'     => 'form-horizontal',
             'method'    => 'POST',
         ];
@@ -514,11 +532,8 @@ class MothershipResourceController extends MothershipController
 
         $data   = [
             'create'        => false,
-            'controller'    => $controller,
             'form'          => $form,
             'resource'      => $this->resource,
-            'plural'        => $plural,
-            'singular'      => $singular,
             'title'         => $title,
         ];
 
@@ -705,7 +720,6 @@ class MothershipResourceController extends MothershipController
      */
     protected function getTitle($resource, $config = [], $fallback = 'edit')
     {
-        $prefix = 'mothership.';
         $page   = $this->method;
         // look for custom language key in the config
         $key = Arr::e($config, 'title');
@@ -713,11 +727,11 @@ class MothershipResourceController extends MothershipController
             // then look for a language item based on the current page
             $key = 'titles.'.$page;
         }
-        if (!Lang::has($prefix.$key)) {
+        if (!$this->hasLang($key)) {
             // finally fallback to a generic message [update or create]
             $key = 'titles.'.$fallback;
         }
-        return $this->getLang($prefix.$key, $resource);
+        return $this->getLang($key, $resource);
     }
 
     /**
@@ -749,18 +763,17 @@ class MothershipResourceController extends MothershipController
      */
     protected function getAlert($resource, $type, $config = [], $fallback = 'edit')
     {
-        $prefix = 'mothership.';
         // look for custom language key in the config
         $key = Arr::e($config, $type.'Alert');
         if (!$key) {
             // then look for a language item based on the requesting (get) method
             $key = 'alerts.'.$this->requestor.'.'.$type;
         }
-        if (!Lang::has($prefix.$key)) {
+        if (!$this->hasLang($key)) {
             // finally fallback to a generic message [update or create]
             $key = 'alerts.'.$fallback.'.'.$type;
         }
-        return $this->getLang($prefix.$key, $resource);
+        return $this->getLang($key, $resource);
     }
 
     /**
@@ -774,12 +787,26 @@ class MothershipResourceController extends MothershipController
      */
     private function getLang($key, $resource)
     {
+        $prefix = 'mothership::mothership.';
         $placeHolders = [
             'singular'  => $resource->singular(),
             'plural'    => $resource->plural(),
             'resource'  => $resource->__toString(),
         ];
-        return Lang::get($key, $placeHolders);
+        return Lang::get($prefix.$key, $placeHolders);
+    }
+
+    /**
+     * Checks if this app has a given language line
+     *
+     * @param string $key
+     *
+     * @return boolean
+     */
+    private function hasLang($key)
+    {
+        $prefix = 'mothership::mothership.';
+        return Lang::has($prefix.$key);
     }
 
     /**
