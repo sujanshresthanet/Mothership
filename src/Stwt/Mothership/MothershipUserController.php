@@ -89,6 +89,11 @@ class MothershipUserController extends MothershipResourceController
         if (!Arr::e($config, 'rules')) {
             $config['rules'] = $this->getPasswordFormRules();
         }
+        if (!Arr::e($config, 'beforeSave')) {
+            $config['beforeSave'] = function ($resource) {
+                $resource->password = Hash::make($resource->password);
+            };
+        }
         return $this->update($id, $config);
     }
 
@@ -109,7 +114,7 @@ class MothershipUserController extends MothershipResourceController
         $rules = $this->resource->getPropery('password')->validation;
 
         // add 'confirmed' rule to password - so it must match the new field
-        //$this->resource->addRule('password', 'confirmed');
+        $this->resource->addRule('password', 'confirmed');
 
         return [
             'password',

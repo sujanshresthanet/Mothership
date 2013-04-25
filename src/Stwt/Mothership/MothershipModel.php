@@ -189,7 +189,7 @@ class MothershipModel extends Revisionable
                 if (is_string($v) AND $this->hasProperty($v)) {
                     $rules[$v] = $this->getRule($v);
                 } elseif (is_array($v)) {
-                    $rules[$v] = $this->getRule($k, $v);
+                    $rules[$k] = $this->getRule($k, $v);
                 }
             }
         }

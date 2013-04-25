@@ -14,14 +14,15 @@
 namespace Stwt\Mothership;
 
 use Input;
-use Stwt\GoodForm\GoodForm as GoodForm;
+use Lang;
+use Log;
+use URL;
 use Request;
 use Redirect;
+use Stwt\GoodForm\GoodForm as GoodForm;
 use Session;
-use URL;
 use Validator;
 use View;
-use Log;
 
 /**
  * MothershipResourceController
@@ -40,6 +41,7 @@ class MothershipResourceController extends MothershipController
 
     protected $controller;
     protected $method;
+    protected $requestor;
 
     protected $resource;
 
@@ -97,6 +99,7 @@ class MothershipResourceController extends MothershipController
 
         $this->controller = Request::segment(2);
         $this->method     = Request::segment(4);
+        $this->requestor  = Input::get('_requestor');
         
         if (Request::segment(3) != 'index' AND Request::segment(3)) {
             $this->breadcrumbs[$this->controller] = $this->resource->plural();
@@ -358,13 +361,20 @@ class MothershipResourceController extends MothershipController
         Log::debug("=========");
         Log::debug("edit($id)");
         Log::debug("Build form with the following fields ".implode(", ", array_keys($fields)));
+
         // start building the form
         $form   = new GoodForm();
+        
         // add field to store request type
         $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'PUT'];
         $form->add($methodField);
+        
         // add field to store url to redirect back to
         $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
+        $form->add($redirectField);
+
+        // add field to store the method that submitted the form
+        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
         $form->add($redirectField);
 
         foreach ($fields as $name => $field) {
@@ -547,7 +557,8 @@ class MothershipResourceController extends MothershipController
         
         if ($validation->fails()) {
             $messages = $validation->messages();
-            Messages::add('error', 'Please correct form errors.');
+            $message = $this->getAlert($this->resource, 'error', $config);
+            Messages::add('error', $message);
             return Redirect::to($redirect)
                 ->withInput()
                 ->withErrors($validation);
@@ -557,9 +568,19 @@ class MothershipResourceController extends MothershipController
                     $this->resource->$field = Input::get($field);
                 }
             }
+            if (Arr::e($config, 'beforeSave')) {
+                $callback = Arr::e($config, 'beforeSave');
+                $callback($this->resource);
+                Log::debug('callback before save');
+            }
             if ($this->resource->save()) {
-                Messages::add('success', 'Updated '.$singular.':'.$this->resource);
-                return Redirect::to($redirect);
+                $message = $this->getAlert($this->resource, 'success', $config);
+                Messages::add('success', $message);
+            }
+            if (Arr::e($config, 'afterSave')) {
+                $callback = Arr::e($config, 'afterSave');
+                $callback($this->resource);
+                Log::debug('callback after save');
             }
             return Redirect::to($redirect)->withInput();
         }
@@ -665,25 +686,47 @@ class MothershipResourceController extends MothershipController
     /**
      * Returns the action title
      *
-     * Titles can contain the following placeholders:
-     * - {singular}
-     * - {plural}
-     * - {resource}
-     *
      * @param string $title
      * @param array  $config
      *
      * @return string
      */
-    public function getTitle($title, $config = [])
+    protected function getTitle($title, $config = [])
     {
         $title = Arr::e($config, 'title', $title);
 
-        $title = str_replace('{singular}', $this->resource->singular(), $title);
-        $title = str_replace('{plural}', $this->resource->plural(), $title);
-        $title = str_replace('{resource}', $this->resource, $title);
-
         return $title;
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     */
+    protected function getAlert($resource, $type, $config = [], $fallback = 'update')
+    {
+        $prefix = 'mothership.';
+        // look for custom language key in the config
+        $langKey = Arr::e($config, $type.'Message');
+        Log::debug("custom key $langKey");
+        if (!$langKey) {
+            // then look for a language item based on the requesting (get) method
+            $langKey = 'alerts.'.$this->requestor.'.'.$type;
+            Log::debug("requestor key $langKey");
+        }
+        if (!Lang::has($prefix.$langKey)) {
+            // finally fallback to a generic message [update or create]
+            $langKey = 'alerts.'.$fallback.'.'.$type;
+            Log::debug("fallback key $langKey");
+        }
+
+        $placeHolders = [
+            'singular'  => $resource->singular(),
+            'plural'    => $resource->plural(),
+            'resource'  => $resource->__toString(),
+        ];
+        return Lang::get($prefix.$langKey, $placeHolders);
     }
 
     /**
