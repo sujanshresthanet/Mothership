@@ -126,39 +126,29 @@ class MothershipResourceController extends MothershipController
      *
      * @return  view
      **/
-    public function index($model = null, $modelId = null)
+    public function index($config = null)
     {
-        if ($model && $modelId) {
-            $resource = $model::find($modelId)->images()->paginate();
-            $this->related[$model] = $modelId;
-        } else {
-            $resource   = $this->resource->paginate(15);
-        }
-        $columns    = $this->resource->getColumns($this->columns);
+        $paginator  = $this->resource->paginate(15);
 
-        $controller = Request::segment(2);
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
+        $title   = $this->getTitle($this->resource, $config);
+        $caption = 'Displaying all '.$this->resource->plural();
+        $columns = $this->resource->getColumns($this->columns);
 
         $this->breadcrumbs['active'] = $this->resource->plural();
 
-        $createUri    = 'admin/'.$controller.'/create';
-        if ($this->related) {
-            foreach ($this->related as $relatedModel => $relatedId) {
-                $createUri .= '/'.$relatedModel.'/'.$relatedId;
-            }
-        }
-        $createButton = Mothership::button($createUri, $singular, 'create');
+        $createUri    = 'admin/'.$this->controller.'/create';
+        
+        $createButton = Mothership::button($createUri, $this->resource->singular(), 'create');
 
         $data = [
             'breadcrumbs'    => $this->breadcrumbs,
-            'resource'       => $resource,
-            'title'          => 'All '.$plural,
-            'createButton'   => $createButton,
-            'controller'     => $controller,
+            'resource'       => $this->resource,
+            'paginator'      => $paginator,
+            'title'          => $title,
+            'caption'        => $caption,
             'columns'        => $columns,
-            'singular'       => $singular,
-            'plural'         => $plural,
+            'controller'     => $this->controller,
+            'createButton'   => $createButton,
         ];
 
         return View::make('mothership::resource.table')

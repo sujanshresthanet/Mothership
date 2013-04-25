@@ -11,7 +11,7 @@
     {{ $createButton }}
 </nav>
 <table class="table table-bordered table-striped table-hover">
-    <caption>Displaying all {{ $plural }}</caption>
+    <caption>{{ $caption }}</caption>
     <thead>
         <tr>
             <th><input id="row-all" name="ids-all" type="checkbox" /></th>
@@ -26,7 +26,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($resource as $r)
+        @foreach ($paginator as $r)
         <tr>
             <td><input id="row-{{ $r->id }}" name="ids[]" type="checkbox" value="{{ $r->id }}"/></td>
         @foreach ($columns as $k => $v)
@@ -46,6 +46,6 @@
 </table>
 </table>
 <div class="pagination pagination-centered">
-    {{ $resource->links() }}
+    {{ $paginator->links() }}
 </div>
 @stop

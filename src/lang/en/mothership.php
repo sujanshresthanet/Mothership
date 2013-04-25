@@ -24,6 +24,7 @@ return array(
         ],
     ],
     'titles' => [
+        'index'    => 'All :plural',
         'show'     => 'View :singular: :resource',
         'edit'     => 'Edit :singular: :resource',
         'password' => 'Update password: :resource',
