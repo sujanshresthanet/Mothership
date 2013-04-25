@@ -693,32 +693,52 @@ class MothershipResourceController extends MothershipController
      */
     protected function getTitle($title, $config = [])
     {
+        $prefix = 'mothership.';
         $title = Arr::e($config, 'title', $title);
 
         return $title;
     }
 
     /**
+     * Returns a localized alert string that will be displayed to the
+     * user after they have completed an action.
      *
+     * Strings are defined in the mothership language file.
+     * There are a number of ways to define which string is returned.
      *
+     * Custom:
+     * In the $config array. If $type='update' add the language path
+     * to $config['updateAlert']
      *
+     * Auto:
+     * If you have a custom edit page controller/{id}/details
+     * this method will look to see if the language line
+     * alerts.details.{type}
      *
+     * Generic:
+     * The default option is to return one of the generic alert messages.
+     * These are defined in the language line  alerts.{fallback}.{type}
+     *
+     * @param object $resource
+     * @param string $type
+     * @param array  $config
+     * @param string $fallback
+     *
+     * @return string
      */
-    protected function getAlert($resource, $type, $config = [], $fallback = 'update')
+    protected function getAlert($resource, $type, $config = [], $fallback = 'edit')
     {
         $prefix = 'mothership.';
         // look for custom language key in the config
-        $langKey = Arr::e($config, $type.'Message');
-        Log::debug("custom key $langKey");
+        $langKey = Arr::e($config, $type.'Alert');
+
         if (!$langKey) {
             // then look for a language item based on the requesting (get) method
             $langKey = 'alerts.'.$this->requestor.'.'.$type;
-            Log::debug("requestor key $langKey");
         }
         if (!Lang::has($prefix.$langKey)) {
             // finally fallback to a generic message [update or create]
             $langKey = 'alerts.'.$fallback.'.'.$type;
-            Log::debug("fallback key $langKey");
         }
 
         $placeHolders = [
