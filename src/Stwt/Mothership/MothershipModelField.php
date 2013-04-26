@@ -291,7 +291,9 @@ class MothershipModelField
     private function initDatetime()
     {
         $type = $this->dataType;
-        if (!$this->type) {
+        if (in_array($this->name, ['created_at', 'updated_at'])) {
+            $this->type = 'hidden';
+        } elseif (!$this->type) {
             $this->type = 'datetime';
         }
         $this->validation[] = 'date_format:Y-m-d H:i:s';

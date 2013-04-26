@@ -19,8 +19,9 @@ use Log;
 use URL;
 use Request;
 use Redirect;
-use Stwt\GoodForm\GoodForm as GoodForm;
 use Session;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as NotFoundHttpException;
+use Stwt\GoodForm\GoodForm as GoodForm;
 use Validator;
 use View;
 
@@ -101,7 +102,11 @@ class MothershipResourceController extends MothershipController
         $this->controller = Request::segment(2);
         $this->method     = Request::segment(4);
         if (!$this->method) {
-            $this->method = (Request::segment(3) ? 'show' : 'index');
+            if (is_string(Request::segment(3))) {
+                $this->method = Request::segment(3);
+            } else {
+                $this->method = (Request::segment(3) ? 'show' : 'index');
+            }
         }
         $this->requestor  = Input::get('_requestor');
         
@@ -131,7 +136,7 @@ class MothershipResourceController extends MothershipController
     {
         $paginator  = $this->resource->paginate(15);
 
-        $title   = $this->getTitle($this->resource, $config);
+        $title   = $this->getTitle($this->resource, $config, 'index');
         $caption = 'Displaying all '.$this->resource->plural();
         $columns = $this->resource->getColumns($this->columns);
 
@@ -164,49 +169,87 @@ class MothershipResourceController extends MothershipController
      **/
     public function create($config = [])
     {
-        if ($model && $modelId) {
-            $this->related[$model] = $modelId;
-        }
-        $action = $this->getAction('create', 'create');
-        $fields = (isset($action['fields']) ? $action['fields'] : []);
-        $fields = $this->resource->getFields($fields);
-
-        $controller = Request::segment(2);
-        $plural     = $this->resource->plural();
-        $singular   = $this->resource->singular();
-        $title      = 'Create '.$singular;
+        $fields = $this->getFields($this->resource, $config);
+        $title  = $this->getTitle($this->resource, $config, 'create');
 
         $this->breadcrumbs['active'] = 'Create';
 
+        // start building the form
         $form   = new GoodForm();
-        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'POST']);
+        
+        // add field to store request type
+        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'POST'];
+        $form->add($methodField);
+        
+        // This is the route a failed form will redirect to
+        $form->add(['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()]);
+
+        // This is the route a succesfull form will redirect to
+        $form->add(
+            [
+                'type' => 'hidden',
+                'name' => '_redirect_success',
+                'value' => URL::to('admin/'.$this->controller),
+            ]
+        );
+
+        // add field to store the method that submitted the form
+        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
+        $form->add($redirectField);
 
         foreach ($fields as $name => $field) {
+            if ($this->resource->hasProperty($name) AND isset($this->resource->{$name})) {
+                // check if this field is a property - it probably
+                // wont but we may have pre assigned values
+                $field->value = $this->resource->{$name};
+            }
             $form->add($field);
         }
-        
+
+        // Add form actions
+        $form->addAction(
+            [
+                'class' => 'btn btn-primary',
+                'form'  => 'button',
+                'name'  => '_save',
+                'type'  => 'submit',
+                'value' => Arr::e($config, 'submitText', 'Save'),
+            ]
+        );
+        $form->addAction(
+            [
+                'class' => 'btn',
+                'form'  => 'button',
+                'name'  => '_cancel',
+                'type'  => 'reset',
+                'value' => 'Cancel',
+            ]
+        );
+
         $errors = Session::get('errors');
         if ($errors) {
             $form->addErrors($errors->getMessages());
         }
 
+        // generate the form action - default to "admin/controller"
+        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller));
+
         $formAttr = [
-            'action'    => $this->getResourceUrl($controller),
+            'action'    => $action,
             'class'     => 'form-horizontal',
             'method'    => 'POST',
         ];
         $form->attr($formAttr);
 
         $data   = [
-            'create'        => true,
-            'controller'    => $controller,
+            'create'        => false,
+            'controller'    => $this->controller,
             'fields'        => $fields,
             'form'          => $form,
             'resource'      => $this->resource,
-            'plural'        => $plural,
-            'singular'      => $singular,
             'title'         => $title,
         ];
+
         return View::make('mothership::resource.form')
             ->with($data)
             ->with($this->getTemplateData())
@@ -218,38 +261,41 @@ class MothershipResourceController extends MothershipController
      *
      * @return void (redirects)
      **/
-    public function store($model = null, $modelId = null)
+    public function store($config = [])
     {
-        if ($model && $modelId) {
-            $this->related[$model] = $modelId;
-        }
-
-        $inputData  = $this->getInputData(Input::all(), $this->resource);
-        $fields     = $this->resource->getFields();
-        $rules      = ($inputData ? $this->resource->getRules(array_keys($inputData)) : []);
+        $data   = Input::all();
+        $fields = array_keys($data);
+        $rules  = $this->getRules($this->resource, $fields, $config);
+        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
         
-        $controller = Request::segment(2);
-        $singular   = $this->resource->singular();
-
-        $validation = Validator::make(Input::all(), $rules);
-
+        $validation = Validator::make($data, $rules);
+        
         if ($validation->fails()) {
             $messages = $validation->messages();
-            Messages::add('error', 'Please correct form errors.');
-            
-            return Redirect::to('admin/'.$controller.'/create')
+            $message = $this->getAlert($this->resource, 'error', $config, 'create');
+            Messages::add('error', $message);
+            return Redirect::to(Input::get('_redirect'))
                 ->withInput()
                 ->withErrors($validation);
         } else {
-            foreach ($fields as $field => $spec) {
-                $this->resource->$field = Input::get($field);
+            foreach ($fields as $field) {
+                if ($this->resource->hasProperty($field) AND Input::get($field)) {
+                    $this->resource->$field = Input::get($field);
+                }
+            }
+            if (Arr::e($config, 'beforeSave')) {
+                $callback = Arr::e($config, 'beforeSave');
+                $callback($this->resource);
             }
             if ($this->resource->save()) {
-                Messages::add('success', 'Created '.$singular);
-                return Redirect::to('admin/'.$controller);
+                $message = $this->getAlert($this->resource, 'success', $config, 'create');
+                Messages::add('success', $message);
             }
-            return Redirect::to('admin/'.$controller.'/create')
-                ->withInput();
+            if (Arr::e($config, 'afterSave')) {
+                $callback = Arr::e($config, 'afterSave');
+                $callback($this->resource);
+            }
+            return Redirect::to(Input::get('_redirect_success'));
         }
     }
 
@@ -425,6 +471,54 @@ class MothershipResourceController extends MothershipController
     }
 
     /**
+     * Attempt to update a resource from the database
+     *
+     * @param int   $id     the resource id
+     * @param array $config override default update of form
+     *
+     * @return   void    (redirect) 
+     **/
+    public function update($id, $config = [])
+    {
+        $this->resource = $this->getResource($id);
+
+        $data   = Input::all();
+        $fields = array_keys($data);
+        $rules  = $this->getRules($this->resource, $fields, $config);
+        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
+        
+        $validation = Validator::make($data, $rules);
+        
+        if ($validation->fails()) {
+            $messages = $validation->messages();
+            $message = $this->getAlert($this->resource, 'error', $config);
+            Messages::add('error', $message);
+            return Redirect::to(Input::get('_redirect'))
+                ->withInput()
+                ->withErrors($validation);
+        } else {
+            foreach ($fields as $field) {
+                if ($this->resource->hasProperty($field) AND Input::get($field)) {
+                    $this->resource->$field = Input::get($field);
+                }
+            }
+            if (Arr::e($config, 'beforeSave')) {
+                $callback = Arr::e($config, 'beforeSave');
+                $callback($this->resource);
+            }
+            if ($this->resource->save()) {
+                $message = $this->getAlert($this->resource, 'success', $config);
+                Messages::add('success', $message);
+            }
+            if (Arr::e($config, 'afterSave')) {
+                $callback = Arr::e($config, 'afterSave');
+                $callback($this->resource);
+            }
+            return Redirect::to(Input::get('_redirect_success'));
+        }
+    }
+
+    /**
      * Construct a view displaying the resources update history
      *
      * @param int $id the resource id
@@ -553,56 +647,6 @@ class MothershipResourceController extends MothershipController
             ->with($data)
             ->with($this->getTemplateData())
             ->with('action_tabs', $this->getTabs());
-    }
-
-    /**
-     * Attempt to update a resource from the database
-     *
-     * @param int   $id     the resource id
-     * @param array $config override default update of form
-     *
-     * @return   void    (redirect) 
-     **/
-    public function update($id, $config = [])
-    {
-        $plural   = $this->resource->plural();
-        $singular = $this->resource->singular();
-
-        $this->resource = $this->getResource($id);
-        $data   = Input::all();
-        $fields = array_keys($data);
-        $rules  = $this->getRules($this->resource, $fields, $config);
-        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
-        
-        $validation = Validator::make($data, $rules);
-        
-        if ($validation->fails()) {
-            $messages = $validation->messages();
-            $message = $this->getAlert($this->resource, 'error', $config);
-            Messages::add('error', $message);
-            return Redirect::to(Input::get('_redirect'))
-                ->withInput()
-                ->withErrors($validation);
-        } else {
-            foreach ($fields as $field) {
-                if ($this->resource->hasProperty($field) AND Input::get($field)) {
-                    $this->resource->$field = Input::get($field);
-                }
-            }
-            if (Arr::e($config, 'beforeSave')) {
-                $callback = Arr::e($config, 'beforeSave');
-                $callback($this->resource);
-            }
-            if ($this->resource->save()) {
-                $message = $this->getAlert($this->resource, 'success', $config);
-                Messages::add('success', $message);
-            }
-            if (Arr::e($config, 'afterSave')) {
-                $callback = Arr::e($config, 'afterSave');
-                $callback($this->resource);
-            }
-            return Redirect::to(Input::get('_redirect_success'));
-        }
     }
 
     /**
@@ -833,16 +877,6 @@ class MothershipResourceController extends MothershipController
                 continue;
             }
             $data[$k] = $v;
-            /*if ($resource->hasProperty($k)) {
-                // skip if property has not changed value
-                if ($v AND $resource->$k == $v) {
-                    continue;
-                }
-                // only update field if it has changed
-                $data[$k] = $v;
-            } else {
-                $data[$k] = $v;
-            }*/
         }
         return $data;
     }
