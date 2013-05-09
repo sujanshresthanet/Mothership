@@ -408,6 +408,10 @@ class MothershipResourceController extends MothershipController
         $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
         $form->add($redirectField);
 
+        // add field to store url to redirect back to on success
+        $redirectSuccessField = ['type' => 'hidden', 'name' => '_redirect_success', 'value' => Request::url()];
+        $form->add($redirectSuccessField);
+
         // add field to store the method that submitted the form
         $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
         $form->add($redirectField);

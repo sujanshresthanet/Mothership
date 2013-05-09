@@ -1,5 +1,9 @@
 # Change Log
 
+## 9th May 2013
+
+* Added redirect on success field to update method (update this with more elegant solution later!)
+
 ## 24th April 2013
 
 * Fixed bug where foreign keys would be detected if "any" class existed with that name. Now we check that it's a class that extends from Mothership Model
