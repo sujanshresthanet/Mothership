@@ -182,10 +182,11 @@ class MothershipModel extends Revisionable
      */
     public function getRules($fields = [])
     {
-        $field = ($fields ?: array_keys($this->properties));
+        $fields = ($fields ?: array_keys($this->properties));
         $rules = [];
         if ($fields) {
             foreach ($fields as $k => $v) {
+                Log::error($k.' '.$v);
                 if (is_string($v) AND $this->hasProperty($v)) {
                     $rules[$v] = $this->getRule($v);
                 } elseif (is_array($v)) {

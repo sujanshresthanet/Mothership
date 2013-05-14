@@ -1,5 +1,9 @@
 # Change Log
 
+## 14th May 2013
+
+* Bug in the getFields method would return 0 rules if no parameter array was set
+
 ## 9th May 2013
 
 * Added redirect on success field to update method (update this with more elegant solution later!)
