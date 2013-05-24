@@ -294,7 +294,8 @@ class MothershipModelField
         if (in_array($this->name, ['created_at', 'updated_at'])) {
             $this->type = 'hidden';
         } elseif (!$this->type) {
-            $this->type = 'datetime';
+            $this->type = 'text';
+            $this->class = 'datetime';
         }
         $this->validation[] = 'date_format:Y-m-d H:i:s';
     }
