@@ -1,5 +1,9 @@
 # Change Log
 
+## 24th May 2013
+
+* Bug with MothershipModelField. Failed to detect subclasses of MothershipModel. Included namespace to class name to fix
+
 ## 14th May 2013
 
 * Bug in the getFields method would return 0 rules if no parameter array was set
