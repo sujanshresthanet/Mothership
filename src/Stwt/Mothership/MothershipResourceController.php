@@ -23,6 +23,7 @@ use Redirect;
 use Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as NotFoundHttpException;
 use Stwt\GoodForm\GoodForm as GoodForm;
+use Str;
 use Validator;
 use View;
 
@@ -109,7 +110,30 @@ class MothershipResourceController extends MothershipController
         $class = static::$model;
         $this->resource = new $class;
 
-        $this->parseRequestUri();        
+        $this->parseRequestUri();
+
+        $this->requestor  = Input::get('_requestor');
+
+        $this->buildBreadcrumbs();
+    }
+
+    protected function buildBreadcrumbs()
+    {
+        if ($this->actionType != 'collection') {
+            $this->breadcrumbs[$this->controller] = $this->resource->plural();
+        }
+
+        if ($this->isRelatedRequest()) {
+            $model = $this->related[0]['model'];
+            $id    = $this->related[0]['id'];
+            $controller = Str::plural($model);
+            $o = $model::find($id);
+
+            $this->breadcrumbs[$controller] = $o->plural();
+
+            $uri = $controller.'/'.$id.'/edit';
+            $this->breadcrumbs[$uri] = $o;
+        }
     }
 
     /*
@@ -123,12 +147,6 @@ class MothershipResourceController extends MothershipController
         $this->method     = $this->getUriMethod();
         $this->actionType = $this->getUriActionType($this->method);
         $this->related    = $this->getUriRelated();
-        
-        $this->requestor  = Input::get('_requestor');
-        
-        if (Request::segment(3) != 'index' AND Request::segment(3)) {
-            $this->breadcrumbs[$this->controller] = $this->resource->plural();
-        }
     }
 
     /*
