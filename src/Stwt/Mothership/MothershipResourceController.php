@@ -13,6 +13,7 @@
 
 namespace Stwt\Mothership;
 
+use DB;
 use Input;
 use Lang;
 use Log;
@@ -48,16 +49,25 @@ class MothershipResourceController extends MothershipController
 
     protected $related;
 
+    // defines what sort of request we are runing
+    // collection, resource or single
+    protected $actionType;
+
     public $columns;
 
     /**
      * Default Actions in this controller
      */
     public $actions = [
-        'collection' => [],
+        'collection' => [
+            'index' => [
+                'label' => 'All',
+                'uri' => '{controller}/index',
+            ],
+        ],
         'single' => [
             'create' => [
-                'label' => 'Add User',
+                'label' => 'Add',
                 'uri' => '{controller}/create',
             ],
         ],
@@ -99,20 +109,105 @@ class MothershipResourceController extends MothershipController
         $class = static::$model;
         $this->resource = new $class;
 
-        $this->controller = Request::segment(2);
-        $this->method     = Request::segment(4);
-        if (!$this->method) {
-            if (is_string(Request::segment(3))) {
-                $this->method = Request::segment(3);
-            } else {
-                $this->method = (Request::segment(3) ? 'show' : 'index');
-            }
-        }
+        $this->parseRequestUri();        
+    }
+
+    /*
+     * Store key values from the uri like the controller and method.
+     *
+     *
+     */
+    protected function parseRequestUri()
+    {
+        $this->controller = $this->getUriController();
+        $this->method     = $this->getUriMethod();
+        $this->actionType = $this->getUriActionType($this->method);
+        $this->related    = $this->getUriRelated();
+        
         $this->requestor  = Input::get('_requestor');
         
         if (Request::segment(3) != 'index' AND Request::segment(3)) {
             $this->breadcrumbs[$this->controller] = $this->resource->plural();
         }
+    }
+
+    /*
+     * Returns the controller uri segment
+     *
+     * @return string
+     */
+    protected function getUriController()
+    {
+        return Request::segment(2);
+    }
+
+    /*
+     * Returns the method uri segment. We follow the following rules to define the method:
+     *
+     * 1. First look in the forth segment after the id e.g. /admin/controller/37/method
+     * 2. Use the uri segment after the controller if it is not an id
+     * 3. If we have a third segment (id) this must be the show method
+     * 4. If we have no third segment this must be the index
+     *
+     * @return string
+     */
+    protected function getUriMethod()
+    {
+        $method = Request::segment(4);
+        if (!$method) {
+            if (is_string(Request::segment(3))) {
+                $method = Request::segment(3);
+            } else {
+                $method = (Request::segment(3) ? 'show' : 'index');
+            }
+        }
+        return $method;
+    }
+
+    /**
+     * Return the type of action the current request is.
+     *
+     * @param string $method
+     *
+     * @return string
+     */
+    protected function getUriActionType($method)
+    {
+        $types = ['resource', 'collection', 'single'];
+
+        foreach ($types as $type) {
+            $actions = $this->getActions($type);
+            if (isset($actions[$method])) {
+                return $type;
+            }
+        }
+        return 'collection';
+    }
+
+    /**
+     * Looks at the Uri and checks if we have any related resources defined
+     * Depending on the type of action this is, the realted model and id will
+     * either begin in the fourth or fifth segment.
+     * e.g.
+     * - collection = /admin/controller/index/relatedModel/relatedId
+     * - single     = /admin/controller/create/relatedModel/relatedId
+     * - resource   = /admin/controller/65/edit/relatedModel/relatedId
+     *
+     * @param array;
+     */
+    protected function getUriRelated()
+    {
+        $offset = ($this->actionType == 'resource' ? 5 : 4 );
+        $related = [];
+        if (Request::segment($offset + 1)) {
+            $relatedModel = Request::segment($offset);
+            $relatedId    = Request::segment($offset + 1);
+            $related[] = [
+                'model' => $relatedModel,
+                'id'    => $relatedId,
+            ];
+        }
+        return $related;
     }
 
     /*
@@ -134,7 +229,13 @@ class MothershipResourceController extends MothershipController
      **/
     public function index($config = null)
     {
-        $paginator  = $this->resource->paginate(15);
+        $resource   = $this->queryRelated($this->resource);
+        $paginator  = $resource->orderBy('created_at', 'desc')->paginate(15);
+
+        $queries = DB::getQueryLog();
+        $lastQuery = end($queries);
+        Log::error('##########');
+        Log::error(print_r($queries, 1));
 
         $title   = $this->getTitle($this->resource, $config, 'index');
         $caption = 'Displaying all '.$this->resource->plural();
@@ -160,6 +261,40 @@ class MothershipResourceController extends MothershipController
         return View::make('mothership::resource.table')
             ->with($data)
             ->with($this->getTemplateData());
+    }
+
+    /*
+     * Checks if the current request is for related resources and
+     * adds that relationship clause to the query
+     *
+     * @param object $resource
+     *
+     * @return object
+     */
+    protected function queryRelated($resource)
+    {
+        if ($this->isRelatedRequest()) {
+            $model = $this->related[0]['model'];
+            $id = $this->related[0]['id'];
+
+            $foreignKey = $model.'_id';
+            if ($resource->hasProperty($foreignKey)) {
+                Log::error('Query related '.get_class($resource));
+                return $resource->where($foreignKey, '=', $id);
+                Log::error('Query related '.get_class($return));
+            }
+        }
+        return $resource;
+    }
+
+    /**
+     * Returns true if this request is an related request
+     *
+     * @return boolean
+     */
+    public function isRelatedRequest()
+    {
+        return $this->related ? true : false;
     }
 
     /**
