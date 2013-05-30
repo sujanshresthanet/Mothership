@@ -5,6 +5,8 @@
 * Added model property caching
 * Added a proper config file template
 * Made the home controller dynamic
+# Added related collection views
+# Added related breadcrumbs
 
 ## 24th May 2013
 
