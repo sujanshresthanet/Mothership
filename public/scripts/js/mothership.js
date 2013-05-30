@@ -1,9 +1,10 @@
-// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.min.js";
+// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/bootstrap-datetimepicker.min.js";
 
 $(function() {
     console.log('hi 0.2');
     // assign colors to data attributes and color swatch
-    $('.input-color').each(
+    // "vendor/bootstrap-colorpicker.js"
+    /*$('.input-color').each(
         function () {
             var $input = $(this).find('input');
             var color = $input.val();
@@ -15,7 +16,7 @@ $(function() {
             $(this).data('color', color);
         }
     );
-    $('.input-color').colorpicker();
+    $('.input-color').colorpicker();*/
 
     $('.datetime').datetimepicker();
 });

@@ -9,20 +9,21 @@
 | pages.
 |
 */
+$controllers = Config::get('mothership::controllers');
 
-if (Config::get('mothership.controllers')) {
+if ($controllers) {
 
-    Route::get('admin/login', 'AdminHomeController@getLogin');
-    Route::post('admin/login', 'AdminHomeController@postLogin');
+    $homeController = Config::get('mothership::homeController');
+
+    Route::get('admin/login', "$homeController@getLogin");
+    Route::post('admin/login', "$homeController@postLogin");
 
     Route::group(
         array('prefix' => 'admin', 'before' => 'mothership'),
-        function () {
-            Route::get('/', 'AdminHomeController@getIndex');
-            Route::get('home', 'AdminHomeController@getIndex');
-            Route::get('logout', 'AdminHomeController@getLogout');
-
-            $controllers = Config::get('mothership.controllers');
+        function () use ($controllers, $homeController) {
+            Route::get('/', "$homeController@getIndex");
+            Route::get('home', "$homeController@getIndex");
+            Route::get('logout', "$homeController@getLogout");
             
             foreach ($controllers as $path => $class) {
                 //Route::resource($path, $class);

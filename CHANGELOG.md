@@ -1,8 +1,16 @@
 # Change Log
 
+## 30th May 2013
+
+* Added model property caching
+* Added a proper config file template
+* Made the home controller dynamic
+
 ## 24th May 2013
 
 * Bug with MothershipModelField. Failed to detect subclasses of MothershipModel. Included namespace to class name to fix
+* Added bootstrap datetimepicker support
+* Removed colorpicker plugin for now as it causes conflict with datetimepicker
 
 ## 14th May 2013
 
