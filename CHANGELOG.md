@@ -1,5 +1,10 @@
 # Change Log
 
+## 30th May 2013
+
+* Added model property caching
+* Added a proper config file template
+
 ## 24th May 2013
 
 * Bug with MothershipModelField. Failed to detect subclasses of MothershipModel. Included namespace to class name to fix
