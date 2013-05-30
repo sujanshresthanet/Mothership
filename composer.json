@@ -12,7 +12,8 @@
         "illuminate/support": "4.0.x",
         "stwt/good-form": "dev-development",
         "codeguy/upload": "*",
-        "venturecraft/revisionable": "1.*"
+        "venturecraft/revisionable": "1.*",
+        "jasonlewis/expressive-date": "1.0.*"
     },
     "autoload": {
         "classmap": [

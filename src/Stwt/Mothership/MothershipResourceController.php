@@ -229,13 +229,18 @@ class MothershipResourceController extends MothershipController
      **/
     public function index($config = null)
     {
-        $resource   = $this->queryRelated($this->resource);
-        $paginator  = $resource->orderBy('created_at', 'desc')->paginate(15);
+        $resource   = $this->resource; 
+        $resource   = $this->queryRelated($resource);
+        $resource   = $this->queryOrderBy($resource);
+        $paginator  = $resource->paginate(15);
 
         $queries = DB::getQueryLog();
         $lastQuery = end($queries);
-        Log::error('##########');
+
+        Log::error('###############');
+        Log::error('# SQL Queries #');
         Log::error(print_r($queries, 1));
+        Log::error('###############');
 
         $title   = $this->getTitle($this->resource, $config, 'index');
         $caption = 'Displaying all '.$this->resource->plural();
@@ -285,6 +290,18 @@ class MothershipResourceController extends MothershipController
             }
         }
         return $resource;
+    }
+
+    /*
+     * Adds an order by clause to the resource query
+     *
+     * @param object $resource
+     *
+     * @return object
+     */
+    protected function queryOrderBy($resource)
+    {
+        return $resource->orderBy('created_at', 'desc');
     }
 
     /**
