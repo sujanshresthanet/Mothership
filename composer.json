@@ -1,6 +1,6 @@
 {
     "name": "stwt/mothership",
-    "description": "",
+    "description": "A Laravel based CRUD app framework.",
     "authors": [
         {
             "name": "Jim Wardlaw",
