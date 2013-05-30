@@ -1,5 +1,7 @@
 <?php namespace Stwt\Mothership;
 
+use Cache;
+use Config;
 use DB;
 use Log;
 use Stwt\Mothership\MothershipModelField as MothershipModelField;
@@ -91,10 +93,35 @@ class MothershipModel extends Revisionable
 
     /**
      * Loads table column schema from the database
+     * We cache this request to save database queries if cache
+     * is set to true in the mothership config file
      *
      * @return   void
      */
     public function loadColumns()
+    {
+        $key = 'Mothership'.get_class($this).'Properties';
+        $loadFromCache = Config::get('mothership.cache');
+        
+        if ($loadFromCache AND Cache::has($key)) {
+            $properties = Cache::get($key);
+        } else {
+            $properties = $this->loadColumnsFromDatabase();
+            if ($loadFromCache) {
+                Cache::forever($key, $properties);
+            }
+        }
+        $this->properties = $properties;
+    }
+
+    /**
+     * Query the database to get all columns in the table, then
+     * initialise a MothershipModelField instance for each column.
+     * This will automatically set the field type, validation rules ect.
+     *
+     * @return array
+     */
+    private function loadColumnsFromDatabase()
     {
         $columns = DB::select('show columns from '.$this->table);
         $properties = [];
@@ -103,7 +130,7 @@ class MothershipModel extends Revisionable
             $existing = (isset($this->properties[$name]) ? $this->properties[$name] : []);
             $properties[$name] = new MothershipModelField($column, $this->table, $existing);
         }
-        $this->properties = $properties;
+        return $properties;
     }
 
     /**
