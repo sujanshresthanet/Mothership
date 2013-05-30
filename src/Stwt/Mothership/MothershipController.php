@@ -28,7 +28,7 @@ class MothershipController extends Controller
         $data = [];
 
         $data['breadcrumbs'] = $this->breadcrumbs;
-        $data['navigation']  = Config::get('mothership.primaryNavigation');
+        $data['navigation']  = Config::get('mothership::primaryNavigation');
         
         if (Auth::check()) {
             $data['user'] = Auth::user();

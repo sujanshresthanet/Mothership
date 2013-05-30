@@ -101,8 +101,8 @@ class MothershipModel extends Revisionable
     public function loadColumns()
     {
         $key = 'Mothership'.get_class($this).'Properties';
-        $loadFromCache = Config::get('mothership.cache');
-        
+        $loadFromCache = Config::get('mothership::cache');
+
         if ($loadFromCache AND Cache::has($key)) {
             $properties = Cache::get($key);
         } else {
