@@ -46,8 +46,10 @@ return [
 	| Cache
 	|--------------------------------------------------------------------------
 	|
-	| Controlls the caching used by Mothership. If cache is set to true, we
-	| cache things like Model column definition to speed up the application.
+	| Controlls the caching used by Mothership. Set this variable to the length
+	| of time you wish the cache to last. If cache is set to false, we will never
+	| cache data. The cache is used to store the Model's column definition to 
+	| speed up the application.
 	|
 	*/
     'cache' => false,

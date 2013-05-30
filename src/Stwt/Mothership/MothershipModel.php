@@ -94,21 +94,23 @@ class MothershipModel extends Revisionable
     /**
      * Loads table column schema from the database
      * We cache this request to save database queries if cache
-     * is set to true in the mothership config file
+     * time is set in the mothership config file.
      *
      * @return   void
      */
     public function loadColumns()
     {
         $key = 'Mothership'.get_class($this).'Properties';
-        $loadFromCache = Config::get('mothership::cache');
+        $cacheTime = Config::get('mothership::cache');
 
-        if ($loadFromCache AND Cache::has($key)) {
+        if ($cacheTime AND Cache::has($key)) {
+            //Log::error("Load properties from cache $key");
             $properties = Cache::get($key);
         } else {
             $properties = $this->loadColumnsFromDatabase();
-            if ($loadFromCache) {
-                Cache::forever($key, $properties);
+            if ($cacheTime) {
+                Cache::put($key, $properties, $cacheTime);
+                Log::error("Store properties in cache $key");
             }
         }
         $this->properties = $properties;
