@@ -3,6 +3,7 @@
 ## 31st May 2013
 
 * Date fields now return a "relative" date string in tables by default. e.g. "7 hours ago"
+# Fixed bug with auto creating select element for foreign keys. Was setting $type to select, not $form.
 
 ## 30th May 2013
 

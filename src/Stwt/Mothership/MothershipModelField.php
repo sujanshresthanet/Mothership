@@ -195,7 +195,7 @@ class MothershipModelField
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
             if (class_exists($relatedModel) AND is_subclass_of($relatedModel, 'Stwt\Mothership\MothershipModel')) {
-                $this->type = 'select';
+                $this->form = 'select';
                 $this->options = [];
                 $this->model = $relatedModel;
                 if (Str::endsWith($this->label, ' Id')) {
