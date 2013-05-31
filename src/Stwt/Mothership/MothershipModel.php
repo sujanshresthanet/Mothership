@@ -81,14 +81,26 @@ class MothershipModel extends Revisionable
         return 'null';
     }
 
+    /*
+     * Return a human readable name for this table
+     * by replacing underscores with spaces.
+     *
+     * @return string
+     */
+    protected function human()
+    {
+        return str_replace('_', ' ', $this->table);
+    }
+
     public function plural($uppercase = true)
     {
-        return ($uppercase ? ucwords($this->table) : $this->table);
+        return $uppercase ? ucwords($this->human()) : $this->human();
     }
 
     public function singular($uppercase = true)
     {
-        return trim(($uppercase ? ucwords($this->table) : $this->table), 's');
+        $singular = Str::singular($this->human());
+        return $uppercase ? ucwords($singular) : $singular;
     }
 
     /**
