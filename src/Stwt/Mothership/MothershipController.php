@@ -52,6 +52,11 @@ class MothershipController extends Controller
 
         if (Auth::attempt($credentials)) {
             Messages::add('success', 'You are now logged in');
+            
+            $user = Auth::user();
+            $user->last_login = date('Y-m-d H:i:s');
+            $user->save();
+
             return Redirect::to('admin');
         }
         Messages::add('error', 'Login incorrect, please try again');

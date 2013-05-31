@@ -12,7 +12,8 @@
 @stop
 
 @section('sidebar')
-<h2>Sidebar</h2>
+<h2>Welcome {{ $user->username }}</h2>
+<p>You last logged in <span class="label">{{ $user->lastLogin() }}</span></p>
 <ul>
     <li>Item One</li>
     <li>Item Two</li>

@@ -39,6 +39,15 @@ class MothershipUserModel extends MothershipModel implements UserInterface, Remi
         return $this->first_name.' '.$this->last_name;
     }
 
+    public function lastLogin()
+    {
+        if (!$this->last_login) {
+            return 'never…';
+        }
+        $date = new \ExpressiveDate($this->last_login);
+        return $date->getRelativeDate();
+    }
+
     /**
      * Get the unique identifier for the user.
      *
