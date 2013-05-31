@@ -12,6 +12,12 @@ class MothershipUserModel extends MothershipModel implements UserInterface, Remi
      */
     protected $table = 'users';
 
+    public $properties = [
+        'password' => [
+            'type' => 'password',
+        ],
+    ];
+
     /**
      * The attributes excluded from the model's JSON form.
      *

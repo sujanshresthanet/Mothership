@@ -3,8 +3,9 @@
 ## 31st May 2013
 
 * Date fields now return a "relative" date string in tables by default. e.g. "7 hours ago"
-# Fixed bug with auto creating select element for foreign keys. Was setting $type to select, not $form.
+* Fixed bug with auto creating select element for foreign keys. Was setting $type to select, not $form.
 * Updated the singular and plural functions
+* Added 'Update Profile' & 'Change Password' actions to the home controller
 
 ## 30th May 2013
 

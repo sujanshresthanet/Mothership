@@ -27,6 +27,7 @@ if ($controllers) {
             Route::get('profile', "$homeController@getProfile");
             Route::put('profile', "$homeController@putProfile");
             Route::get('password', "$homeController@getPassword");
+            Route::put('password', "$homeController@putPassword");
 
             Route::get('logout', "$homeController@getLogout");            
             foreach ($controllers as $path => $class) {

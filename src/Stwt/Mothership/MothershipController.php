@@ -6,9 +6,11 @@ use Config;
 use Input;
 use Redirect;
 use Log;
+use Hash;
 use View;
 use URI;
 use URL;
+use Session;
 use Stwt\GoodForm\GoodForm as GoodForm;
 use Validator;
 
@@ -52,9 +54,48 @@ class MothershipController extends Controller
             ->with($data);
     }
 
+    /**
+     * Render a form to login to the admin
+     *
+     * @return View
+     */
     public function getLogin()
     {
         return View::make('mothership::home.login')->with($this->getTemplateData());
+    }
+
+    /**
+     * Attempt to login the user
+     *
+     * @return Redirect
+     */
+    public function postLogin()
+    {
+        $credentials = ['email' => Input::get('email'), 'password' => Input::get('password')];
+
+        if (Auth::attempt($credentials)) {
+            Messages::add('success', 'You are now logged in');
+            
+            $user = Auth::user();
+            $user->last_login = date('Y-m-d H:i:s');
+            $user->save();
+
+            return Redirect::to('admin');
+        }
+        Messages::add('error', 'Login incorrect, please try again');
+        return Redirect::to('admin/login');
+    }
+
+    /**
+     * Log the user out of the admin
+     *
+     * @return Redirect
+     */
+    public function getLogout()
+    {
+        Auth::logout();
+        Messages::add('success', 'You have been logged out');
+        return Redirect::to('admin/login');
     }
 
     /**
@@ -77,6 +118,11 @@ class MothershipController extends Controller
         foreach ($fields as $name => $field) {
             $field->value = $user->{$name};
             $form->add($field);
+        }
+
+        $errors = Session::get('errors');
+        if ($errors) {
+            $form->addErrors($errors->getMessages());
         }
 
         // Add form actions
@@ -103,6 +149,7 @@ class MothershipController extends Controller
             'class'     => 'form-horizontal',
             'method'    => 'POST',
         ];
+
         $form->attr($formAttr);
 
         $data['title'] = 'Your Profile';
@@ -146,36 +193,125 @@ class MothershipController extends Controller
                 Messages::add('success', $message);
             }
             return Redirect::to(URL::to('admin/profile'));
-        }
-        
+        }    
     }
 
+    /**
+     * Render a form to update user password
+     *
+     * @return View
+     */
     public function getPassword()
     {
-        return 'Password';
-    }
+        $data = [];
 
-    public function postLogin()
-    {
-        $credentials = ['email' => Input::get('email'), 'password' => Input::get('password')];
+        $form = new GoodForm;
+        $user = \User::find(Auth::user()->id);
 
-        if (Auth::attempt($credentials)) {
-            Messages::add('success', 'You are now logged in');
-            
-            $user = Auth::user();
-            $user->last_login = date('Y-m-d H:i:s');
-            $user->save();
+        // add field to store request type
+        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'PUT'];
+        $form->add($methodField);
 
-            return Redirect::to('admin');
+        // get current rules assigned to the password property
+        // our confirmation property will also need to match these rules
+        $rules = $user->getPropery('password')->validation;
+
+        // add 'confirmed' rule to password - so it must match the new field
+        $user->addRule('password', 'confirmed');
+
+        $fields = [
+            'password',
+            'password_confirmation' => [
+                'label'      => 'Confirm password',
+                'name'       => 'password_confirmation',
+                'type'       => 'password',
+                'validation' => $rules,
+            ],
+        ];
+
+        $fields = $user->getFields($fields);
+        foreach ($fields as $name => $field) {
+            $form->add($field);
         }
-        Messages::add('error', 'Login incorrect, please try again');
-        return Redirect::to('admin/login');
+
+        $errors = Session::get('errors');
+        if ($errors) {
+            $form->addErrors($errors->getMessages());
+        }
+
+        // Add form actions
+        $form->addAction(
+            [
+                'class' => 'btn btn-primary',
+                'form'  => 'button',
+                'name'  => '_save',
+                'type'  => 'submit',
+                'value' => 'Update',
+            ]
+        );
+        $form->addAction(
+            [
+                'class' => 'btn',
+                'form'  => 'button',
+                'name'  => '_cancel',
+                'type'  => 'reset',
+                'value' => 'Cancel',
+            ]
+        );
+
+        $formAttr = [
+            'class'     => 'form-horizontal',
+            'method'    => 'POST',
+        ];
+        $form->attr($formAttr);
+
+        $data['title'] = 'Change Password';
+        $data['content'] = $form->generate();
+
+        return View::make('mothership::home.index')
+            ->with($data)
+            ->with($this->getTemplateData());
     }
 
-    public function getLogout()
+    /**
+     * Update the users password
+     *
+     * @return Redirect
+     */
+    public function putPassword()
     {
-        Auth::logout();
-        Messages::add('success', 'You have been logged out');
-        return Redirect::to('admin/login');
+        $user = \User::find(Auth::user()->id);
+
+        $data   = Input::all();
+        $fields = array_keys($data);
+        
+        $passwordRules = $user->getPropery('password')->validation;
+
+        $confirmationRules = $passwordRules;
+        $passwordRules[]   = 'confirmed';
+
+        $rules = [
+            'password'              => $passwordRules,
+            'password_confirmation' => $confirmationRules
+        ];
+        
+        $validation = Validator::make($data, $rules);
+
+        if ($validation->fails()) {
+            $messages = $validation->messages();
+            $message = 'There was an error updating your password. Please correct errors in the Form.';
+            Messages::add('error', $message);
+            return Redirect::to(URL::to('admin/password'))
+                ->withInput()
+                ->withErrors($validation);
+        } else {
+            $user->password = Hash::make($data['password']);
+
+            if ($user->save()) {
+                $message = 'Password updated successfully!';
+                Messages::add('success', $message);
+            }
+            return Redirect::to(URL::to('admin/password'));
+        }
     }
 }
