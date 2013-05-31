@@ -17,7 +17,7 @@ class MothershipUserModel extends MothershipModel implements UserInterface, Remi
      *
      * @var array
      */
-    protected $hidden = array('password');
+    protected $hidden = array('password', 'last_login');
 
     /**
      * Returns the string description of the user

@@ -23,6 +23,11 @@ if ($controllers) {
         function () use ($controllers, $homeController) {
             Route::get('/', "$homeController@getIndex");
             Route::get('home', "$homeController@getIndex");
+
+            Route::get('profile', "$homeController@getProfile");
+            Route::put('profile', "$homeController@putProfile");
+            Route::get('password', "$homeController@getPassword");
+
             Route::get('logout', "$homeController@getLogout");            
             foreach ($controllers as $path => $class) {
                 //Route::resource($path, $class);
