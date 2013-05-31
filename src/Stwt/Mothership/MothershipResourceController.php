@@ -81,14 +81,6 @@ class MothershipResourceController extends MothershipController
                 'label' => 'Edit',
                 'uri' => '{controller}/{id}/edit',
             ],
-            'password' => [
-                'label' => 'Password',
-                'uri' => '{controller}/{id}/password',
-            ],
-            'history' => [
-                'label' => 'History',
-                'uri' => '{controller}/{id}/history',
-            ],
             'delete'  => [
                 'label' => 'Delete',
                 'uri' => '{controller}/{id}/delete',
