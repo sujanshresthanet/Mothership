@@ -1,5 +1,9 @@
 # Change Log
 
+## 31st May 2013
+
+* Date fields now return a "relative" date string in tables by default. e.g. "7 hours ago"
+
 ## 30th May 2013
 
 * Added model property caching

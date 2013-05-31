@@ -410,6 +410,9 @@ class MothershipModelField
     {
         if ($this->model) {
             return $instance->{$this->model};
+        } else if ($this->isDate()) {
+            $date = new \ExpressiveDate($instance->{$this->name});
+            return $date->getRelativeDate();
         }
         return $instance->{$this->name};
     }
@@ -491,6 +494,11 @@ class MothershipModelField
     protected function isScalar()
     {
         return in_array($this->type, ['number', 'double', 'integer']);
+    }
+
+    protected function isDate()
+    {
+        return in_array($this->dataType, ['date', 'datetime', 'timestamp']);
     }
 
     /**
