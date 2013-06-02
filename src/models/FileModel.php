@@ -36,10 +36,20 @@ class FileModel extends BaseModel
     public $maxSize = '20M';
 
     /**
-     * Server path to the upload directory root
-     * @var [type]
+     * The default subdirectory, this is the default dir that the source
+     * image will be stored in. null = no subdir
+     * 
+     * @var string
      */
-    protected $path;
+    protected $defaultSubDirectory = null;
+
+    /**
+     * Server path to the upload directory root - set it relative to the apps
+     * storage directory.
+     * 
+     * @var string
+     */
+    protected $path = '/uploads/files';
 
     /**
      * Constructs the instance and set's our upload dir
@@ -47,7 +57,7 @@ class FileModel extends BaseModel
     public function __construct ()
     {
         parent::__construct();
-        $this->path = storage_path().'/uploads/files';
+        $this->path = storage_path().$this->path;
     }
 
     public function __toString()
@@ -119,6 +129,7 @@ class FileModel extends BaseModel
      */
     public function getPath ($subDirectory = null)
     {
+        $subDirectory = ($subDirectory ? $subDirectory : $this->defaultSubDirectory);
         return $subDirectory ? $this->path.'/'.$subDirectory : $this->path;
     }
 
