@@ -3,7 +3,7 @@
 use Log;
 use Str;
 
-class MothershipModelField
+class Field
 {
     public $name;
     public $null;
@@ -108,7 +108,7 @@ class MothershipModelField
         if ($this->key == 'PRI') {
             $this->type = 'hidden';
         }
-        if ($this->key == 'PRI' OR $this->key == 'UNI') {
+        if ($this->key == 'PRI' or $this->key == 'UNI') {
             $this->validation[] = 'unique:'.$this->table;
         }
 
@@ -194,7 +194,7 @@ class MothershipModelField
         // check if this integer is a foreign key to a valid object
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
-            if (class_exists($relatedModel) AND is_subclass_of($relatedModel, 'Stwt\Mothership\MothershipModel')) {
+            if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\BaseModel')) {
                 $this->form = 'select';
                 $this->options = [];
                 $this->model = $relatedModel;
@@ -410,7 +410,7 @@ class MothershipModelField
     {
         if ($this->model) {
             return $instance->{$this->model};
-        } else if ($this->isDate()) {
+        } elseif ($this->isDate()) {
             $date = new \ExpressiveDate($instance->{$this->name});
             return $date->getRelativeDate();
         }

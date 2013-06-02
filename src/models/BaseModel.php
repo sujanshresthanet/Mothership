@@ -4,15 +4,15 @@ use Cache;
 use Config;
 use DB;
 use Log;
-use Stwt\Mothership\MothershipModelField as MothershipModelField;
 use Str;
-use Venturecraft\Revisionable\Revisionable;
+use Venturecraft\Revisionable\Revisionable as Revisionable;
 
-class MothershipModel extends Revisionable
+class BaseModel extends \Eloquent
 {
 
     protected $properties   = [];
-    protected $hidden       = ['password'];
+    protected $hidden       = ['created_at', 'updated_at'];
+    protected $guarded      = ['id', 'created_at', 'updated_at'];
 
     protected $columns      = null;
     protected $fields       = null;
@@ -116,13 +116,11 @@ class MothershipModel extends Revisionable
         $cacheTime = Config::get('mothership::cache');
 
         if ($cacheTime and Cache::has($key)) {
-            //Log::error("Load properties from cache $key");
             $properties = Cache::get($key);
         } else {
             $properties = $this->loadColumnsFromDatabase();
             if ($cacheTime) {
                 Cache::put($key, $properties, $cacheTime);
-                Log::error("Store properties in cache $key");
             }
         }
         $this->properties = $properties;
@@ -130,7 +128,7 @@ class MothershipModel extends Revisionable
 
     /**
      * Query the database to get all columns in the table, then
-     * initialise a MothershipModelField instance for each column.
+     * initialise a Field instance for each column.
      * This will automatically set the field type, validation rules ect.
      *
      * @return array
@@ -142,7 +140,7 @@ class MothershipModel extends Revisionable
         foreach ($columns as $column) {
             $name = $column->Field;
             $existing = (isset($this->properties[$name]) ? $this->properties[$name] : []);
-            $properties[$name] = new MothershipModelField($column, $this->table, $existing);
+            $properties[$name] = new Field($column, $this->table, $existing);
         }
         return $properties;
     }
@@ -227,7 +225,6 @@ class MothershipModel extends Revisionable
         $rules = [];
         if ($fields) {
             foreach ($fields as $k => $v) {
-                Log::error($k.' '.$v);
                 if (is_string($v) and $this->hasProperty($v)) {
                     $rules[$v] = $this->getRule($v);
                 } elseif (is_array($v)) {
@@ -301,7 +298,7 @@ class MothershipModel extends Revisionable
      *
      * @param string $property
      *
-     * @return object MothershipModelField
+     * @return object Field
      */
     public function getPropery($property)
     {

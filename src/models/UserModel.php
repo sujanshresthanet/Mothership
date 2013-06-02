@@ -1,9 +1,9 @@
 <?php namespace Stwt\Mothership;
 
-use Illuminate\Auth\UserInterface;
-use Illuminate\Auth\Reminders\RemindableInterface;
+use Illuminate\Auth\UserInterface as UserInterface;
+use Illuminate\Auth\Reminders\RemindableInterface as RemindableInterface;
 
-class MothershipUserModel extends MothershipModel implements UserInterface, RemindableInterface
+class UserModel extends BaseModel implements UserInterface, RemindableInterface
 {
     /**
      * The database table used by the model.
