@@ -18,6 +18,9 @@ class FileModel extends BaseModel
         ],
     ];
 
+    protected $hidden       = ['created_at', 'updated_at'];
+    protected $guarded      = ['id', 'filename', 'mime_type', 'created_at', 'updated_at'];
+
     /**
      * Allowed mime types
      * 
@@ -49,7 +52,7 @@ class FileModel extends BaseModel
 
     public function __toString()
     {
-        return $this->getFilename();
+        return $this->title;
     }
 
     /**
