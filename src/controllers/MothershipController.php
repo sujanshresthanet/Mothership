@@ -98,67 +98,7 @@ class MothershipController extends Controller
         return Redirect::to('admin/login');
     }
 
-    /**
-     * Render a form to update user profiles
-     * 
-     * @return View
-     */
-    public function getProfile()
-    {
-        $data = [];
 
-        $form = new GoodForm;
-        $user = \User::find(Auth::user()->id);
-
-        // add field to store request type
-        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'PUT'];
-        $form->add($methodField);
-
-        $fields = $user->getFields();
-        foreach ($fields as $name => $field) {
-            $field->value = $user->{$name};
-            $form->add($field);
-        }
-
-        $errors = Session::get('errors');
-        if ($errors) {
-            $form->addErrors($errors->getMessages());
-        }
-
-        // Add form actions
-        $form->addAction(
-            [
-                'class' => 'btn btn-primary',
-                'form'  => 'button',
-                'name'  => '_save',
-                'type'  => 'submit',
-                'value' => 'Save',
-            ]
-        );
-        $form->addAction(
-            [
-                'class' => 'btn',
-                'form'  => 'button',
-                'name'  => '_cancel',
-                'type'  => 'reset',
-                'value' => 'Cancel',
-            ]
-        );
-
-        $formAttr = [
-            'class'     => 'form-horizontal',
-            'method'    => 'POST',
-        ];
-
-        $form->attr($formAttr);
-
-        $data['title'] = 'Your Profile';
-        $data['content'] = $form->generate();
-
-        return View::make('mothership::home.index')
-            ->with($data)
-            ->with($this->getTemplateData());
-    }
 
     /**
      * Update the logged in users profile
