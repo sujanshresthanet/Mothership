@@ -41,8 +41,8 @@ class ImageModel extends FileModel
             'w' => 500,
             'h' => null,
         ],
-        'thumn' => [
-            'w' => 500,
+        'thumb' => [
+            'w' => 100,
             'h' => null,
         ],
     ];
@@ -71,6 +71,25 @@ class ImageModel extends FileModel
     protected $path = '/uploads/images';
 
     /****************************/
+
+    /**
+     * Delete images from the server
+     * 
+     * @param string $subDirectory
+     * 
+     * @return [type]
+     */
+    public function deleteFile($subDirectory = null)
+    {
+        if (!$subDirectory) {
+            foreach ($this->sizes as $name => $dimensions) {
+                parent::deleteFile($name);
+            }
+            return true;
+        } else {
+            parent::deleteFile($subDirectory);
+        }
+    }
 
     /**
      * Returns the public url to the image
@@ -113,7 +132,7 @@ class ImageModel extends FileModel
      */
     public function initImage()
     {
-       foreach ($this->sizes as $name => $dimensions) {
+        foreach ($this->sizes as $name => $dimensions) {
             if ($this->defaultSubDirectory == $name) {
                 continue;
             }
@@ -152,8 +171,8 @@ class ImageModel extends FileModel
         );
 
         // Saving the result
-        $dirPath         = $tile->getPath($name);
-        $filename        = $tile->getFilename();
+        $dirPath         = $this->getPath($name);
+        $filename        = $this->getFilename();
         $createFolders   = true;
         $backgroundColor = null;
         $imageQuality    = 95;
