@@ -83,7 +83,17 @@ class FileController extends ResourceController
 
         $resource->renameFile($file);
 
+        $callback = Arr::e($config, 'beforeSave');
+        if ($callback) {
+            $callback($resource);
+        }
+
         $resource->save();
+
+        $callback = Arr::e($config, 'afterSave');
+        if ($callback) {
+            $callback($resource);
+        }
 
         $message = $this->getAlert($resource, 'success', $config, 'create');
         Messages::add('success', $message);

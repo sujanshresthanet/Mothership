@@ -43,10 +43,32 @@ class ImageController extends FileController
         parent::__construct();
         $this->columns = [
             'Image' => function ($image) {
-                return $image->image('source', $image->title, ['width' => 100]);
+                return $image->image('source', $image->title, ['width' => 120]);
             },
             'title',
             'created_at',
         ];
+    }
+
+
+    /**
+     * Extend the store method to add a beforeSave callback
+     * that will resize images to all defined dimesions.
+     * 
+     * @param  array $config
+     * 
+     * @return Redirect
+     */
+    public function store($config = [])
+    {
+        $config = Arr::s(
+            $config,
+            'afterSave',
+            function ($image) {
+                $image->initImage();
+            }
+        );
+
+        return parent::store($config);
     }
 }

@@ -2,6 +2,7 @@
 
 use HTML;
 use Log;
+use PHPImageWorkshop\ImageWorkshop as ImageWorkshop;
 use URL;
 
 class ImageModel extends FileModel
@@ -25,6 +26,26 @@ class ImageModel extends FileModel
      * @var array
      */
     public $mimeTypes = ['image/png', 'image/jpeg'];
+
+    /**
+     * Array of image dimensions this image is available in
+     * 
+     * @var array
+     */
+    public $sizes = [
+        'source' => [
+            'w' => null,
+            'h' => null,
+        ],
+        'large' => [
+            'w' => 500,
+            'h' => null,
+        ],
+        'thumn' => [
+            'w' => 500,
+            'h' => null,
+        ],
+    ];
 
     /**
      * The route to the img controller that will return our image data
@@ -51,6 +72,12 @@ class ImageModel extends FileModel
 
     /****************************/
 
+    /**
+     * Returns the public url to the image
+     * 
+     * @param  string $size
+     * @return string
+     */
     public function src($size = null)
     {
         $size = is_null($size) ? $this->defaultSubDirectory : $size;
@@ -73,9 +100,72 @@ class ImageModel extends FileModel
      */
     public function image($size = null, $alt = null, $attributes = array())
     {
-
         $src = $this->src($size);
 
         return HTML::image($src, $alt, $attributes);
+    }
+
+    /**
+     * Initialise a new uploaded image by rezising to all predifined
+     * sizes
+     * 
+     * @return void
+     */
+    public function initImage()
+    {
+       foreach ($this->sizes as $name => $dimensions) {
+            if ($this->defaultSubDirectory == $name) {
+                continue;
+            }
+            $this->resizeImage($name, $dimensions);
+        }
+    }
+
+    /**
+     * Resize the image to a predefined size
+     * 
+     * @param  string $size
+     * @param  array $dimensions
+     * 
+     * @return void
+     */
+    protected function resizeImage($name, $dimensions)
+    {
+        // load image from master subdir
+        $layer = ImageWorkshop::initFromPath($this->getFilePath());
+
+        // resize specs
+        $thumbWidth         = $dimensions['w']; // px
+        $thumbHeight        = $dimensions['h'];
+        $conserveProportion = true;
+        $positionX          = 0; // px
+        $positionY          = 0; // px
+        $position           = 'MM';
+         
+        $layer->resizeInPixel(
+            $thumbWidth,
+            $thumbHeight,
+            $conserveProportion,
+            $positionX,
+            $positionY,
+            $position
+        );
+
+        // Saving the result
+        $dirPath         = $tile->getPath($name);
+        $filename        = $tile->getFilename();
+        $createFolders   = true;
+        $backgroundColor = null;
+        $imageQuality    = 95;
+        
+        Log::error('save '.$dirPath);
+
+        $layer->save(
+            $dirPath,
+            $filename,
+            $createFolders,
+            $backgroundColor,
+            $imageQuality
+        );
     }
 }

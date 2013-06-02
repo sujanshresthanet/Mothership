@@ -13,6 +13,7 @@
         "stwt/good-form": "dev-development",
         "stwt/img-yard": "dev-master",
         "codeguy/upload": "*",
+        "sybio/image-workshop": "dev-master",
         "venturecraft/revisionable": "1.*",
         "jasonlewis/expressive-date": "1.0.*"
     },
