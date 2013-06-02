@@ -471,7 +471,9 @@ class ResourceController extends BaseController
      **/
     public function edit($id, $config = [])
     {
-        $resource = $this->getResource($id);
+        $this->resource = $this->getResource($id);
+
+        $resource = $this->resource;
         $fields   = $this->getFields($resource, $config);
         $title    = $this->getTitle($resource, $config, 'create');
 
@@ -514,8 +516,9 @@ class ResourceController extends BaseController
      **/
     public function update($id, $config = [])
     {
-        $resource = $this->getResource($id);
-
+        $this->resource = $this->getResource($id);
+        
+        $resource = $this->resource;
         $errorMessage = $this->getAlert($resource, 'error', $config);
         $successMessage = $this->getAlert($resource, 'success', $config);
 
@@ -579,7 +582,6 @@ class ResourceController extends BaseController
      **/
     public function delete($id, $config = [])
     {
-        
         $this->resource = $this->getResource($id);
 
         $title  = $this->getTitle($this->resource, $config);
@@ -648,7 +650,7 @@ class ResourceController extends BaseController
 
         $data   = [
             'create'        => false,
-            'form'          => $form,
+            'form'          => $form->generate(),
             'resource'      => $this->resource,
             'title'         => $title,
         ];
@@ -657,6 +659,34 @@ class ResourceController extends BaseController
             ->with($data)
             ->with($this->getTemplateData())
             ->with('action_tabs', $this->getTabs());
+    }
+
+    /**
+     * Present a view confirm mass deletion of resources
+     * 
+     * @param  array $config
+     * 
+     * @return View
+     */
+    public function destroyCollection($config = [])
+    {
+        $ids = Input::get('ids');
+        $resource = $this->resource;
+        if (!$ids) {
+            $message = $this->getAlert($resource, 'empty', $config, 'massDelete');
+            Messages::add('warning', $message);
+        } else {
+            $items = $resource->whereIn('id', $ids)->get();
+            if ($items) {
+                $resource->whereIn('id', $ids)->delete();
+                $message = $this->getAlert($resource, 'success', $config, 'massDelete');
+                Messages::add('success', $message);
+            } else {
+                $message = $this->getAlert($resource, 'error', $config, 'massDelete');
+                Messages::add('error', $message);
+            }
+        }
+        return Redirect::to(Request::url());
     }
 
     /**

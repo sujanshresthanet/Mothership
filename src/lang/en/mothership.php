@@ -12,6 +12,13 @@ return array(
             'error'   => 'There was a problem <b>deleting</b> the :singular <b>:resource</b>.
                           Please correct errors in the form.',
         ],
+        'massDelete' => [
+            'success' => 'Selected :plural succesfully <b>deleted</b>.',
+            'empty'   => 'No <b>:plural</b> were selected for deletion.
+                          Tick the items yoy wish to delete and try again.',
+            'error'   => 'There was a problem <b>deleting</b> selected :plural.
+                          Please try again.',
+        ],
         'edit' => [
             'success' => ':singular <b>:resource</b> updated succesfully.',
             'error'   => 'There was a problem saving the :singular <b>:resource</b>.

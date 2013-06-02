@@ -29,7 +29,7 @@ if ($controllers) {
             Route::get('password', "$homeController@getPassword");
             Route::put('password', "$homeController@putPassword");
 
-            Route::get('logout', "$homeController@getLogout");            
+            Route::get('logout', "$homeController@getLogout");
             foreach ($controllers as $path => $class) {
                 //Route::resource($path, $class);
                 
@@ -114,6 +114,8 @@ if ($controllers) {
                 // ---------------
                 // destroy
                 Route::delete($path.'/{id}', $class.'@destroy');
+                // mass delete
+                Route::delete($path, $class.'@destroyCollection');
             }
         }
     );
