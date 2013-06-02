@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Redirect as Redirect;
 use Illuminate\Support\Facades\URL as URL;
 use Illuminate\Support\Facades\Validator as Validator;
 
+/**
+ * The FormGenerator class is used to both Build and Update
+ * Forms that are tightly coupled with models.
+ */
 class FormGenerator
 {
     /**
@@ -87,6 +91,22 @@ class FormGenerator
      * @var URL
      */
     private $errorRedirect;
+
+    /**
+     * Closure to call before the resource object is saved.
+     * The closure will have one argument, the resource instance.
+     * 
+     * @var closure
+     */
+    private $beforeSave;
+
+    /**
+     * Closure to call before the resource object is saved.
+     * The closure will have one argument, the resource instance.
+     * 
+     * @var closure
+     */
+    private $afterSave;
 
     /**
      * Sets the resource object that we will build/update the form
@@ -325,6 +345,36 @@ class FormGenerator
     }
 
     /**
+     * Defines a closure to be called right before the resource is
+     * saved. The closure will accept an instance of the resource
+     * as an arguement.
+     * 
+     * @param closure $closure
+     * 
+     * @return object
+     */
+    public function beforeSave($closure)
+    {
+        $this->beforeSave = $closure;
+        return $this;
+    }
+
+    /**
+     * Defines a closure to be called right after the resource is
+     * saved. The closure will accept an instance of the resource
+     * as an arguement.
+     * 
+     * @param closure $closure
+     * 
+     * @return object
+     */
+    public function afterSave($closure)
+    {
+        $this->afterSave = $closure;
+        return $this;
+    }
+
+    /**
      * Attempts to update a model instance with input data.
      * If $input parameter is null we use data from Input::all()
      *
@@ -338,21 +388,18 @@ class FormGenerator
 
         $rules = $this->getRules();
 
-        Log::error(print_r(array_keys($rules), 1));
-
         $validation = Validator::make($data, $rules);
 
         if ($validation->fails()) {
             Messages::add('error', $this->errorMessage);
             $messages = $validation->messages();
-            Log::error(print_r($messages, 1));
-
             $this->formSuccess = false;
             $this->validation = $validation;
         } else {
-            $this->resource->update($data);
+            $this->updateResource($data);
+            $this->callback('beforeSave');
             $this->resource->save();
-
+            $this->callback('afterSave');
             Messages::add('success', $this->successMessage);
             $this->formSuccess = true;
         }
@@ -403,8 +450,6 @@ class FormGenerator
      */
     private function addFieldsToForm($form)
     {
-        Log::error('#################');
-        Log::error('Fields: '.print_r(array_keys($this->fields), 1));
         foreach ($this->fields as $name => $field) {
             if ($this->resource->isProperty($name)) {
                 $field->value = $this->resource->{$name};
@@ -467,7 +512,41 @@ class FormGenerator
      */
     private function getRules()
     {
-        $fields = array_keys($this->fields);
-        return $this->resource->getRules();
+        if (!$this->rules) {
+            $fields = array_keys($this->fields);
+            return $this->resource->getRules($rules);
+        }
+        return $this->rules;
+    }
+
+    /**
+     * Update the resource fields with input data
+     * 
+     * @param array $data
+     * 
+     * @return void
+     */
+    private function updateResource($data)
+    {
+        foreach ($data as $key => $value) {
+            if ($this->resource->isProperty($key)) {
+                $this->resource->{$key} = $value;
+            }
+        }
+    }
+
+    /**
+     * Calls a defined callback if it's set
+     * 
+     * @param string $name
+     * 
+     * @return void
+     */
+    private function callback($name)
+    {
+        if ($this->{$name}) {
+            $callback = $this->{$name};
+            $callback($this->resource);
+        }
     }
 }
