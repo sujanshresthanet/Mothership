@@ -239,18 +239,13 @@ class ResourceController extends BaseController
      **/
     public function index($config = null)
     {
-        $resource   = $this->resource; 
+        $resource   = $this->resource;
         $resource   = $this->queryRelated($resource);
         $resource   = $this->queryOrderBy($resource);
         $paginator  = $resource->paginate(15);
 
         $queries = DB::getQueryLog();
         $lastQuery = end($queries);
-
-        Log::error('###############');
-        Log::error('# SQL Queries #');
-        Log::error(print_r($queries, 1));
-        Log::error('###############');
 
         $title   = $this->getTitle($this->resource, $config, 'index');
         $caption = 'Displaying all '.$this->resource->plural();
@@ -335,40 +330,17 @@ class ResourceController extends BaseController
         $fields   = $this->getFields($resource, $config);
         $title    = $this->getTitle($resource, $config, 'create');
 
+        // generate the form action - default to "admin/controller"
+        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller));
+
         $this->breadcrumbs['active'] = 'Create';
 
         $form = FormGenerator::resource($resource)
             ->method('post')
             ->fields($fields)
-            ->form();
-
-        /*
-        // This is the route a failed form will redirect to
-        $form->add(['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()]);
-
-        // This is the route a succesfull form will redirect to
-        $form->add(
-            [
-                'type' => 'hidden',
-                'name' => '_redirect_success',
-                'value' => URL::to('admin/'.$this->controller),
-            ]
-        );
-
-        // add field to store the method that submitted the form
-        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
-        $form->add($redirectField);
-        */
-
-        // generate the form action - default to "admin/controller"
-        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller));
-
-        $formAttr = [
-            'action'    => $action,
-            'class'     => 'form-horizontal',
-            'method'    => 'POST',
-        ];
-        $form->attr($formAttr);
+            ->form()
+                ->attr('action', $action)
+                ->generate();
 
         $data   = [
             'create'        => false,
@@ -392,40 +364,20 @@ class ResourceController extends BaseController
      **/
     public function store($config = [])
     {
-        $data   = Input::all();
-        $fields = array_keys($data);
-        $rules  = $this->getRules($this->resource, $fields, $config);
-        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
-        
-        $validation = Validator::make($data, $rules);
-        
-        if ($validation->fails()) {
-            $messages = $validation->messages();
-            $message = $this->getAlert($this->resource, 'error', $config, 'create');
-            Messages::add('error', $message);
-            return Redirect::to(Input::get('_redirect'))
-                ->withInput()
-                ->withErrors($validation);
-        } else {
-            foreach ($fields as $field) {
-                if ($this->resource->hasProperty($field) AND Input::get($field)) {
-                    $this->resource->$field = Input::get($field);
-                }
-            }
-            if (Arr::e($config, 'beforeSave')) {
-                $callback = Arr::e($config, 'beforeSave');
-                $callback($this->resource);
-            }
-            if ($this->resource->save()) {
-                $message = $this->getAlert($this->resource, 'success', $config, 'create');
-                Messages::add('success', $message);
-            }
-            if (Arr::e($config, 'afterSave')) {
-                $callback = Arr::e($config, 'afterSave');
-                $callback($this->resource);
-            }
-            return Redirect::to(Input::get('_redirect_success'));
-        }
+        $resource = $this->resource;
+
+        $errorMessage = $this->getAlert($resource, 'error', $config, 'create');
+        $successMessage = $this->getAlert($resource, 'success', $config, 'create');
+
+        return FormGenerator::resource($resource)
+            ->errorMessage($errorMessage)
+            ->successMessage($successMessage)
+            ->errorRedirect('admin/'.$this->controller.'/create')
+            ->successRedirect('admin/'.$this->controller)
+            ->beforeSave(Arr::e($config, 'beforeSave'))
+            ->afterSave(Arr::e($config, 'afterSave'))
+            ->save()
+            ->redirect();
     }
 
     /**
@@ -519,74 +471,23 @@ class ResourceController extends BaseController
      **/
     public function edit($id, $config = [])
     {
-        $this->resource = $this->getResource($id);
+        $resource = $this->getResource($id);
+        $fields   = $this->getFields($resource, $config);
+        $title    = $this->getTitle($resource, $config, 'create');
 
-        $fields = $this->getFields($this->resource, $config);
-        $title  = $this->getTitle($this->resource, $config);
+         // generate the form action - default to "admin/controller/id"
+        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller.'/'.$id));
 
         $this->breadcrumbs['active'] = 'Edit';
 
-        // start building the form
-        $form   = new GoodForm();
-        
-        // add field to store request type
-        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'PUT'];
-        $form->add($methodField);
-        
-        // add field to store url to redirect back to
-        $redirectField = ['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()];
-        $form->add($redirectField);
-
-        // add field to store url to redirect back to on success
-        $redirectSuccessField = ['type' => 'hidden', 'name' => '_redirect_success', 'value' => Request::url()];
-        $form->add($redirectSuccessField);
-
-        // add field to store the method that submitted the form
-        $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
-        $form->add($redirectField);
-
-        foreach ($fields as $name => $field) {
-            if ($this->resource->hasProperty($name)) {
-                // check if this field is a property
-                $field->value = $this->resource->{$name};
-            }
-            $form->add($field);
-        }
-
-        // Add form actions
-        $form->addAction(
-            [
-                'class' => 'btn btn-primary',
-                'form'  => 'button',
-                'name'  => '_save',
-                'type'  => 'submit',
-                'value' => Arr::e($config, 'submitText', 'Save'),
-            ]
-        );
-        $form->addAction(
-            [
-                'class' => 'btn',
-                'form'  => 'button',
-                'name'  => '_cancel',
-                'type'  => 'reset',
-                'value' => 'Cancel',
-            ]
-        );
-
-        $errors = Session::get('errors');
-        if ($errors) {
-            $form->addErrors($errors->getMessages());
-        }
-
-        // generate the form action - default to "admin/controller/id"
-        $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller.'/'.$id));
-
-        $formAttr = [
-            'action'    => $action,
-            'class'     => 'form-horizontal',
-            'method'    => 'POST',
-        ];
-        $form->attr($formAttr);
+        $form = FormGenerator::resource($resource)
+            ->method('put')
+            ->fields($fields)
+            ->saveButton(Arr::e($config, 'submitText', 'Save'))
+            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->form()
+                ->attr('action', $action)
+                ->generate();
 
         $data   = [
             'create'        => false,
@@ -613,42 +514,18 @@ class ResourceController extends BaseController
      **/
     public function update($id, $config = [])
     {
-        $this->resource = $this->getResource($id);
+        $resource = $this->getResource($id);
 
-        $data   = Input::all();
-        $fields = array_keys($data);
-        $rules  = $this->getRules($this->resource, $fields, $config);
-        $data   = $this->filterInputData($this->resource, $data, array_keys($rules));
-        
-        $validation = Validator::make($data, $rules);
-        
-        if ($validation->fails()) {
-            $messages = $validation->messages();
-            $message = $this->getAlert($this->resource, 'error', $config);
-            Messages::add('error', $message);
-            return Redirect::to(Input::get('_redirect'))
-                ->withInput()
-                ->withErrors($validation);
-        } else {
-            foreach ($fields as $field) {
-                if ($this->resource->hasProperty($field) AND Input::get($field)) {
-                    $this->resource->$field = Input::get($field);
-                }
-            }
-            if (Arr::e($config, 'beforeSave')) {
-                $callback = Arr::e($config, 'beforeSave');
-                $callback($this->resource);
-            }
-            if ($this->resource->save()) {
-                $message = $this->getAlert($this->resource, 'success', $config);
-                Messages::add('success', $message);
-            }
-            if (Arr::e($config, 'afterSave')) {
-                $callback = Arr::e($config, 'afterSave');
-                $callback($this->resource);
-            }
-            return Redirect::to(Input::get('_redirect_success'));
-        }
+        $errorMessage = $this->getAlert($resource, 'error', $config);
+        $successMessage = $this->getAlert($resource, 'success', $config);
+
+        return FormGenerator::resource($resource)
+            ->errorMessage($errorMessage)
+            ->successMessage($successMessage)
+            ->beforeSave(Arr::e($config, 'beforeSave'))
+            ->afterSave(Arr::e($config, 'afterSave'))
+            ->save()
+            ->redirect('admin/'.$this->controller.'/'.$id.'/edit');
     }
 
     /**
@@ -825,7 +702,7 @@ class ResourceController extends BaseController
     {
         $class = static::$model;
         $resource = $class::find($id);
-        if (!$resource->exists() AND $throwExceptionIfNotFound) {
+        if (!$resource->exists() and $throwExceptionIfNotFound) {
             throw new NotFoundHttpException;
         }
         return $resource;

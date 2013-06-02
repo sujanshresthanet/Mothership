@@ -310,7 +310,7 @@ class FormGenerator
      * 
      * @return object
      */
-    public function saveMessage($message)
+    public function successMessage($message)
     {
         $this->successMessage = $message;
         return $this;
@@ -386,7 +386,7 @@ class FormGenerator
     {
         $data = ($input ?: Input::all());
 
-        $rules = $this->getRules();
+        $rules = $this->getRules($data);
 
         $validation = Validator::make($data, $rules);
 
@@ -507,14 +507,16 @@ class FormGenerator
 
     /**
      * Return a rules array for all fields in the form
+     *
+     * @param array $data
      * 
      * @return array
      */
-    private function getRules()
+    private function getRules($data)
     {
         if (!$this->rules) {
-            $fields = array_keys($this->fields);
-            return $this->resource->getRules($rules);
+            $fields = array_keys($data);
+            return $this->resource->getRules($fields);
         }
         return $this->rules;
     }

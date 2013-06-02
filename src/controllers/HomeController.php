@@ -124,7 +124,7 @@ class HomeController extends BaseController
 
         return FormGenerator::resource($user)
             ->errorMessage('There was an error updating your profile. Please correct errors in the Form.')
-            ->saveMessage('Profile updated successfully!')
+            ->successMessage('Profile updated successfully!')
             ->save()
             ->redirect('admin/profile');
     }
@@ -177,7 +177,7 @@ class HomeController extends BaseController
                 }
             )
             ->errorMessage('There was an error updating your password. Please correct errors in the Form.')
-            ->saveMessage('Password updated successfully!')
+            ->successMessage('Password updated successfully!')
             ->save()
             ->redirect('admin/password');
     }

@@ -10,5 +10,5 @@
 
 @include('mothership::common.tabs')
 
-{{ $form->generate() }}
+{{ $form }}
 @stop
