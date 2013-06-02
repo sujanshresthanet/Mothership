@@ -79,7 +79,7 @@ class FormGenerator
 	 */
 	public function fields($fields)
 	{
-		$this->fields = $fields;
+		$this->fields = $this->resource->getFields($fields);
 		return $this;
 	}
 
@@ -222,7 +222,9 @@ class FormGenerator
 	 */
 
 	/**
-	 * Adds form fields for the resource instance
+	 * Adds form fields for the resource instance. Also check
+	 * if thie field is a property of the resource and set the
+	 * field value.
 	 *
 	 * @param GoodForm $form
 	 *
@@ -231,7 +233,9 @@ class FormGenerator
 	private function addFieldsToForm($form)
 	{
 		foreach ($this->fields as $name => $field) {
-            $field->value = $this->resource->{$name};
+			if ($this->resource->isProperty($name)) {
+	            $field->value = $this->resource->{$name};
+	        }
             $form->add($field);
         }
 	}
