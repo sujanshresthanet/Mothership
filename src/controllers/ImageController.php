@@ -5,7 +5,7 @@ use Messages;
 use Redirect;
 use Request;
 
-class MothershipImageController extends MothershipFileController
+class MothershipImageController extends FileController
 {
     public function store($relatedModel = null, $relatedId = null)
     {

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth as Auth;
 use Illuminate\Support\Facades\View as View;
 use User;
 
-class MothershipHomeController extends MothershipController
+class HomeController extends BaseController
 {
     /**
      * Render a form to update user profiles

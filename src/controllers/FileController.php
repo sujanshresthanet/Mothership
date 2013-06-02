@@ -6,7 +6,7 @@ use Session;
 use URL;
 use View;
 
-class MothershipFileController extends MothershipResourceController
+class FileController extends ResourceController
 {
     //
 }

@@ -5,7 +5,7 @@ use Input;
 use Request;
 use URL;
 
-class MothershipUserController extends MothershipResourceController
+class UserController extends ResourceController
 {
     /**
      * Class name of the Resource model this controller uses

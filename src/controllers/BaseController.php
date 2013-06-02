@@ -14,7 +14,7 @@ use Session;
 use Stwt\GoodForm\GoodForm as GoodForm;
 use Validator;
 
-class MothershipController extends Controller
+class BaseController extends Controller
 {
     
     protected $breadcrumbs;

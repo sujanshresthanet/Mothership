@@ -38,7 +38,7 @@ use View;
  * @license  http://www.wtfpl.net/txt/copying/ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
  * @link     http://stwt.co/
  */
-class MothershipResourceController extends MothershipController
+class ResourceController extends BaseController
 {
     public static $model;
 
