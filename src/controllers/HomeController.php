@@ -1,30 +1,26 @@
 <?php namespace Stwt\Mothership;
 
 use Illuminate\Support\Facades\Auth as Auth;
+use Illuminate\Support\Facades\Input as Input;
+use Illuminate\Support\Facades\Redirect as Redirect;
 use Illuminate\Support\Facades\View as View;
 use User;
 
+/**
+ * HomeController
+ *
+ * Base class for your admin Home controller. 
+ * Contains actions for:
+ * - Login              @getLogin/@postLogin
+ * - Logout             @getLogout
+ * - Homepage           @getIndex
+ * - Update Profiles    @getProfile/@postProfile
+ * - Change Password    @getPassword/@postPassword
+ */
 class HomeController extends BaseController
 {
     /**
-     * Render the admin homepage
-     *
-     * @return View
-     */
-    public function getIndex()
-    {
-        $data = [];
-
-        $data['title'] = 'Hi There!';
-        $data['content'] = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-
-        return View::make('mothership::home.index')
-            ->with($this->getTemplateData())
-            ->with($data);
-    }
-
-    /**
-     * Render a form to login to the admin
+     * Render a form to login a user to the admin
      *
      * @return View
      */
@@ -68,6 +64,29 @@ class HomeController extends BaseController
     }
 
     /**
+     * Render the admin homepage
+     *
+     * @return View
+     */
+    public function getIndex()
+    {
+        $data = [];
+
+        $data['title'] = 'Hi There!';
+        $data['content'] = 'Lorem ipsum dolor sit amet, consectetur 
+        adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore 
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
+        ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+        irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
+        sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+        return View::make('mothership::home.index')
+            ->with($this->getTemplateData())
+            ->with($data);
+    }
+
+    /**
      * Render a form to update user profiles
      * 
      * @return View
@@ -105,6 +124,16 @@ class HomeController extends BaseController
      */
     public function putProfile()
     {
+        $userId = Auth::user()->id;
+        $user   = User::find($userId);
+
+        return FormGenerator::resource($user)
+            ->errorMessage('There was an error updating your profile. Please correct errors in the Form.')
+            ->saveMessage('Profile updated successfully!')
+            ->save()
+            ->redirect('admin/profile');
+
+        /*
         $user = \User::find(Auth::user()->id);
 
         $data   = Input::all();
@@ -122,7 +151,7 @@ class HomeController extends BaseController
                 ->withErrors($validation);
         } else {
             foreach ($fields as $field) {
-                if ($user->hasProperty($field) AND Input::get($field)) {
+                if ($user->hasProperty($field) and Input::get($field)) {
                     $user->$field = Input::get($field);
                 }
             }
@@ -131,7 +160,8 @@ class HomeController extends BaseController
                 Messages::add('success', $message);
             }
             return Redirect::to(URL::to('admin/profile'));
-        }    
+        }
+        */
     }
 
     /**

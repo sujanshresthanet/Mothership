@@ -1,5 +1,13 @@
 # Change Log
 
+## 1st June
+
+* Added a new FormGenerator class to move form building logic outside of the controllers
+* Moved controllers to the controller dir and renamed, removing the Mothership prefix
+* Added HomeController class
+* Moved to use the Eloquent guarded array instead of hidden for generating default forms.
+* Fixed bug where getRules would return guarded field rules by defualt
+
 ## 31st May 2013
 
 * Date fields now return a "relative" date string in tables by default. e.g. "7 hours ago"

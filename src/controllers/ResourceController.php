@@ -331,18 +331,18 @@ class ResourceController extends BaseController
      **/
     public function create($config = [])
     {
-        $fields = $this->getFields($this->resource, $config);
-        $title  = $this->getTitle($this->resource, $config, 'create');
+        $resource = $this->resource;
+        $fields   = $this->getFields($resource, $config);
+        $title    = $this->getTitle($resource, $config, 'create');
 
         $this->breadcrumbs['active'] = 'Create';
 
-        // start building the form
-        $form   = new GoodForm();
-        
-        // add field to store request type
-        $methodField = ['type' => 'hidden', 'name' => '_method', 'value' => 'POST'];
-        $form->add($methodField);
-        
+        $form = FormGenerator::resource($resource)
+            ->method('post')
+            ->fields($fields)
+            ->form();
+
+        /*
         // This is the route a failed form will redirect to
         $form->add(['type' => 'hidden', 'name' => '_redirect', 'value' => Request::url()]);
 
@@ -358,40 +358,7 @@ class ResourceController extends BaseController
         // add field to store the method that submitted the form
         $redirectField = ['type' => 'hidden', 'name' => '_requestor', 'value' => $this->method];
         $form->add($redirectField);
-
-        foreach ($fields as $name => $field) {
-            if ($this->resource->hasProperty($name) AND isset($this->resource->{$name})) {
-                // check if this field is a property - it probably
-                // wont but we may have pre assigned values
-                $field->value = $this->resource->{$name};
-            }
-            $form->add($field);
-        }
-
-        // Add form actions
-        $form->addAction(
-            [
-                'class' => 'btn btn-primary',
-                'form'  => 'button',
-                'name'  => '_save',
-                'type'  => 'submit',
-                'value' => Arr::e($config, 'submitText', 'Save'),
-            ]
-        );
-        $form->addAction(
-            [
-                'class' => 'btn',
-                'form'  => 'button',
-                'name'  => '_cancel',
-                'type'  => 'reset',
-                'value' => 'Cancel',
-            ]
-        );
-
-        $errors = Session::get('errors');
-        if ($errors) {
-            $form->addErrors($errors->getMessages());
-        }
+        */
 
         // generate the form action - default to "admin/controller"
         $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller));

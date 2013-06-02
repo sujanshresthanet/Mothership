@@ -25,6 +25,8 @@ class MothershipUserModel extends MothershipModel implements UserInterface, Remi
      */
     protected $hidden = array('password', 'last_login');
 
+    protected $guarded = array('id', 'password', 'last_login', 'created_at', 'updated_at');
+    
     /**
      * Returns the string description of the user
      *

@@ -115,7 +115,7 @@ class MothershipModel extends Revisionable
         $key = 'Mothership'.get_class($this).'Properties';
         $cacheTime = Config::get('mothership::cache');
 
-        if ($cacheTime AND Cache::has($key)) {
+        if ($cacheTime and Cache::has($key)) {
             //Log::error("Load properties from cache $key");
             $properties = Cache::get($key);
         } else {
@@ -189,12 +189,12 @@ class MothershipModel extends Revisionable
      */
     public function getProperties($subset = null)
     {
-        $subset = ( $subset ?: array_diff(array_keys($this->properties), $this->hidden) );
+        $subset = ( $subset ?: array_diff(array_keys($this->properties), $this->guarded) );
         $properties = [];
         foreach ($subset as $k => $v) {
             if (is_callable($v)) {
                 $properties[$k] = $v;
-            } elseif (is_string($v) AND isset($this->properties[$v])) {
+            } elseif (is_string($v) and isset($this->properties[$v])) {
                 $properties[$v] = $this->properties[$v];
             } else {
                 $properties[$k] = $v;
@@ -223,12 +223,12 @@ class MothershipModel extends Revisionable
      */
     public function getRules($fields = [])
     {
-        $fields = ($fields ?: array_keys($this->properties));
+        $fields = ($fields ?: array_diff(array_keys($this->properties), $this->guarded));
         $rules = [];
         if ($fields) {
             foreach ($fields as $k => $v) {
                 Log::error($k.' '.$v);
-                if (is_string($v) AND $this->hasProperty($v)) {
+                if (is_string($v) and $this->hasProperty($v)) {
                     $rules[$v] = $this->getRule($v);
                 } elseif (is_array($v)) {
                     $rules[$k] = $this->getRule($k, $v);
