@@ -1,6 +1,7 @@
 <?php namespace Stwt\Mothership;
 
 use Illuminate\Support\Facades\Auth as Auth;
+use Illuminate\Support\Facades\Hash as Hash;
 use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Redirect as Redirect;
 use Illuminate\Support\Facades\View as View;
@@ -100,17 +101,11 @@ class HomeController extends BaseController
 
         $form = FormGenerator::resource($user)
             ->method('put')
-            ->form();
-
-        $formAttr = [
-            'class'     => 'form-horizontal',
-            'method'    => 'POST',
-        ];
-
-        $form->attr($formAttr);
+            ->form()
+            ->generate();
 
         $data['title'] = 'Your Profile';
-        $data['content'] = $form->generate();
+        $data['content'] = $form;
 
         return View::make('mothership::home.index')
             ->with($data)
@@ -132,36 +127,6 @@ class HomeController extends BaseController
             ->saveMessage('Profile updated successfully!')
             ->save()
             ->redirect('admin/profile');
-
-        /*
-        $user = \User::find(Auth::user()->id);
-
-        $data   = Input::all();
-        $fields = array_keys($data);
-        $rules  = $user->getRules($fields);
-        
-        $validation = Validator::make($data, $rules);
-
-        if ($validation->fails()) {
-            $messages = $validation->messages();
-            $message = 'There was an error updating your profile. Please correct errors in the Form.';
-            Messages::add('error', $message);
-            return Redirect::to(URL::to('admin/profile'))
-                ->withInput()
-                ->withErrors($validation);
-        } else {
-            foreach ($fields as $field) {
-                if ($user->hasProperty($field) and Input::get($field)) {
-                    $user->$field = Input::get($field);
-                }
-            }
-            if ($user->save()) {
-                $message = 'Profile updated successfully!';
-                Messages::add('success', $message);
-            }
-            return Redirect::to(URL::to('admin/profile'));
-        }
-        */
     }
 
     /**
@@ -176,26 +141,45 @@ class HomeController extends BaseController
         $userId = Auth::user()->id;
         $user   = User::find($userId);
 
-        $fields = $this->getUpdatePasswordFields($user);
+        $fields = $this->getPasswordFields($user);
 
         $form = FormGenerator::resource($user)
             ->method('put')
             ->fields($fields)
-            ->form();
-
-        $formAttr = [
-            'class'     => 'form-horizontal',
-            'method'    => 'POST',
-        ];
-
-        $form->attr($formAttr);
+            ->form()
+            ->generate();
 
         $data['title'] = 'Change Password';
-        $data['content'] = $form->generate();
+        $data['content'] = $form;
 
         return View::make('mothership::home.index')
             ->with($data)
             ->with($this->getTemplateData());
+    }
+
+    /**
+     * Update the users password
+     *
+     * @return Redirect
+     */
+    public function putPassword()
+    {
+        $userId = Auth::user()->id;
+        $user   = User::find($userId);
+
+        $rules = $this->getPasswordRules($user);
+
+        return FormGenerator::resource($user)
+            ->rules($rules)
+            ->beforeSave(
+                function ($resource) {
+                     $resource->password = Hash::make($resource->password);
+                }
+            )
+            ->errorMessage('There was an error updating your password. Please correct errors in the Form.')
+            ->saveMessage('Password updated successfully!')
+            ->save()
+            ->redirect('admin/password');
     }
 
     /**
@@ -212,7 +196,7 @@ class HomeController extends BaseController
      *
      * @return array
      */
-    protected function getUpdatePasswordFields($user)
+    protected function getPasswordFields($user)
     {
         $rules = $user->getPropery('password')->validation;
         $user->addRule('password', 'confirmed');
@@ -228,44 +212,29 @@ class HomeController extends BaseController
     }
 
     /**
-     * Update the users password
+     * Returns the rules for the update password form. This is a password
+     * and a confirm field. The confirm field is a virtual field, so we 
+     * construct an array spec for it.
      *
-     * @return Redirect
+     * Get current rules assigned to the password property the confirm field
+     * will also need to match these rules.
+     *
+     * Add 'confirmed' rule to password - so it must match the virtual field
+     *
+     * @param object $user
+     * 
+     * @return array
      */
-    public function putPassword()
+    public function getPasswordRules($user)
     {
-        $user = \User::find(Auth::user()->id);
-
-        $data   = Input::all();
-        $fields = array_keys($data);
-        
         $passwordRules = $user->getPropery('password')->validation;
 
         $confirmationRules = $passwordRules;
         $passwordRules[]   = 'confirmed';
 
-        $rules = [
+        return [
             'password'              => $passwordRules,
             'password_confirmation' => $confirmationRules
         ];
-        
-        $validation = Validator::make($data, $rules);
-
-        if ($validation->fails()) {
-            $messages = $validation->messages();
-            $message = 'There was an error updating your password. Please correct errors in the Form.';
-            Messages::add('error', $message);
-            return Redirect::to(URL::to('admin/password'))
-                ->withInput()
-                ->withErrors($validation);
-        } else {
-            $user->password = Hash::make($data['password']);
-
-            if ($user->save()) {
-                $message = 'Password updated successfully!';
-                Messages::add('success', $message);
-            }
-            return Redirect::to(URL::to('admin/password'));
-        }
     }
 }
