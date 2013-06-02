@@ -333,7 +333,7 @@ class ResourceController extends BaseController
         // generate the form action - default to "admin/controller"
         $action = Arr::e($config, 'action', URL::to('admin/'.$this->controller));
 
-        $this->breadcrumbs['active'] = 'Create';
+        $this->breadcrumbs['active'] = Arr::e($config, 'breadcrumb', 'Create');
 
         $form = FormGenerator::resource($resource)
             ->method('post')
@@ -806,6 +806,7 @@ class ResourceController extends BaseController
         $page   = $this->method;
         // look for custom language key in the config
         $key = Arr::e($config, 'title');
+        Log::error('key = '.$key);
         if (!$key) {
             // then look for a language item based on the current page
             $key = 'titles.'.$page;

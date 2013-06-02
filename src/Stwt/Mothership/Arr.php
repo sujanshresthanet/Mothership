@@ -32,4 +32,35 @@ class Arr
     {
         return (isset($array[$index]) ? $array[$index] : $default);
     }
+
+    /**
+     * Alias of setElement
+     * 
+     * @param array $array
+     * @param mixed $index
+     * @param mixed $value
+     * 
+     * @return array
+     */
+    public static function s($array, $index, $value)
+    {
+        return static::setElement($array, $index, $value);
+    }
+
+    /**
+     * Sets an element of an array if it is not already defined
+     * 
+     * @param array $array
+     * @param mixed $index
+     * @param mixed $value
+     * 
+     * @return array
+     */
+    public static function setElement($array, $index, $value)
+    {
+        if (!isset($array[$index])) {
+            $array[$index] = $value;
+        }
+        return $array;
+    }
 }

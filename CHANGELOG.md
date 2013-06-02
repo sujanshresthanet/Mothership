@@ -7,6 +7,8 @@
 * Added HomeController class
 * Moved to use the Eloquent guarded array instead of hidden for generating default forms.
 * Fixed bug where getRules would return guarded field rules by defualt
+* Added mass deletion to collection views
+* Added FileModel and FileController
 
 ## 31st May 2013
 

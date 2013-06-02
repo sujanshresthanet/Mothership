@@ -32,6 +32,7 @@ return array(
     ],
     'titles' => [
         'index'    => 'All :plural',
+        'upload'   => 'Upload a new :singular.',
         'create'   => 'Create a new :singular.',
         'show'     => 'View :singular: :resource',
         'edit'     => 'Edit :singular: :resource',

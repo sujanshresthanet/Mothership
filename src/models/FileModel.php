@@ -1,0 +1,121 @@
+<?php namespace Stwt\Mothership;
+
+use Str;
+use Log;
+use Illuminate\Support\Facades\File as File;
+
+class FileModel extends BaseModel
+{
+    /**
+     * Column specification array
+     * 
+     * @var array
+     */
+    public $properties = [
+        'filename' => [
+            'label' => 'File',
+            'type'  => 'file',
+        ],
+    ];
+
+    /**
+     * Allowed mime types
+     * 
+     * @var array
+     */
+    public $mimeTypes = [];
+
+    /**
+     * The maximum size for an uploaded file
+     * 
+     * @var string
+     */
+    public $maxSize = '20M';
+
+    /**
+     * Server path to the upload directory root
+     * @var [type]
+     */
+    protected $path;
+
+    /**
+     * Constructs the instance and set's our upload dir
+     */
+    public function __construct ()
+    {
+        parent::__construct();
+        $this->path = storage_path().'/uploads/files';
+    }
+
+    /**
+     * Rename the file to a radom string and retain the original name in the
+     * title property. Also assign any other data to the model from the file
+     * like extension and mime type.
+     *
+     * @note Issue with getMimetype(). Requires the 'fileinfo' extension.
+     * 
+     * @param \Upload\File $file
+     * 
+     * @return boolean
+     */
+    public function renameFile($file)
+    {
+        // old path
+        $oldFilename = $this->getPath().'/'.$file->getNameWithExtension();
+
+        $this->title      = $file->getName();
+        $this->filename   = Str::random();
+        $this->extension  = $file->getExtension();
+        $this->mime_type  = '';
+        //$file->getMimetype();
+
+        // new path
+        $newFilename = $this->getFilePath();
+
+        return rename($oldFilename, $newFilename);
+    }
+
+    /**
+     * Return the path to the directory this file is stored in
+     * 
+     * @param string $subDirectory
+     * 
+     * @return string
+     */
+    public function getPath ($subDirectory = null)
+    {
+        return $subDirectory ? $this->path.'/'.$subDirectory : $this->path;
+    }
+
+    /**
+     * Return the full path with filename of the file on the server
+     * 
+     * @param string $subDirectory
+     * 
+     * @return string
+     */
+    public function getFilePath ($subDirectory = null)
+    {
+        return $this->getPath($subDirectory).'/'.$this->getFilename();
+    }
+
+    /**
+     * Return the full filename of the file on the server
+     * 
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename.'.'.$this->extension;
+    }
+
+    /**
+     * Return an instance of the File object for this file
+     * 
+     * @return [type]
+     */
+    public function getFile($subDirectory = null)
+    {
+        return File::get($this->getFilePath($subDirectory));
+    }
+}
