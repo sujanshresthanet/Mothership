@@ -678,7 +678,19 @@ class ResourceController extends BaseController
         } else {
             $items = $resource->whereIn('id', $ids)->get();
             if ($items) {
+                
+                $callback = Arr::e($config, 'beforeDelete');
+                if ($callback) {
+                    $callback($items);
+                }
+
                 $resource->whereIn('id', $ids)->delete();
+                
+                $callback = Arr::e($config, 'afterDelete');
+                if ($callback) {
+                    $callback();
+                }
+
                 $message = $this->getAlert($resource, 'success', $config, 'massDelete');
                 Messages::add('success', $message);
             } else {
@@ -712,7 +724,19 @@ class ResourceController extends BaseController
             Messages::add('error', $message);
             return Redirect::to(Input::get('_redirect'))->withErrors($validation);
         } else {
+            
+            $callback = Arr::e($config, 'beforeDelete');
+            if ($callback) {
+                $callback($this->resource);
+            }
+            
             $this->resource->delete();
+            
+            /*$callback = Arr::e($config, 'afterDelete');
+            if ($callback) {
+                $callback();
+            }*/
+
             $message = $this->getAlert($this->resource, 'success', $config);
             Messages::add('success', $message);
             return Redirect::to(Input::get('_redirect_success'));

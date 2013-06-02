@@ -93,6 +93,53 @@ class FileController extends ResourceController
     }
 
     /**
+     * Extend the destroy method to delete a file from the server
+     * as well as the database
+     * 
+     * @param int $id
+     * @param array $config
+     * 
+     * @return Redirect
+     */
+    public function destroy($id, $config = [])
+    {
+        $config = Arr::s(
+            $config,
+            'beforeDelete',
+            function ($file) {
+                $file->deleteFile();
+            }
+        );
+
+        return parent::destroy($id, $config);
+    }
+
+    /**
+     * Extend the destry collection method to delete each file in
+     * the collection from the server as well as the database.
+     * 
+     * @param  array $config
+     * 
+     * @return Redirect
+     */
+    public function destroyCollection($config = [])
+    {
+        $config = Arr::s(
+            $config,
+            'beforeDelete',
+            function ($collection) {
+                foreach ($collection as $file) {
+                    $file->deleteFile();
+                }
+            }
+        );
+
+        return parent::destroyCollection($config);
+    }
+
+    /**********************************/
+
+    /**
      * Attempt to upload a new file.
      * Check:
      * - That a file was posted

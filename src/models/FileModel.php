@@ -47,6 +47,11 @@ class FileModel extends BaseModel
         $this->path = storage_path().'/uploads/files';
     }
 
+    public function __toString()
+    {
+        return $this->getFilename();
+    }
+
     /**
      * Rename the file to a radom string and retain the original name in the
      * title property. Also assign any other data to the model from the file
@@ -73,6 +78,33 @@ class FileModel extends BaseModel
         $newFilename = $this->getFilePath();
 
         return rename($oldFilename, $newFilename);
+    }
+
+    /**
+     * Delete the file from the server
+     * 
+     * @param string $subDirectory
+     * 
+     * @return [type]
+     */
+    public function deleteFile($subDirectory = null)
+    {
+        if ($this->fileExists($subDirectory)) {
+            return unlink($this->getFilePath($subDirectory));
+        }
+        return true;
+    }
+
+    /**
+     * Check file exists on the server
+     *
+     * @param string $subDirectory
+     * 
+     * @return boolean
+     */
+    public function fileExists($subDirectory = null)
+    {
+        return file_exists($this->getFilePath($subDirectory));
     }
 
     /**
