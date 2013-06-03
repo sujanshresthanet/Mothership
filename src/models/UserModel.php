@@ -12,7 +12,7 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
      */
     protected $table = 'users';
 
-    public $properties = [
+    protected $properties = [
         'password' => [
             'type' => 'password',
         ],

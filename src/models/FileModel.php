@@ -11,7 +11,7 @@ class FileModel extends BaseModel
      * 
      * @var array
      */
-    public $properties = [
+    protected $properties = [
         'filename' => [
             'label' => 'File',
             'type'  => 'file',
@@ -26,14 +26,14 @@ class FileModel extends BaseModel
      * 
      * @var array
      */
-    public $mimeTypes = [];
+    protected $mimeTypes = [];
 
     /**
      * The maximum size for an uploaded file
      * 
      * @var string
      */
-    public $maxSize = '20M';
+    protected $maxSize = '20M';
 
     /**
      * The default subdirectory, this is the default dir that the source

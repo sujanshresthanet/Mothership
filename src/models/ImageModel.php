@@ -13,7 +13,7 @@ class ImageModel extends FileModel
      * 
      * @var array
      */
-    public $properties = [
+    protected $properties = [
         'filename' => [
             'label' => 'Image',
             'type'  => 'file',
@@ -25,14 +25,14 @@ class ImageModel extends FileModel
      * 
      * @var array
      */
-    public $mimeTypes = ['image/png', 'image/jpeg'];
+    protected $mimeTypes = ['image/png', 'image/jpeg'];
 
     /**
      * Array of image dimensions this image is available in
      * 
      * @var array
      */
-    public $sizes = [
+    protected $sizes = [
         'source' => [
             'w' => null,
             'h' => null,
