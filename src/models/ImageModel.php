@@ -119,6 +119,17 @@ class ImageModel extends FileModel
         }
     }
 
+
+    /**
+     * Returns the url to this resources thumbnail image.
+     *
+     * @return string
+     */
+    public function thumbnailSrc()
+    {
+        return $this->src($this->thumbnailSubDirectory);
+    }
+
     /**
      * Generate an HTML image element for this resources thumbnail image.
      *

@@ -200,12 +200,21 @@ class Field
             $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
             if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\BaseModel')) {
 
-                $this->form = $this->form ?: 'select';
+                if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\ImageModel')) {
+                    $this->form = $this->form ?: 'image';
+                } else {
+                    $this->form = $this->form ?: 'select';
+                }
                 $this->options = [];
                 $this->model = $relatedModel;
+                $this->max  = null;
+                $this->min  = null;
+                $this->step = null;
+                $this->type = null;
                 if (Str::endsWith($this->label, ' Id')) {
                     $this->label = substr($this->label, 0, strlen($this->label) - 3);
                 }
+
             }
         }
     }
