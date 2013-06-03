@@ -36,14 +36,12 @@ class ImageModel extends FileModel
         'source' => [
             'w' => null,
             'h' => null,
-        ],
-        'large' => [
-            'w' => 500,
-            'h' => null,
+            'p' => 'http://placehold.it/260x180',
         ],
         'thumb' => [
             'w' => 100,
             'h' => null,
+            'p' => 'http://placehold.it/100x100',
         ],
     ];
 
@@ -61,6 +59,13 @@ class ImageModel extends FileModel
      * @var string
      */
     protected $defaultSubDirectory = 'source';
+
+    /**
+     * The subdirectory thumbnails are stored in
+     * 
+     * @var string
+     */
+    protected $thumbnailSubDirectory = 'thumb';
 
     /**
      * Server path to the upload directory root - set it relative to the apps
@@ -92,7 +97,8 @@ class ImageModel extends FileModel
     }
 
     /**
-     * Returns the public url to the image
+     * Returns the public url to the image. If this instance is empty
+     * we return the placehoder image specified for the image size
      * 
      * @param  string $size
      * @return string
@@ -100,13 +106,29 @@ class ImageModel extends FileModel
     public function src($size = null)
     {
         $size = is_null($size) ? $this->defaultSubDirectory : $size;
-        
-        $route = $this->route;
+        Log::error('get src '.$size);
+        if ($this->id) {
+            $route = $this->route;
 
-        $route = str_replace('{id}', $this->id, $route);
-        $route = str_replace('{size}', $size, $route);
+            $route = str_replace('{id}', $this->id, $route);
+            $route = str_replace('{size}', $size, $route);
 
-        return URL::to($route);
+            return URL::to($route);
+        } else {
+            return $this->sizes[$size]['p'];
+        }
+    }
+
+    /**
+     * Generate an HTML image element for this resources thumbnail image.
+     *
+     * @param  string  $alt
+     * @param  array   $attributes
+     * @return string
+     */
+    public function thumbnail($alt = null, $attributes = array())
+    {
+        return $this->image($this->thumbnailSubDirectory, $alt, $attributes);
     }
 
     /**
@@ -120,6 +142,8 @@ class ImageModel extends FileModel
     public function image($size = null, $alt = null, $attributes = array())
     {
         $src = $this->src($size);
+
+        $alt = $alt ?: (string)$this;
 
         return HTML::image($src, $alt, $attributes);
     }

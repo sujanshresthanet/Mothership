@@ -3,6 +3,10 @@
 use Log;
 use Str;
 
+/**
+ * Represents an Model field. Attempts to map the properties found
+ * in the database column
+ */
 class Field
 {
     public $name;
@@ -195,7 +199,8 @@ class Field
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
             if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\BaseModel')) {
-                $this->form = 'select';
+
+                $this->form = $this->form ?: 'select';
                 $this->options = [];
                 $this->model = $relatedModel;
                 if (Str::endsWith($this->label, ' Id')) {

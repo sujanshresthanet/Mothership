@@ -450,6 +450,7 @@ class FormGenerator
      */
     private function addFieldsToForm($form)
     {
+        Log::error('Add Fields '.print_r(array_keys($this->fields), 1));
         foreach ($this->fields as $name => $field) {
             if ($this->resource->isProperty($name)) {
                 $field->value = $this->resource->{$name};

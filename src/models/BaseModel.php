@@ -53,7 +53,7 @@ class BaseModel extends \Eloquent
         if ($this->id) {
             return get_class($this).': '.$this->id;
         }
-        return null;
+        return 'New '.$this->singular();
     }
 
     /**

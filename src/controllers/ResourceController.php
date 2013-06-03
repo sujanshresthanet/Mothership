@@ -830,7 +830,6 @@ class ResourceController extends BaseController
         $page   = $this->method;
         // look for custom language key in the config
         $key = Arr::e($config, 'title');
-        Log::error('key = '.$key);
         if (!$key) {
             // then look for a language item based on the current page
             $key = 'titles.'.$page;
