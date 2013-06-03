@@ -43,7 +43,7 @@ class ImageController extends FileController
         parent::__construct();
         $this->columns = [
             'Image' => function ($image) {
-                return $image->image('source', $image->title, ['width' => 120]);
+                return $image->thumbnail($image->title, ['width' => 120]);
             },
             'title',
             'created_at',
