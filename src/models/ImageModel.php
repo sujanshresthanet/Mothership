@@ -25,7 +25,7 @@ class ImageModel extends FileModel
      * 
      * @var array
      */
-    protected $mimeTypes = ['image/png', 'image/jpeg'];
+    public $mimeTypes = ['image/png', 'image/jpeg'];
 
     /**
      * Array of image dimensions this image is available in
@@ -44,6 +44,13 @@ class ImageModel extends FileModel
             'p' => 'http://placehold.it/100x100',
         ],
     ];
+
+    /**
+     * The maximum size for an uploaded file
+     * 
+     * @var string
+     */
+    public $maxSize = '20M';
 
     /**
      * The route to the img controller that will return our image data

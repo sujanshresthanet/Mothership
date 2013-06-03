@@ -26,14 +26,14 @@ class FileModel extends BaseModel
      * 
      * @var array
      */
-    protected $mimeTypes = [];
+    public $mimeTypes = [];
 
     /**
      * The maximum size for an uploaded file
      * 
      * @var string
      */
-    protected $maxSize = '20M';
+    public $maxSize = '20M';
 
     /**
      * The default subdirectory, this is the default dir that the source
