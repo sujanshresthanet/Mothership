@@ -1,5 +1,9 @@
 # Change Log
 
+## 3rd June
+
+* Added Image picker to forms
+
 ## 2nd June
 
 * Added mass deletion to collection views
