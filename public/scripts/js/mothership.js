@@ -50,11 +50,11 @@ function moImagePicker() {
  * @return {[type]}
  */
 function moDateTimePicker() {
-    var selector = 'input.datetime';
+    var selector = '.datetime input';
     if ($(selector).length) {
         $(selector).datetimepicker();
     }
-    var selector = 'input.date';
+    var selector = '.date input';
     if ($(selector).length) {
         $(selector).datetimepicker(
             {
@@ -62,7 +62,7 @@ function moDateTimePicker() {
             }
         );
     }
-    var selector = 'input.time';
+    var selector = '.time input';
     if ($(selector).length) {
         $(selector).datetimepicker(
             {
