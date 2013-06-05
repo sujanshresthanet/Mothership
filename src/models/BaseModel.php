@@ -12,7 +12,7 @@ class BaseModel extends \Eloquent
 
     protected $properties   = [];
     protected $hidden       = [];
-    protected $guarded      = ['id', 'created_at', 'updated_at'];
+    protected $guarded      = ['id', 'created_at', 'updated_at', 'deleted_at'];
 
     protected $columns      = null;
     protected $fields       = null;
