@@ -40,24 +40,31 @@ use View;
  */
 class ResourceController extends BaseController
 {
+    /**
+     * The model this controller maps to
+     * 
+     * @var class
+     */
     public static $model;
 
     protected $controller;
+
     protected $method;
+    
     protected $requestor;
 
     protected $resource;
 
     protected $related;
 
-    // defines what sort of request we are runing
-    // collection, resource or single
     protected $actionType;
 
     public $columns;
 
     /**
-     * Default Actions in this controller
+     * Default Action methods in this controller, also constructs the navigation
+     * 
+     * @var array
      */
     public $actions = [
         'collection' => [

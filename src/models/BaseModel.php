@@ -9,21 +9,76 @@ use Venturecraft\Revisionable\Revisionable as Revisionable;
 
 class BaseModel extends \Eloquent
 {
-
-    protected $properties   = [];
-    protected $hidden       = [];
-    protected $guarded      = ['id', 'created_at', 'updated_at', 'deleted_at'];
-
-    protected $columns      = null;
-    protected $fields       = null;
-
+    /**
+     * Name of the mysql table for this model
+     * 
+     * @var string
+     */
     protected $table;
 
+    /**
+     * This models db column properties
+     * ---
+     * This array is auto loaded from the database details but any of the
+     * attributes can be overridden here.
+     * 
+     * Example of column properties:
+     * 
+     * [column_name] => [
+     *     'label'      => '',  // the column label
+     *     'form'       => '',  // the type of form element e.g. [input, select, textarea]
+     *     'validation' => [],  // array of validation rules
+     * ],
+     * 
+     * @var array
+     */
+    protected $properties = [];
+
+    /**
+     * Columns that are hidden when returning the model as an array or json
+     * 
+     * @var array
+     */
+    protected $hidden = [];
+
+    /**
+     * Columns that can't be "mass assigned", and will not appear in the default forms
+     * 
+     * @var array
+     */
+    protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Do not keep a record of changes to these columns in the revisons table
+     * 
+     * @var array
+     */
     protected $dontKeepRevisionOf = [
         'updated_at',
         'created_at',
     ];
 
+    /**
+     * Default columns that are displayed in the admin table
+     * @var array
+     */
+    protected $columns = null;
+
+    /**
+     * Default fields that will appear in the admin form
+     * @var array
+     */
+    protected $fields = null;
+
+    /**
+     * -------------------------
+     */
+
+    /**
+     * Construct the instance and load the property array
+     *
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
