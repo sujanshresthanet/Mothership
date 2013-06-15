@@ -106,7 +106,7 @@ class BaseModel extends \Eloquent
     public function __toString()
     {
         if ($this->id) {
-            return get_class($this).': '.$this->id;
+            return class_basename(get_class($this)).': '.$this->id;
         }
         return 'New '.$this->singular();
     }
