@@ -75,15 +75,32 @@ class BaseModel extends \Eloquent
      */
 
     /**
-     * Construct the instance and load the property array
+     * Construct the instance 
+     * - Initialise the models $properties
      *
      * @return void
      */
     public function __construct()
     {
         parent::__construct();
+        $this->properties = $this->initProperties($this->properties);
         $this->loadColumns();
     }
+
+    /**
+     * Initialise any custom properties, allows you to add closures and methods.
+     * After this method is called the rest of the column properties will be initialised
+     * by the database schema, so you only need to overrider custom attributes.
+     * 
+     * @param array $properties The models properties array
+     * 
+     * @return array
+     */
+    protected function initProperties($properties)
+    {
+        return $properties;
+    }
+
 
     /*
      * Mock the Repo Interface for this model to make testing cleaner

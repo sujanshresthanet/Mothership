@@ -1,5 +1,9 @@
 # Change Log
 
+## 15th June
+
+* Added initProperties so closures can be added to $properties without the need to override the constructor
+
 ## 3rd June
 
 * Added Image picker to forms
