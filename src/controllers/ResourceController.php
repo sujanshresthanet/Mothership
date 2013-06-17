@@ -75,6 +75,7 @@ class ResourceController extends BaseController
     
     protected $resource;
     protected $related = null;
+    protected $path;
 
     public function __construct()
     {
@@ -88,6 +89,7 @@ class ResourceController extends BaseController
         LinkFactory::seed($config);
 
         $this->related = Arr::e($config, 'related');
+        $this->path    = Arr::e($config, 'path');
     }
 
     /**
@@ -419,8 +421,9 @@ class ResourceController extends BaseController
         $actions = $this->getActions(['resource', 'related', 'single']);
         foreach ($actions as $key => $action) {
             $route = $action['uri'];
+            $path = Mothership::pathFromController(get_class($this));
             // replace {controller} with current controller uri segment
-            $uri = str_replace('{controller}', Request::segment(2), $route);
+            $uri = str_replace('{controller}', $path, $route);
 
             if ($resource->id) {
                 // replace {id} with current resource id
@@ -428,6 +431,12 @@ class ResourceController extends BaseController
             } else {
                 // if this action has no current resource disable the action
                 $uri = (strpos($uri, '{id}') === false ? $uri : null);
+            }
+
+            // if related prefix with related uri
+            if ($this->related) {
+                $ruri = $this->related['uri'];
+                $uri = $ruri.$uri;
             }
 
             if ($uri) {
