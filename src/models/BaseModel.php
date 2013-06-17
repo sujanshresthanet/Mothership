@@ -120,7 +120,7 @@ class BaseModel extends Ardent
 
     public function singular($uppercase = true)
     {
-        $singular = ($this->singular ?: $this->table);
+        $singular = ($this->singular ?: str_singular($this->table));
         return $uppercase ? ucwords($singular) : $singular;
     }
 
