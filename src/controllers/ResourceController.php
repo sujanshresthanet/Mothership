@@ -332,7 +332,25 @@ class ResourceController extends BaseController
     public function destroy($id, $config = [])
     {
         $this->before($config);
-        return 'Destroy';
+
+        $resource = $this->resource->find($id);
+
+        $rules      = ['_delete' => ['required', 'in:'.$id]];
+        $messages   = ['required' => 'Please check the box to confirm you want to delete this record.'];
+
+        $v = Validator::make(Input::all(), $rules, $messages);
+        
+        if ($v->fails()) {
+            Messages::add('error', Lang::alert('delete.error', $resource, $this->related));
+            return Redirect::to(URL::current())
+                ->withErrors($v);
+        } else {
+            $resource->delete();
+            Messages::add('success', Lang::alert('delete.success', $resource, $this->related));
+            return Redirect::to(LinkFactory::collection());
+        }
+
+
     }
 
     ##########################################################

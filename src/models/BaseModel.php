@@ -93,6 +93,9 @@ class BaseModel extends Ardent
         parent::__construct($attributes);
         $this->properties = $this->initProperties($this->properties);
         $this->loadColumns();
+        if ($this->hasProperty('deleted_at')) {
+            $this->softDelete = true;
+        }
     }
 
     /**

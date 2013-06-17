@@ -10,7 +10,7 @@ return array(
         'delete' => [
             'success' => ':singular succesfully <b>deleted</b>.',
             'error'   => 'There was a problem <b>deleting</b> the :singular <b>:resource</b>.
-                          Please correct errors in the form.',
+                          Please confirm you really wish to delete this :singular.',
         ],
         'massDelete' => [
             'success' => 'Selected :plural succesfully <b>deleted</b>.',
