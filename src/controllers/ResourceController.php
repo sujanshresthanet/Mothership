@@ -13,10 +13,13 @@
 
 namespace Stwt\Mothership;
 
+use Input;
 use Log;
+use Redirect;
 use Request;
 use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
+use Validator;
 
 /**
  * MothershipResourceController
@@ -131,12 +134,11 @@ class ResourceController extends BaseController
         $fields = $resource->getFields(Arr::e($config, 'fields'));
 
         $form = FormGenerator::resource($resource)
-            ->method('put')
+            ->method('post')
             ->fields($fields)
             ->saveButton(Arr::e($config, 'submitText', 'Save'))
             ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
             ->form()
-                ->attr('action', '')
                 ->generate();
 
         $data['tabs']       = $this->getTabs($resource);
@@ -220,16 +222,57 @@ class ResourceController extends BaseController
 
     public function store($config = [])
     {
-        return 'Store';
+        $this->before($config);
+
+        $resource = $this->resource;
+
+        $input = Input::all();
+        $rules = $resource->getRules();
+    
+        $v = Validator::make($input, $rules);
+
+        if ($v->fails()) {
+            return Redirect::to(URL::current())
+                ->withInput()
+                ->withErrors($v->messages());
+        }
+
+        Log::error('CREATE: '.print_r($input, 1));
+        Log::error('redirect to '.LinkFactory::collection());
+
+        // $resource->name = Input::get('name');
+        // $resource->slug = Input::get('slug');
+        // $resource->status = Input::get('status');
+        // $resource->template = Input::get('template');
+
+        $input = [
+            'name' => Input::get('name'),
+            'slug' => Input::get('slug'),
+            'status' => Input::get('status'),
+            'template' => Input::get('template'),
+        ];
+
+        $resource = \Page::create($input);
+        
+        if (!$resource) {
+            Log::error('error creating');
+            return Redirect::to(URL::current())
+                ->withInput();
+        }
+
+        return Redirect::to(LinkFactory::collection())
+            ->with('flash', 'Your resource has been created!');
     }
 
     public function update($id, $config = [])
     {
+        $this->before($config);
         return 'Update';
     }
 
     public function destroy($id, $config = [])
     {
+        $this->before($config);
         return 'Destroy';
     }
 

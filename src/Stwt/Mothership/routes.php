@@ -93,9 +93,14 @@ if ($controllers) {
 
                 // store
                 Route::post(
-                    $path,
+                    $path.'/create',
                     function () use ($class) {
-                        return with(new $class)->store();
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'create',
+                            'type'       => 'store',
+                        ];
+                        return with(new $class)->store($config);
                     }
                 );
 
@@ -104,7 +109,13 @@ if ($controllers) {
                     $path.'/{idMethod}',
                     function ($idMethod) use ($class) {
                         list($id, $method) = explode(':', $idMethod);
-                        return with(new $class)->update($id);
+                        $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'id'         => $id,
+                            'type'       => 'update',
+                        ];
+                        return with(new $class)->update($id, $config);
                     }
                 );
 
@@ -112,7 +123,14 @@ if ($controllers) {
                 Route::delete(
                     $path.'/{id}',
                     function ($id) use ($class) {
-                        return with(new $class)->destroy($id);
+
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'delete',
+                            'id'         => $id,
+                            'type'       => 'destroy',
+                        ];
+                        return with(new $class)->destroy($id, $config);
                     }
                 )->where('id', '[0-9]+');
 

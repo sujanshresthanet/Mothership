@@ -56,7 +56,7 @@ class LinkFactory
      * 
      * @return URL
      */
-    public static function collection($action)
+    public static function collection($action = null)
     {
         $url = 'admin/{related}{controller}';
         
