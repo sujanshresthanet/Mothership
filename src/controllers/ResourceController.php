@@ -221,7 +221,8 @@ class ResourceController extends BaseController
     }
 
     /**
-     * Create a new resource from posted data. 
+     * Create a new resource from posted data.
+     * 
      * Posted data id automatically assigned to and validated by
      * the Ardent class extension on the resource model
      * On success redirect to the index page, on error redirect back
@@ -251,10 +252,38 @@ class ResourceController extends BaseController
         }
     }
 
+    /**
+     * Update an existing resource from posted data.
+     * 
+     * Posted data id automatically assigned to and validated by
+     * the Ardent class extension on the resource model
+     * On success or error redirect back to edit page
+     * 
+     * @param int $id       - the id of the resource
+     * @param array $config - array of optional data
+     * 
+     * @return Redirect
+     */
     public function update($id, $config = [])
     {
         $this->before($config);
-        return 'Update';
+
+        $resource = $this->resource->find($id);
+        $rules = $resource->getRules();
+
+        $resource->autoHydrateEntityFromInput   = true;
+        $resource->autoPurgeRedundantAttributes = true;
+        $resource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
+        
+        if ($resource->save($rules)) {
+            Messages::add('success', 'Your resource has been updated!');
+            return Redirect::to(URL::current());
+        } else {
+            Messages::add('error', 'Error updating resource');
+            return Redirect::to(URL::current())
+                ->withInput()
+                ->withErrors($resource->errors());
+        }
     }
 
     public function destroy($id, $config = [])

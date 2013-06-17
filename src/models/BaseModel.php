@@ -84,9 +84,9 @@ class BaseModel extends Ardent
     public $autoHydrateEntityFromInput = false;
     public $autoPurgeRedundantAttributes = true;
 
-    public function __construct()
+    public function __construct( array $attributes = array() )
     {
-        parent::__construct();
+        parent::__construct($attributes);
         $this->properties = $this->initProperties($this->properties);
         $this->loadColumns();
     }
