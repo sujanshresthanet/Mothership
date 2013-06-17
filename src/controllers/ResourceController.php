@@ -285,6 +285,11 @@ class ResourceController extends BaseController
         $resource->autoPurgeRedundantAttributes = true;
         
         if ($resource->save($rules)) {
+            if ($this->related) {
+                $related = $this->related['resource'];
+                $plural   = $resource->hasManyName();
+                $resource  = $related->{$plural}()->save($resource);
+            }
             Messages::add('success', Lang::alert('create.success', $resource, $this->related));
             return Redirect::to(LinkFactory::collection());
         } else {

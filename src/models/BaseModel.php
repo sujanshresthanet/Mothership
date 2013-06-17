@@ -128,13 +128,13 @@ class BaseModel extends Ardent
     public function singular($uppercase = true)
     {
         $singular = ($this->singular ?: str_singular($this->table));
-        return $uppercase ? ucwords($singular) : $singular;
+        return $uppercase ? ucwords($singular) : strtolower($singular);
     }
 
     public function plural($uppercase = true)
     {
         $plural = ($this->plural ?: str_plural($this->singular()));
-        return $uppercase ? ucwords($plural) : $plural;
+        return $uppercase ? ucwords($plural) : strtolower($plural);
     }
 
     public function hasManyName()

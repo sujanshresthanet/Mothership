@@ -29,6 +29,29 @@ return array(
             'error'   => 'There was a changing the password of :singular <b>:resource</b>.
                           Please correct errors in the form.',
         ],
+
+        'rcreate' => [
+            'success' => ':singular <b>:resource</b> added succesfully to :rresource.',
+            'error'   => 'There was a problem saving the :singular <b>:resource</b>.
+                          Please correct errors in the form.',
+        ],
+        'rdelete' => [
+            'success' => ':singular succesfully <b>deleted</b>.',
+            'error'   => 'There was a problem <b>deleting</b> the :singular <b>:resource</b>.
+                          Please confirm you really wish to delete this :singular.',
+        ],
+        'rmassDelete' => [
+            'success' => 'Selected :plural succesfully <b>deleted</b>.',
+            'empty'   => 'No <b>:plural</b> were selected for deletion.
+                          Tick the items you wish to delete and try again.',
+            'error'   => 'There was a problem <b>deleting</b> selected :plural.
+                          Please try again.',
+        ],
+        'redit' => [
+            'success' => ':singular <b>:resource</b> updated succesfully.',
+            'error'   => 'There was a problem saving the :singular <b>:resource</b>.
+                          Please correct errors in the form.',
+        ],
     ],
     'title' => [
         'index'    => 'All :plural',

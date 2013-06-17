@@ -151,6 +151,7 @@ if ($controllers) {
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,
                                 'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
                             ]
                         ];
                         return with(new $class)->index($config);
@@ -159,12 +160,11 @@ if ($controllers) {
                 ->where('relatedPath', '[A-Za-z]+')
                 ->where('relatedId', '[0-9]+');
 
-                // related create/index
+                // related create
                 Route::get(
                     '{relatedPath}/{relatedId}/'.$path.'/{method}',
                     function ($relatedPath, $relatedId, $method) use ($class) {
                         $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
-
                         $config = [
                             'controller' => $class,
                             'action'     => $method,
@@ -207,7 +207,7 @@ if ($controllers) {
                 ->where('relatedId', '[0-9]+')
                 ->where('id', '[0-9]+');
 
-                // related view
+                // related edit
                 Route::get(
                     '{relatedPath}/{relatedId}/'.$path.'/{idMethod}',
                     function ($relatedPath, $relatedId, $idMethod) use ($class) {
@@ -230,6 +230,60 @@ if ($controllers) {
                 )
                 ->where('relatedPath', '[A-Za-z]+')
                 ->where('relatedId', '[0-9]+');
+
+                // store
+                Route::post(
+                    '{relatedPath}/{relatedId}/'.$path.'/{method}',
+                    function ($relatedPath, $relatedId, $method) use ($class) {
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'type'       => 'store',
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
+                        ];
+                        return with(new $class)->store($config);
+                    }
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+')
+                ->where('method', '[A-Za-z]+');
+
+                // update
+                Route::put(
+                    $path.'/{idMethod}',
+                    function ($idMethod) use ($class) {
+                        return 'Update';
+                        list($id, $method) = explode(':', $idMethod);
+                        $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'id'         => $id,
+                            'type'       => 'update',
+                        ];
+                        return with(new $class)->update($id, $config);
+                    }
+                );
+
+                // destroy
+                Route::delete(
+                    $path.'/{id}:delete',
+                    function ($id) use ($class) {
+                        return 'Destroy';
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'delete',
+                            'id'         => $id,
+                            'type'       => 'destroy',
+                        ];
+                        return with(new $class)->destroy($id, $config);
+                    }
+                )->where('id', '[0-9]+');
             }
         }
     );
