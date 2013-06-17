@@ -121,7 +121,7 @@ if ($controllers) {
 
                 // destroy
                 Route::delete(
-                    $path.'/{id}',
+                    $path.'/{id}:delete',
                     function ($id) use ($class) {
 
                         $config = [

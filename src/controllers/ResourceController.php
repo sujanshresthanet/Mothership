@@ -17,6 +17,7 @@ use Input;
 use Log;
 use Redirect;
 use Request;
+use Stwt\GoodForm\GoodForm as GoodForm;
 use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
 use Validator;
@@ -212,12 +213,53 @@ class ResourceController extends BaseController
      */
     public function delete($id, $config = [])
     {
-        $r = Arr::e($config, 'related');
-        if ($r) {
-            return 'Delete '.$id.' '.$r['path'].' - '.$r['id'];
-        } else {
-            return 'Delete '.$id;
-        }
+        $data = [];
+
+        $this->before($config);
+
+        $resource = $this->resource->find($id);
+
+        $form = new GoodForm();
+
+        $form->add(['type' => 'hidden', 'name' => '_method', 'value' => 'DELETE']);
+
+        // Confirm delete checkbox
+        $form->add(
+            [
+                'label' => 'Confirm Delete',
+                'type'  => 'checkbox',
+                'name'  => '_delete',
+                'value' => $id,
+            ]
+        );
+
+        // Add form actions
+        $form->addAction(
+            [
+                'class' => 'btn btn-danger',
+                'form'  => 'button',
+                'name'  => '_save',
+                'type'  => 'submit',
+                'value' => 'Delete',
+            ]
+        );
+        $form->addAction(
+            [
+                'form'  => 'macro',
+                'value' => function () {
+                    return '<a class="btn" href="'.mo_edit().'">Cancel</a>';
+                },
+            ]
+        );
+
+        $form = $form->generate();
+
+        $data['tabs']       = $this->getTabs($resource);
+        $data['title']      = Lang::title('edit', $resource, $this->related);
+        $data['resource']   = $resource;
+        $data['form']       = $form;
+
+        return View::make('mothership::theme.resource.form', $data);
     }
 
     /**

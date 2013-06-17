@@ -15,7 +15,7 @@ if (!function_exists('mo_create')) {
 }
 
 if (!function_exists('mo_edit')) {
-    function mo_edit($id, $action = null)
+    function mo_edit($id = null, $action = null)
     {
         return  Stwt\Mothership\LinkFactory::resource($id, $action);
     }
