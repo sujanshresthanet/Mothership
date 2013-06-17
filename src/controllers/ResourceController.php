@@ -13,6 +13,7 @@
 
 namespace Stwt\Mothership;
 
+use Log;
 use Stwt\Mothership\LinkFactory as LinkFactory;
 
 /**
@@ -96,15 +97,16 @@ class ResourceController extends BaseController
 
         $this->before($config);
 
-        $resource = $this->resource;
-
-        $collection = $this->resource->all();
+        $resource   = $this->resource;
+        $collection = $this->queryRelated($resource);
+        $collection = $this->queryOrderBy($collection);
+        $collection = $collection->paginate(15);
 
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['collection'] = $collection;
         $data['title']      = Lang::title('index', $resource, $this->related);
 
-        return View::make('mothership::theme/resource/index', $data);
+        return View::make('mothership::theme.resource.index', $data);
     }
 
     /**
@@ -152,12 +154,17 @@ class ResourceController extends BaseController
      */
     public function edit($id, $config = [])
     {
-        $r = Arr::e($config, 'related');
-        if ($r) {
-            return 'Edit '.$id.' '.$r['path'].' - '.$r['id'];
-        } else {
-            return 'Edit '.$id;
-        }
+        $data = [];
+
+        $this->before($config);
+
+        $resource = $this->resource->find($id);
+
+        $data['title']      = Lang::title('edit', $resource, $this->related);
+        $data['resource']   = $resource;
+        $data['form']       = '';
+
+        return View::make('mothership::theme.resource.form', $data);
     }
 
     /**
@@ -181,5 +188,39 @@ class ResourceController extends BaseController
     public function store($config = [])
     {
         
+    }
+
+    /*
+     * Checks if the current request is for related resources and
+     * adds that relationship clause to the query
+     *
+     * @param object $resource
+     *
+     * @return object
+     */
+    protected function queryRelated($resource)
+    {
+        if ($this->related) {
+            Log::error('Yes : is related request');
+
+            $resource = $this->related['resource'];
+            $id       = $this->related['id'];
+            $hasMany  = $this->resource->hasManyName();
+            
+            return $resource->$hasMany();
+        }
+        return $resource;
+    }
+
+    /*
+     * Adds an order by clause to the resource query
+     *
+     * @param object $resource
+     *
+     * @return object
+     */
+    protected function queryOrderBy($resource)
+    {
+        return $resource->orderBy('created_at', 'desc');
     }
 }

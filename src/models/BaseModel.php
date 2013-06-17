@@ -97,6 +97,16 @@ class BaseModel extends Eloquent
         return $uppercase ? ucwords($plural) : $plural;
     }
 
+    public function hasManyName()
+    {
+        return $this->table;
+    }
+
+    public function hasOneName()
+    {
+        return str_singular($this->table);
+    }
+
     /**
      * Loads table column schema from the database
      * We cache this request to save database queries if cache
