@@ -280,18 +280,27 @@ if ($controllers) {
 
                 // destroy
                 Route::delete(
-                    $path.'/{id}:delete',
-                    function ($id) use ($class) {
-                        return 'Destroy';
+                    '{relatedPath}/{relatedId}/'.$path.'/{idMethod}',
+                    function ($relatedPath, $relatedId, $idMethod) use ($class) {
+                        list($id, $method) = explode(':', $idMethod);
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
                         $config = [
                             'controller' => $class,
-                            'action'     => 'delete',
+                            'action'     => $method,
                             'id'         => $id,
-                            'type'       => 'destroy',
+                            'type'       => 'update',
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
                         ];
                         return with(new $class)->destroy($id, $config);
                     }
-                )->where('id', '[0-9]+');
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+');
             }
         }
     );
