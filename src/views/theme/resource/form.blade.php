@@ -1,4 +1,4 @@
-@extends('mothership::layouts.main')
+@extends('mothership::theme.layouts.main')
 
 @section('title')
 {{ $title}}
