@@ -256,19 +256,27 @@ if ($controllers) {
 
                 // update
                 Route::put(
-                    $path.'/{idMethod}',
-                    function ($idMethod) use ($class) {
-                        return 'Update';
+                    '{relatedPath}/{relatedId}/'.$path.'/{idMethod}',
+                    function ($relatedPath, $relatedId, $idMethod) use ($class) {
                         list($id, $method) = explode(':', $idMethod);
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
                         $config = [
                             'controller' => $class,
                             'action'     => $method,
                             'id'         => $id,
                             'type'       => 'update',
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
                         ];
                         return with(new $class)->update($id, $config);
                     }
-                );
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+');
 
                 // destroy
                 Route::delete(
