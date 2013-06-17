@@ -60,7 +60,7 @@ class FormGenerator
 
     /**
      * Message displayed to user on form success
-     * 
+     *
      * @var string
      */
     private $successMessage;
@@ -379,10 +379,11 @@ class FormGenerator
      * If $input parameter is null we use data from Input::all()
      *
      * @param array  $input
+     * 
      *
      * @return mixed
      */
-    public function save($input = null)
+    public function save($input = null, $related = null)
     {
         $data = ($input ?: Input::all());
 
@@ -399,6 +400,12 @@ class FormGenerator
             $this->updateResource($data);
             $this->callback('beforeSave');
             $this->resource->save();
+            if ($related) {
+                Log::error('Save related object');
+                $related->save($this->resource);
+            } else {
+                Log::error('is not related');
+            }
             $this->callback('afterSave');
             Messages::add('success', $this->successMessage);
             $this->formSuccess = true;

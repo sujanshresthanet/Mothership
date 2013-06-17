@@ -427,6 +427,8 @@ class Field
         } elseif ($this->isDate()) {
             $date = new \ExpressiveDate($instance->{$this->name});
             return $date->getRelativeDate();
+        } elseif ($this->isString()) {
+            return Str::words($instance->{$this->name}, 9);
         }
         return $instance->{$this->name};
     }
@@ -513,6 +515,11 @@ class Field
     protected function isDate()
     {
         return in_array($this->dataType, ['date', 'datetime', 'timestamp']);
+    }
+
+    protected function isString()
+    {
+        return in_array($this->dataType, ['varchar', 'text']);
     }
 
     /**

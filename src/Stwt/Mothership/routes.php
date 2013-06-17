@@ -9,6 +9,158 @@
 | pages.
 |
 */
+
+
+$homeController = Config::get('mothership::homeController');
+
+Route::get('admin/login', "$homeController@getLogin");
+Route::post('admin/login', "$homeController@postLogin");
+
+$controllers = Config::get('mothership::controllers');
+
+if ($controllers) {
+
+    Route::group(
+        [
+            'prefix' => 'admin',
+            'before' => 'mothership',
+        ],
+        function () use ($controllers, $homeController) {
+
+            Route::get('/', "$homeController@getIndex");
+            Route::get('home', "$homeController@getIndex");
+
+            Route::get('profile', "$homeController@getProfile");
+            Route::put('profile', "$homeController@putProfile");
+            Route::get('password', "$homeController@getPassword");
+            Route::put('password', "$homeController@putPassword");
+
+            foreach ($controllers as $path => $class) {
+                // index
+                Route::get(
+                    $path,
+                    function () use ($class) {
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'index',
+                            'type'       => 'collection',
+                        ];
+                        return with(new $class)->index($config);
+                    }
+                );
+
+                // create / index
+                Route::get(
+                    $path.'/{method}',
+                    function ($method) use ($class) {
+                        return with(new $class)->$method();
+                    }
+                )->where('method', '[A-Za-z]+');
+                
+                // view
+                Route::get(
+                    $path.'/{id}',
+                    function ($id) use ($class) {
+                        return with(new $class)->show($id);
+                    }
+                )->where('id', '[0-9]+');
+                
+                // edit/delete
+                Route::get(
+                    $path.'/{idMethod}',
+                    function ($idMethod) use ($class) {
+                        list($id, $method) = explode(':', $idMethod);
+                        return with(new $class)->{$method}($id);
+                    }
+                );
+
+                // related index
+                Route::get(
+                    '{relatedPath}/{relatedId}/'.$path,
+                    function ($relatedPath, $relatedId) use ($class) {
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        $config = [
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                            ]
+                        ];
+                        return with(new $class)->index($config);
+                    }
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+');
+
+                // related create/index
+                Route::get(
+                    '{relatedPath}/{relatedId}/'.$path.'/{method}',
+                    function ($relatedPath, $relatedId, $method) use ($class) {
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        $config = [
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
+                        ];
+                        return with(new $class)->$method($config);
+                    }
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+')
+                ->where('method', '[A-Za-z]+');
+
+                // related view
+                Route::get(
+                    '{relatedPath}/{relatedId}/'.$path.'/{id}',
+                    function ($relatedPath, $relatedId, $id) use ($class) {
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        $config = [
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
+                        ];
+                        return with(new $class)->show($id, $config);
+                    }
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+')
+                ->where('id', '[0-9]+');
+
+                // related view
+                Route::get(
+                    '{relatedPath}/{relatedId}/'.$path.'/{idMethod}',
+                    function ($relatedPath, $relatedId, $idMethod) use ($class) {
+                        $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        $config = [
+                            'related' => [
+                                'path'      => $relatedPath,
+                                'id'        => $relatedId,
+                                'resource'  => $relatedResource,
+                                'uri'       => $relatedPath.'/'.$relatedId.'/',
+                            ]
+                        ];
+                        list($id, $method) = explode(':', $idMethod);
+                        return with(new $class)->$method($id, $config);
+                    }
+                )
+                ->where('relatedPath', '[A-Za-z]+')
+                ->where('relatedId', '[0-9]+');
+            }
+        }
+    );
+}
+
+
+
+
+
+return;
 $controllers = Config::get('mothership::controllers');
 
 if ($controllers) {

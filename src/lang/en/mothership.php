@@ -37,5 +37,8 @@ return array(
         'show'     => 'View :singular: :resource',
         'edit'     => 'Edit :singular: :resource',
         'password' => 'Update password: :resource',
+        // related titles
+        'rindex'   => 'All :rplural :plural',
+        'redit'    => 'Edit :singular: :resource',
     ],
 );

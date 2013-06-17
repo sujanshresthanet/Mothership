@@ -3,18 +3,36 @@
 use Cache;
 use Config;
 use DB;
-use Eloquent;
 use Log;
 use Str;
-use \Mockery as Mockery;
+use Venturecraft\Revisionable\Revisionable as Revisionable;
 
-class BaseModel extends Eloquent
+class BaseModelOld extends \Eloquent
 {
+    /**
+     * Name of the mysql table for this model
+     * 
+     * @var string
+     */
     protected $table;
 
-    protected $singular;
-
-    protected $plural;
+    /**
+     * This models db column properties
+     * ---
+     * This array is auto loaded from the database details but any of the
+     * attributes can be overridden here.
+     * 
+     * Example of column properties:
+     * 
+     * [column_name] => [
+     *     'label'      => '',  // the column label
+     *     'form'       => '',  // the type of form element e.g. [input, select, textarea]
+     *     'validation' => [],  // array of validation rules
+     * ],
+     * 
+     * @var array
+     */
+    protected $properties = [];
 
     /**
      * Columns that are hidden when returning the model as an array or json
@@ -51,32 +69,57 @@ class BaseModel extends Eloquent
      * @var array
      */
     protected $fields = null;
-    
+
+    /**
+     * -------------------------
+     */
+
+    /**
+     * Construct the instance 
+     * - Initialise the models $properties
+     *
+     * @return void
+     */
     public function __construct()
     {
+        parent::__construct();
         $this->properties = $this->initProperties($this->properties);
         $this->loadColumns();
     }
 
     /**
-     * Method used to make testing cleaner
+     * Initialise any custom properties, allows you to add closures and methods.
+     * After this method is called the rest of the column properties will be initialised
+     * by the database schema, so you only need to overrider custom attributes.
      * 
-     * @return Mockery
+     * @param array $properties The models properties array
+     * 
+     * @return array
      */
-    public static function shouldReceive()
+    protected function initProperties($properties)
     {
-        $class = get_called_class();
-        $repo = "Stwt\\Storage\\{$class}\\{$class}RepositoryInterface";
-        $mock = Mockery::mock($repo);
-
-        App::instance($repo, $mock);
-
-        return call_user_func_array(
-            [$mock, 'shouldReceive'],
-            func_get_args()
-        );
+        return $properties;
     }
 
+
+    /*
+     * Mock the Repo Interface for this model to make testing cleaner
+     * CODE SMELL - but Jeffery said it's ok!
+     */
+    public static function shouldReceive($value = '')
+    {
+        $repo = get_called_class() . 'RepositoryInterface';
+        $mock = Mockery::mock($repo);
+        App::instance($repo, $mock);
+        return call_user_func_array([$mock, 'shouldReceive'], func_get_args());
+    }
+
+    /**
+     * Return a string representation of this instance
+     *
+     * @access   public
+     * @return   string
+     */
     public function __toString()
     {
         if ($this->id) {
@@ -85,16 +128,51 @@ class BaseModel extends Eloquent
         return 'New '.$this->singular();
     }
 
-    public function singular($uppercase = true)
+    /**
+     * Checks if this instance exists in the db
+     *
+     * @return boolean
+     */
+    public function exists()
     {
-        $singular = ($this->singular ?: $this->table);
-        return $uppercase ? ucwords($singular) : $singular;
+        return isset($this->id);
+    }
+
+    /**
+     * Return a string representation of this instance for
+     * use in the revision history
+     *
+     * @access   public
+     * @return   string
+     */
+    public function identifiableName()
+    {
+        if ($this->id) {
+            return $this->__toString();
+        }
+        return 'null';
+    }
+
+    /*
+     * Return a human readable name for this table
+     * by replacing underscores with spaces.
+     *
+     * @return string
+     */
+    protected function human()
+    {
+        return str_replace('_', ' ', $this->table);
     }
 
     public function plural($uppercase = true)
     {
-        $plural = ($this->plural ?: str_plural($this->singular()));
-        return $uppercase ? ucwords($plural) : $plural;
+        return $uppercase ? ucwords($this->human()) : $this->human();
+    }
+
+    public function singular($uppercase = true)
+    {
+        $singular = Str::singular($this->human());
+        return $uppercase ? ucwords($singular) : $singular;
     }
 
     /**
@@ -309,12 +387,5 @@ class BaseModel extends Eloquent
     public function isProperty($name)
     {
         return ( isset($this->properties[$name]) ?: false );
-    }
-
-
-
-    protected function initProperties($properties)
-    {
-        return $properties;
     }
 }
