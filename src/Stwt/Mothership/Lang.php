@@ -5,16 +5,17 @@ class Lang extends \Illuminate\Support\Facades\Lang
     /**
      * Return the page title for a view from a language file
      * 
-     * @param [type] $view     - The view name
+     * @param string $category - The language string category
+     * @param string $view     - The view name
      * @param object $resource - The resource instance
      * @param array  $related  - A related resource [optional]
      * 
      * @return string
      */
-    public static function title($view, $resource, $related = null)
+    public static function get($category, $view, $resource, $related = null)
     {
         $view = $related ? 'r'.$view : $view;
-        $key = 'mothership::mothership.titles.'.$view;
+        $key = 'mothership::mothership.'.$category.'.'.$view;
 
         $placeHolders = [
             'singular'  => $resource->singular(),
@@ -30,5 +31,34 @@ class Lang extends \Illuminate\Support\Facades\Lang
         }
 
         return parent::get($key, $placeHolders);
+    }
+
+    /**
+     * Return the page title for a view from a language file
+     * 
+     * @param [type] $view     - The view name
+     * @param object $resource - The resource instance
+     * @param array  $related  - A related resource [optional]
+     * 
+     * @return string
+     */
+    public static function title($view, $resource, $related = null)
+    {
+        return self::get('title', $view, $resource, $related);
+    }
+
+    /**
+     * Return the page title for a view from a language file
+     * 
+     * @param [type] $view     - The view name
+     * @param object $resource - The resource instance
+     * @param array  $related  - A related resource [optional]
+     * 
+     * @return string
+     */
+    public static function caption($view, $resource, $related = null)
+    {
+        
+        return self::get('caption', $view, $resource, $related);
     }
 }

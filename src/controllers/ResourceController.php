@@ -104,8 +104,10 @@ class ResourceController extends BaseController
         $collection = $this->queryOrderBy($collection);
         $collection = $collection->paginate(15);
 
+        $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['collection'] = $collection;
+        $data['resource']   = $resource;
         $data['title']      = Lang::title('index', $resource, $this->related);
 
         return View::make('mothership::theme.resource.index', $data);

@@ -30,7 +30,7 @@ return array(
                           Please correct errors in the form.',
         ],
     ],
-    'titles' => [
+    'title' => [
         'index'    => 'All :plural',
         'upload'   => 'Upload a new :singular.',
         'create'   => 'Create a new :singular.',
@@ -41,4 +41,7 @@ return array(
         'rindex'   => 'All :rplural :plural',
         'redit'    => 'Edit :singular: :resource',
     ],
+    'caption' => [
+        'index' => 'Displaying all :plural',
+    ]
 );

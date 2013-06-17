@@ -3,9 +3,13 @@
 @section('content')
     <header>
         <h1>{{ $title }}</h1>
+        <nav>
+            <a class="pull-right btn btn-success" href="{{ mo_create() }}">+ {{ $singular }}</a>
+        </nav>
     </header>
     <section>
         <table class="table table-bordered table-striped table-hover">
+            <caption>{{ $caption }}</caption>
             <thead>
                 <th><input id="row-all" name="ids-all" type="checkbox" /></th>
                 @foreach ($columns as $k => $v)

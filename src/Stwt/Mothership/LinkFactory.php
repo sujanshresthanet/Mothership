@@ -64,14 +64,21 @@ class LinkFactory
     /**
      * Returns URL to a single (create) route
      * 
-     * @param strung $action - the single action to route to
+     * @param string $action - the single action to route to
      *                         defaults to the first action
      *                         
      * @return URL
      */
     public static function single($action = null)
     {
-        # code...
+        $url = 'admin/{related}{controller}/{action}';
+        $action = 'create';
+        $data = [
+            'controller' => self::$path,
+            'action'     => $action,
+            'related'    => Arr::e(self::$related, 'uri'),
+        ];
+        return URL::to(self::replace($url, $data));
     }
 
     /**
