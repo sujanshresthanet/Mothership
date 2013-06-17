@@ -120,12 +120,29 @@ class ResourceController extends BaseController
      */
     public function create($config = [])
     {
-        $r = Arr::e($config, 'related');
-        if ($r) {
-            return 'Create '.$r['path'].' - '.$r['id'];
-        } else {
-            return 'Create';
-        }
+        $data = [];
+
+        $this->before($config);
+
+        $resource = $this->resource;
+
+        $fields = $resource->getFields(Arr::e($config, 'fields'));
+
+        $form = FormGenerator::resource($resource)
+            ->method('put')
+            ->fields($fields)
+            ->saveButton(Arr::e($config, 'submitText', 'Save'))
+            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->form()
+                ->attr('action', '')
+                ->generate();
+
+        $data['tabs']       = $this->getTabs($resource);
+        $data['title']      = Lang::title('create', $resource, $this->related);
+        $data['resource']   = $resource;
+        $data['form']       = $form;
+
+        return View::make('mothership::theme.resource.form', $data);
     }
 
     /**
