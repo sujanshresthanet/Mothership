@@ -13,6 +13,7 @@
         "stwt/img-yard": "dev-master",
         "codeguy/upload": "*",
         "sybio/image-workshop": "dev-master",
+        "laravelbook/ardent": "dev-master",
         "venturecraft/revisionable": "1.*",
         "jasonlewis/expressive-date": "1.0.*"
     },

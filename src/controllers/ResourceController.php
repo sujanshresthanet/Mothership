@@ -220,48 +220,35 @@ class ResourceController extends BaseController
         }
     }
 
+    /**
+     * Create a new resource from posted data. 
+     * Posted data id automatically assigned to and validated by
+     * the Ardent class extension on the resource model
+     * On success redirect to the index page, on error redirect back
+     * to create page.
+     * 
+     * @param array $config - array of optional data
+     * 
+     * @return Redirect
+     */
     public function store($config = [])
     {
         $this->before($config);
 
         $resource = $this->resource;
-
-        $input = Input::all();
         $rules = $resource->getRules();
-    
-        $v = Validator::make($input, $rules);
 
-        if ($v->fails()) {
+        $resource->autoHydrateEntityFromInput   = true;
+        $resource->autoPurgeRedundantAttributes = true;
+        
+        if ($resource->save($rules)) {
+            return Redirect::to(LinkFactory::collection())
+                ->with('flash', 'Your resource has been created!');
+        } else {
             return Redirect::to(URL::current())
                 ->withInput()
-                ->withErrors($v->messages());
+                ->withErrors($resource->errors());
         }
-
-        Log::error('CREATE: '.print_r($input, 1));
-        Log::error('redirect to '.LinkFactory::collection());
-
-        // $resource->name = Input::get('name');
-        // $resource->slug = Input::get('slug');
-        // $resource->status = Input::get('status');
-        // $resource->template = Input::get('template');
-
-        $input = [
-            'name' => Input::get('name'),
-            'slug' => Input::get('slug'),
-            'status' => Input::get('status'),
-            'template' => Input::get('template'),
-        ];
-
-        $resource = \Page::create($input);
-        
-        if (!$resource) {
-            Log::error('error creating');
-            return Redirect::to(URL::current())
-                ->withInput();
-        }
-
-        return Redirect::to(LinkFactory::collection())
-            ->with('flash', 'Your resource has been created!');
     }
 
     public function update($id, $config = [])

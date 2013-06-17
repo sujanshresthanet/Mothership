@@ -7,8 +7,9 @@ use Eloquent;
 use Log;
 use Str;
 use \Mockery as Mockery;
+use \LaravelBook\Ardent\Ardent;
 
-class BaseModel extends Eloquent
+class BaseModel extends Ardent
 {
     protected $table;
 
@@ -35,10 +36,25 @@ class BaseModel extends Eloquent
      * 
      * @var array
      */
-    protected $dontKeepRevisionOf = [
-        'updated_at',
-        'created_at',
-    ];
+    protected $dontKeepRevisionOf = ['updated_at', 'created_at',];
+
+    /**
+     * This models db column properties
+     * ---
+     * This array is auto loaded from the database details but any of the
+     * attributes can be overridden here.
+     * 
+     * Example of column properties:
+     * 
+     * [column_name] => [
+     *     'label'      => '',  // the column label
+     *     'form'       => '',  // the type of form element e.g. [input, select, textarea]
+     *     'validation' => [],  // array of validation rules
+     * ],
+     * 
+     * @var array
+     */
+    protected $properties = [];
 
     /**
      * Default columns that are displayed in the admin table
@@ -52,8 +68,25 @@ class BaseModel extends Eloquent
      */
     protected $fields = null;
     
+    /**
+     * Declare all rules for fields in the model
+     * 
+     * @var array
+     */
+    public static $rules = [];
+
+    /**
+     * If set to true, models are hydrated from form input submission automatically.
+     * We'll set this to true as and when we need it
+     * 
+     * @var boolean
+     */
+    public $autoHydrateEntityFromInput = false;
+    public $autoPurgeRedundantAttributes = true;
+
     public function __construct()
     {
+        parent::__construct();
         $this->properties = $this->initProperties($this->properties);
         $this->loadColumns();
     }
