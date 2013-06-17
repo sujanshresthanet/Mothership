@@ -74,6 +74,35 @@ if ($controllers) {
                     }
                 );
 
+                // store
+                Route::post(
+                    $path,
+                    function () use ($class) {
+                        return with(new $class)->store();
+                    }
+                );
+
+                // update
+                Route::put(
+                    $path.'/{idMethod}',
+                    function ($idMethod) use ($class) {
+                        list($id, $method) = explode(':', $idMethod);
+                        return with(new $class)->update($id);
+                    }
+                );
+
+                // destroy
+                Route::delete(
+                    $path.'/{id}',
+                    function ($id) use ($class) {
+                        return with(new $class)->destroy($id);
+                    }
+                )->where('id', '[0-9]+');
+
+                #########################################
+                # Related Routes                        #
+                #########################################
+
                 // related index
                 Route::get(
                     '{relatedPath}/{relatedId}/'.$path,
