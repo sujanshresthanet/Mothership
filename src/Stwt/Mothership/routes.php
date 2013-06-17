@@ -53,7 +53,12 @@ if ($controllers) {
                 Route::get(
                     $path.'/{method}',
                     function ($method) use ($class) {
-                        return with(new $class)->$method();
+                        $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'type'       => 'collection',
+                        ];
+                        return with(new $class)->$method($config);
                     }
                 )->where('method', '[A-Za-z]+');
                 
@@ -61,6 +66,12 @@ if ($controllers) {
                 Route::get(
                     $path.'/{id}',
                     function ($id) use ($class) {
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'show',
+                            'id'         => $id,
+                            'type'       => 'collection',
+                        ];
                         return with(new $class)->show($id);
                     }
                 )->where('id', '[0-9]+');
@@ -70,7 +81,13 @@ if ($controllers) {
                     $path.'/{idMethod}',
                     function ($idMethod) use ($class) {
                         list($id, $method) = explode(':', $idMethod);
-                        return with(new $class)->{$method}($id);
+                        $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'id'         => $id,
+                            'type'       => 'collection',
+                        ];
+                        return with(new $class)->{$method}($id, $config);
                     }
                 );
 

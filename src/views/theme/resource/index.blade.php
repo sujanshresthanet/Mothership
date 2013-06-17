@@ -4,7 +4,7 @@
     <header>
         <h1>{{ $title }}</h1>
         <nav>
-            <a class="pull-right btn btn-success" href="{{ mo_create() }}">+ {{ $singular }}</a>
+            <a class="pull-right btn btn-success" href="{{ mo_create() }}"><i class="icon-white icon-plus"></i> {{ $singular }}</a>
         </nav>
     </header>
     <section>

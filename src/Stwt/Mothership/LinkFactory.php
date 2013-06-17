@@ -58,7 +58,13 @@ class LinkFactory
      */
     public static function collection($action)
     {
-        # code...
+        $url = 'admin/{related}{controller}';
+        
+        $data = [
+            'controller' => self::$path,
+            'related'    => Arr::e(self::$related, 'uri'),
+        ];
+        return URL::to(self::replace($url, $data));
     }
 
     /**
