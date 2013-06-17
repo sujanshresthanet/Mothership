@@ -507,19 +507,24 @@ class Field
      * @access   protected
      * @return   boolean
      */
-    protected function isScalar()
+    public function isScalar()
     {
         return in_array($this->type, ['number', 'double', 'integer']);
     }
 
-    protected function isDate()
+    public function isDate()
     {
         return in_array($this->dataType, ['date', 'datetime', 'timestamp']);
     }
 
-    protected function isString()
+    public function isString()
     {
         return in_array($this->dataType, ['varchar', 'text']);
+    }
+
+    public function allowsNull()
+    {
+        return $this->null;
     }
 
     /**

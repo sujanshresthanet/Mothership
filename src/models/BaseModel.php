@@ -9,6 +9,10 @@ use Str;
 use \Mockery as Mockery;
 use \LaravelBook\Ardent\Ardent;
 
+use Input;
+use Validator;
+use MessageBag;
+
 class BaseModel extends Ardent
 {
     protected $table;
@@ -84,7 +88,7 @@ class BaseModel extends Ardent
     public $autoHydrateEntityFromInput = false;
     public $autoPurgeRedundantAttributes = true;
 
-    public function __construct( array $attributes = array() )
+    public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);
         $this->properties = $this->initProperties($this->properties);
@@ -354,6 +358,71 @@ class BaseModel extends Ardent
         return ( isset($this->properties[$name]) ?: false );
     }
 
+    /**
+     * Validate the model instance Override Ardent method
+     *
+     * Add logic to the set attribute part so we do not assign empty string
+     * to attributes that are nullable. These are set to null instead
+     *
+     * @param array   $rules          Validation rules
+     * @param array   $customMessages Custom error messages
+     * @return bool
+     */
+    public function validate(array $rules = array(), array $customMessages = array())
+    {
+        // check for overrides, then remove any empty rules
+        $rules = (empty($rules)) ? static::$rules : $rules;
+        foreach ($rules as $field => $rls) {
+            if ($rls == '') {
+                unset( $rules[$field] );
+            }
+        }
+
+        if (empty($rules)) {
+            return true;
+        }
+
+        $customMessages = (empty($customMessages)) ? static::$customMessages : $customMessages;
+
+        if ($this->forceEntityHydrationFromInput || (empty($this->attributes) && $this->autoHydrateEntityFromInput)) {
+            // pluck only the fields which are defined in the validation rule-set
+            $attributes = array_intersect_key(Input::all(), $rules);
+
+            // Set each given attribute on the model
+            foreach ($attributes as $key => $value) {
+                // check if "" posted and property is allows null values
+                if ($this->getPropery($key)->allowsNull() and empty($value)) {
+                    // set attribure to null
+                    $this->setAttribute($key, null);
+                } else {
+                    $this->setAttribute($key, $value);
+                }
+            }
+        }
+
+        $data = $this->attributes; // the data under validation
+
+        // perform validation
+        $validator = Validator::make($data, $rules, $customMessages);
+        $success = $validator->passes();
+
+        if ($success) {
+            // if the model is valid, unset old errors
+            if ($this->validationErrors->count() > 0) {
+                $this->validationErrors = new MessageBag;
+            }
+        } else {
+            // otherwise set the new ones
+            $this->validationErrors = $validator->messages();
+
+            // stash the input to the current session
+            if (Input::hasSessionStore()) {
+                Input::flash();
+            }
+        }
+
+        return $success;
+    }
 
 
     protected function initProperties($properties)
