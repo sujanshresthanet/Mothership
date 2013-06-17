@@ -329,6 +329,14 @@ class ResourceController extends BaseController
         }
     }
 
+    /**
+     * Deletes a given resource if the user has confirmed it
+     * 
+     * @param int $id       - the id of the resource
+     * @param array $config - array of optional data
+     * 
+     * @return Redirect         [description]
+     */
     public function destroy($id, $config = [])
     {
         $this->before($config);
@@ -349,8 +357,6 @@ class ResourceController extends BaseController
             Messages::add('success', Lang::alert('delete.success', $resource, $this->related));
             return Redirect::to(LinkFactory::collection());
         }
-
-
     }
 
     ##########################################################

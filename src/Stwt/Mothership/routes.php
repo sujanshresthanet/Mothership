@@ -144,6 +144,9 @@ if ($controllers) {
                     function ($relatedPath, $relatedId) use ($class) {
                         $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
                         $config = [
+                            'controller' => $class,
+                            'action'     => 'index',
+                            'type'       => 'collection',
                             'related' => [
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,
@@ -161,7 +164,11 @@ if ($controllers) {
                     '{relatedPath}/{relatedId}/'.$path.'/{method}',
                     function ($relatedPath, $relatedId, $method) use ($class) {
                         $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+
                         $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'type'       => 'single',
                             'related' => [
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,
@@ -182,6 +189,10 @@ if ($controllers) {
                     function ($relatedPath, $relatedId, $id) use ($class) {
                         $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
                         $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'id'         => $id,
+                            'type'       => 'resource',
                             'related' => [
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,
@@ -201,7 +212,12 @@ if ($controllers) {
                     '{relatedPath}/{relatedId}/'.$path.'/{idMethod}',
                     function ($relatedPath, $relatedId, $idMethod) use ($class) {
                         $relatedResource = Mothership::resourceFromPath($relatedPath, $relatedId);
+                        list($id, $method) = explode(':', $idMethod);
                         $config = [
+                            'controller' => $class,
+                            'action'     => $method,
+                            'id'         => $id,
+                            'type'       => 'resource',
                             'related' => [
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,
@@ -209,7 +225,6 @@ if ($controllers) {
                                 'uri'       => $relatedPath.'/'.$relatedId.'/',
                             ]
                         ];
-                        list($id, $method) = explode(':', $idMethod);
                         return with(new $class)->$method($id, $config);
                     }
                 )

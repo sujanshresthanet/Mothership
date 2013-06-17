@@ -32,16 +32,17 @@ return array(
     ],
     'title' => [
         'index'    => 'All :plural',
-        'upload'   => 'Upload a new :singular.',
         'create'   => 'Create a new :singular.',
         'show'     => 'View :singular: :resource',
         'edit'     => 'Edit :singular: :resource',
-        'password' => 'Update password: :resource',
         // related titles
         'rindex'   => 'All :rplural :plural',
-        'redit'    => 'Edit :singular: :resource',
+        'rcreate'   => 'Create a new :singular for :rresource.',
+        'rshow'     => 'View :rresource’s :singular: :resource',
+        'redit'     => 'Edit :rresource’s :singular: :resource',
     ],
     'caption' => [
         'index' => 'Displaying all :plural',
+        'rindex' => 'Displaying all of :rresource’s :plural',
     ]
 );
