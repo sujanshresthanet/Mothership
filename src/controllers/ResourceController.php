@@ -243,9 +243,10 @@ class ResourceController extends BaseController
         $resource->autoPurgeRedundantAttributes = true;
         
         if ($resource->save($rules)) {
-            return Redirect::to(LinkFactory::collection())
-                ->with('flash', 'Your resource has been created!');
+            Messages::add('success', Lang::alert('create.success', $resource, $this->related));
+            return Redirect::to(LinkFactory::collection());
         } else {
+            Messages::add('error', Lang::alert('create.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
                 ->withErrors($resource->errors());
@@ -276,10 +277,10 @@ class ResourceController extends BaseController
         $resource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
         
         if ($resource->save($rules)) {
-            Messages::add('success', 'Your resource has been updated!');
+            Messages::add('success', Lang::alert('edit.success', $resource, $this->related));
             return Redirect::to(URL::current());
         } else {
-            Messages::add('error', 'Error updating resource');
+            Messages::add('error', Lang::alert('edit.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
                 ->withErrors($resource->errors());

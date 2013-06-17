@@ -1,9 +1,9 @@
 <?php
 
 return array(
-    'alerts' => [
+    'alert' => [
         'create' => [
-            'success' => ':singular <b>:resource</b> updated succesfully.',
+            'success' => ':singular <b>:resource</b> added succesfully.',
             'error'   => 'There was a problem saving the :singular <b>:resource</b>.
                           Please correct errors in the form.',
         ],

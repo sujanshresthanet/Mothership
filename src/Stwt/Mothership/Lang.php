@@ -48,7 +48,7 @@ class Lang extends \Illuminate\Support\Facades\Lang
     }
 
     /**
-     * Return the page title for a view from a language file
+     * Return the table/list caption for a view from a language file
      * 
      * @param [type] $view     - The view name
      * @param object $resource - The resource instance
@@ -60,5 +60,20 @@ class Lang extends \Illuminate\Support\Facades\Lang
     {
         
         return self::get('caption', $view, $resource, $related);
+    }
+
+    /**
+     * Return the alert message for a view from a language file
+     * 
+     * @param [type] $key      - The alert name e.g. create.success, update.error
+     * @param object $resource - The resource instance
+     * @param array  $related  - A related resource [optional]
+     * 
+     * @return string
+     */
+    public static function alert($key, $resource, $related = null)
+    {
+        
+        return self::get('alert', $key, $resource, $related);
     }
 }
