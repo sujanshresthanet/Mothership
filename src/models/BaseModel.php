@@ -201,6 +201,9 @@ class BaseModel extends Ardent
      */
     public function getColumns($subset = null)
     {
+        if (!$subset and $this->columns) {
+            $subset = $this->columns;
+        }
         return $this->getProperties($subset);
     }
 
