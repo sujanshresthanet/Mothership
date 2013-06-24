@@ -25,7 +25,7 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
      */
     protected $hidden = array('password', 'last_login');
 
-    protected $guarded = array('id', 'password', 'last_login', 'created_at', 'updated_at');
+    protected $guarded = array('id', 'password', 'last_login', 'created_at', 'updated_at', 'deleted_at');
     
     /**
      * Returns the string description of the user

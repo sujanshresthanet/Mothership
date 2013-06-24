@@ -1,6 +1,7 @@
 <?php namespace Stwt\Mothership;
 
 use Illuminate\Support\Facades\Auth as Auth;
+use Illuminate\Support\Facades\Config as Config;
 use Illuminate\Support\Facades\Hash as Hash;
 use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Redirect as Redirect;
@@ -96,8 +97,10 @@ class HomeController extends BaseController
     {
         $data = [];
 
+        $userClass = Config::get('auth.model');
+
         $userId = Auth::user()->id;
-        $user   = User::find($userId);
+        $user   = $userClass::find($userId);
 
         $form = FormGenerator::resource($user)
             ->method('put')
@@ -119,8 +122,9 @@ class HomeController extends BaseController
      */
     public function putProfile()
     {
+        $userClass = Config::get('auth.model');
         $userId = Auth::user()->id;
-        $user   = User::find($userId);
+        $user   = $userClass::find($userId);
 
         return FormGenerator::resource($user)
             ->errorMessage('There was an error updating your profile. Please correct errors in the Form.')
@@ -138,8 +142,9 @@ class HomeController extends BaseController
     {
         $data = [];
 
+        $userClass = Config::get('auth.model');
         $userId = Auth::user()->id;
-        $user   = User::find($userId);
+        $user   = $userClass::find($userId);
 
         $fields = $this->getPasswordFields($user);
 
@@ -164,8 +169,9 @@ class HomeController extends BaseController
      */
     public function putPassword()
     {
+        $userClass = Config::get('auth.model');
         $userId = Auth::user()->id;
-        $user   = User::find($userId);
+        $user   = $userClass::find($userId);
 
         $rules = $this->getPasswordRules($user);
 
