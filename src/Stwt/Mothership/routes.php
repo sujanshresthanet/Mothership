@@ -15,6 +15,7 @@ $homeController = Config::get('mothership::homeController');
 
 Route::get('admin/login', "$homeController@getLogin");
 Route::post('admin/login', "$homeController@postLogin");
+Route::get('admin/logout', "$homeController@getLogout");
 
 $controllers = Config::get('mothership::controllers');
 
@@ -311,6 +312,8 @@ if ($controllers) {
 
 
 return;
+
+
 $controllers = Config::get('mothership::controllers');
 
 if ($controllers) {
