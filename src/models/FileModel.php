@@ -53,10 +53,12 @@ class FileModel extends BaseModel
 
     /**
      * Constructs the instance and set's our upload dir
+     * 
+     * @param array $attributes
      */
-    public function __construct ()
+    public function __construct(array $attributes = [])
     {
-        parent::__construct();
+        parent::__construct($attributes);
         $this->path = storage_path().$this->path;
     }
 
