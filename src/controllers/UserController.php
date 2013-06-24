@@ -10,43 +10,44 @@ class UserController extends ResourceController
     /**
      * Class name of the Resource model this controller uses
      */
-    public static $model = 'User';
+    public $model = 'User';
 
     /**
      * Actions in this controller
      * The User controller comes complete with an extra password action
      */
     public $actions = [
-        'collection' => [],
-        'resource' => [
-            'view' => [
-                'label' => 'View',
-                'uri' => '{controller}/{id}',
+        'collection' => [
+            'index' => [
+                'label' => 'All',
+                'uri' => '{controller}/index',
             ],
+        ],
+        'single' => [
+            'create' => [
+                'label' => 'Add',
+                'uri' => '{controller}/create',
+            ],
+        ],
+        'resource' => [
             'edit' => [
                 'label' => 'Edit',
-                'uri' => '{controller}/{id}/edit',
+                'uri' => '{controller}/{id}:edit',
             ],
             'password' => [
                 'label' => 'Password',
                 'uri' => '{controller}/{id}/password',
             ],
-            'history' => [
-                'label' => 'History',
-                'uri' => '{controller}/{id}/history',
+            'view' => [
+                'label' => 'View',
+                'uri' => '{controller}/{id}',
             ],
             'delete'  => [
                 'label' => 'Delete',
-                'uri' => '{controller}/{id}/delete',
+                'uri' => '{controller}/{id}:delete',
             ],
         ],
         'related' => [
-        ],
-        'single' => [
-            'create' => [
-                'label' => 'Add User',
-                'uri' => '{controller}/create',
-            ],
         ],
     ];
 
