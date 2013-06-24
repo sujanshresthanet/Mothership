@@ -3,7 +3,9 @@
 class ImageController extends FileController
 {
     /**
-     * Default Actions in this controller
+     * Default Action methods in this controller, also constructs the navigation
+     * 
+     * @var array
      */
     public $actions = [
         'collection' => [
@@ -19,22 +21,23 @@ class ImageController extends FileController
             ],
         ],
         'resource' => [
-            'view' => [
-                'label' => 'Preview',
-                'uri' => '{controller}/{id}',
-            ],
             'edit' => [
                 'label' => 'Edit',
-                'uri' => '{controller}/{id}/edit',
+                'uri' => '{controller}/{id}:edit',
+            ],
+            'view' => [
+                'label' => 'View',
+                'uri' => '{controller}/{id}',
             ],
             'delete'  => [
                 'label' => 'Delete',
-                'uri' => '{controller}/{id}/delete',
+                'uri' => '{controller}/{id}:delete',
             ],
         ],
         'related' => [
         ],
     ];
+    
 
     /*********************/
 
