@@ -286,12 +286,23 @@ class ResourceController extends BaseController
         $resource->autoHydrateEntityFromInput   = true;
         $resource->autoPurgeRedundantAttributes = true;
         
+        $callback = Arr::e($config, 'beforeSave');
+        if ($callback) {
+            $callback($resource);
+        }
+
         if ($resource->save($rules)) {
             if ($this->related) {
                 $related = $this->related['resource'];
                 $plural   = $resource->hasManyName();
                 $resource  = $related->{$plural}()->save($resource);
             }
+
+            $callback = Arr::e($config, 'afterSave');
+            if ($callback) {
+                $callback($resource);
+            }
+            
             Messages::add('success', Lang::alert('create.success', $resource, $this->related));
             return Redirect::to(LinkFactory::collection());
         } else {
@@ -325,7 +336,16 @@ class ResourceController extends BaseController
         $resource->autoPurgeRedundantAttributes = true;
         $resource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
         
+        $callback = Arr::e($config, 'beforeSave');
+        if ($callback) {
+            $callback($resource);
+        }
+
         if ($resource->save($rules)) {
+            $callback = Arr::e($config, 'afterSave');
+            if ($callback) {
+                $callback($resource);
+            }
             Messages::add('success', Lang::alert('edit.success', $resource, $this->related));
             return Redirect::to(URL::current());
         } else {
