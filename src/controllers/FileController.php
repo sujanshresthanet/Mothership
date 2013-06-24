@@ -69,20 +69,22 @@ class FileController extends ResourceController
      */
     public function store($config = [])
     {
+        $this->before($config);
+
         $resource = $this->resource;
+        $rules = $resource->getRules();
 
         $file = $this->uploadFile($resource);
         
         if ($this->errorMessages) {
-            $redirectUrl = URL::to('admin/'.$this->controller.'/create');
-            $message = $this->getAlert($resource, 'error', $config, 'create');
-            Messages::add('error', $message);
-            return Redirect::to($redirectUrl)
-                ->withErrors($this->errorMessages);
+            Messages::add('error', Lang::alert('create.error', $resource, $this->related));
+            return Redirect::to(URL::current())
+                ->withInput()
+                ->withErrors($resource->errors());
         }
 
         $resource->renameFile($file);
-
+        
         $callback = Arr::e($config, 'beforeSave');
         if ($callback) {
             $callback($resource);
@@ -95,11 +97,8 @@ class FileController extends ResourceController
             $callback($resource);
         }
 
-        $message = $this->getAlert($resource, 'success', $config, 'create');
-        Messages::add('success', $message);
-
-        $redirectUrl = URL::to('admin/'.$this->controller);
-        return Redirect::to($redirectUrl);
+        Messages::add('success', Lang::alert('create.success', $resource, $this->related));
+        return Redirect::to(LinkFactory::collection());
     }
 
     /**
