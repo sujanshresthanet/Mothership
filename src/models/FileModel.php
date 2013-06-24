@@ -19,7 +19,7 @@ class FileModel extends BaseModel
     ];
 
     protected $hidden       = ['created_at', 'updated_at'];
-    protected $guarded      = ['id', 'filename', 'mime_type', 'created_at', 'updated_at'];
+    protected $guarded      = ['id', 'filename', 'mime_type', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * Allowed mime types
