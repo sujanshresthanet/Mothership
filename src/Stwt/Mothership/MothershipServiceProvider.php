@@ -44,6 +44,7 @@ class MothershipServiceProvider extends ServiceProvider
     {
         return [
             'Basset\BassetServiceProvider',
+            'Baum\BaumServiceProvider',
             'Stwt\GoodForm\GoodFormServiceProvider',
             'Stwt\ImgYard\ImgYardServiceProvider',
         ];
