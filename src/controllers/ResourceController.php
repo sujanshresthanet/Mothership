@@ -147,9 +147,9 @@ class ResourceController extends BaseController
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('create', $resource, $this->related);
         $data['resource']   = $resource;
-        $data['form']       = $form;
+        $data['content']    = $form;
 
-        return View::make('mothership::theme.resource.form', $data);
+        return View::make('mothership::theme.resource.single', $data);
     }
 
     /**
@@ -200,9 +200,9 @@ class ResourceController extends BaseController
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
-        $data['form']       = $form;
+        $data['content']    = $form;
 
-        return View::make('mothership::theme.resource.form', $data);
+        return View::make('mothership::theme.resource.single', $data);
     }
 
     /**

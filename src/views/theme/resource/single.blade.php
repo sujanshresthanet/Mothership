@@ -13,6 +13,6 @@
         @include('mothership::theme.common.tabs')
     </header>
     <section>
-        {{ $form }}
+        {{ $content }}
     </section>
 @stop
