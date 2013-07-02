@@ -13,7 +13,7 @@ class View extends \Illuminate\Support\Facades\View
         return $data;
     }
 
-    public static function make($path, $data = [])
+    public static function makeTemplate($path, $data = [])
     {
         $data = self::baseData($data);
         return parent::make($path, $data);

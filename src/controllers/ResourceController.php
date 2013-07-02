@@ -116,7 +116,7 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['title']      = Lang::title('index', $resource, $this->related);
 
-        return View::make('mothership::theme.resource.index', $data);
+        return View::makeTemplate('mothership::theme.resource.index', $data);
     }
 
     /**
@@ -149,7 +149,7 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::make('mothership::theme.resource.single', $data);
+        return View::makeTemplate('mothership::theme.resource.single', $data);
     }
 
     /**
@@ -202,7 +202,7 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::make('mothership::theme.resource.single', $data);
+        return View::makeTemplate('mothership::theme.resource.single', $data);
     }
 
     /**
@@ -261,7 +261,7 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['form']       = $form;
 
-        return View::make('mothership::theme.resource.form', $data);
+        return View::makeTemplate('mothership::theme.resource.form', $data);
     }
 
     /**
