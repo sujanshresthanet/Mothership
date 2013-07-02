@@ -90,6 +90,9 @@ if ($controllers) {
                             'id'         => $id,
                             'type'       => 'collection',
                         ];
+                        if (!method_exists($class, $method)) {
+                            $method = 'edit';
+                        }
                         return with(new $class)->{$method}($id, $config);
                     }
                 );
@@ -228,6 +231,9 @@ if ($controllers) {
                                 'uri'       => $relatedPath.'/'.$relatedId.'/',
                             ]
                         ];
+                        if (!method_exists($class, $method)) {
+                            $method = 'edit';
+                        }
                         return with(new $class)->$method($id, $config);
                     }
                 )
