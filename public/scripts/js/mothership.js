@@ -1,4 +1,4 @@
-// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js";
+// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js", "vendor/redactor.min.js";
 
 /**
  * Attaches the color picer to input elements
@@ -19,7 +19,6 @@ function moColorPicker() {
                 if (!color) {
                     color = '#FFF';
                 }
-                console.log('color: '+$input.val());
                 $(this).find('.add-on i').css('background-color', color);
                 $(this).data('color', color);
             }
@@ -72,8 +71,23 @@ function moDateTimePicker() {
     }
 }
 
+/**
+ * Adds html WYSIWYG editor to textbox
+ * 
+ * @return void
+ */
+function moHtml() {
+    $('form .html').redactor({
+        iframe:     true,
+        minHeight:  500,
+        css:        '/css/style.css'
+    });
+}
+
 $(function() {
     moColorPicker();
     moImagePicker();
     moDateTimePicker();
+    moHtml();
+    console.log('version 1');
 });

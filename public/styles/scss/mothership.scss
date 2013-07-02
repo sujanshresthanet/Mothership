@@ -1,7 +1,8 @@
 @import "vendor/bootstrap";
 @import "vendor/colorpicker";
-@import "vendor/bootstrap-datetimepicker.min.scss";
-@import "vendor/image-picker.scss";
+@import "vendor/bootstrap-datetimepicker.min";
+@import "vendor/image-picker";
+@import "vendor/redactor";
 
 body {
     background-color: #92c52a;

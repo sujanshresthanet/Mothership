@@ -421,7 +421,7 @@ class ResourceController extends BaseController
      */
     protected function queryOrderBy($resource)
     {
-        return $resource->orderBy('created_at', 'desc');
+        return $resource->orderBy('id', 'asc');
     }
 
     ##########################################################
