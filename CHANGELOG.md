@@ -1,5 +1,10 @@
 # Change Log
 
+## 3rd July
+
+* Switched order getProperties detectes properties and closures to fix bug where some properties were flagged as closures
+* Added new humanize string helper
+
 ## 15th June
 
 * Added initProperties so closures can be added to $properties without the need to override the constructor

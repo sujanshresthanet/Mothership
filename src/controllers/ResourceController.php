@@ -406,7 +406,11 @@ class ResourceController extends BaseController
             $resource = $this->related['resource'];
             $id       = $this->related['id'];
             $hasMany  = $this->resource->hasManyName();
-            
+            if (!method_exists($resource, $hasMany)) {
+                $class   = get_class($resource);
+                $message = "Error querying related resource. $hasMany() method does not exist in class $class.";
+                throw new \Exception($message, 1);
+            }
             return $resource->$hasMany();
         }
         return $resource;

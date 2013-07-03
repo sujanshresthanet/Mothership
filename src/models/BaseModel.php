@@ -128,19 +128,19 @@ class BaseModel extends Ardent
 
     public function singular($uppercase = true)
     {
-        $singular = ($this->singular ?: str_singular($this->table));
+        $singular = ($this->singular ?: str_plural(humanize($this->table)));
         return $uppercase ? ucwords($singular) : strtolower($singular);
     }
 
     public function plural($uppercase = true)
     {
-        $plural = ($this->plural ?: str_plural($this->singular()));
+        $plural = ($this->plural ?: humanize($this->table));
         return $uppercase ? ucwords($plural) : strtolower($plural);
     }
 
     public function hasManyName()
     {
-        return $this->table;
+        return camel_case($this->table);
     }
 
     public function hasOneName()
@@ -157,15 +157,15 @@ class BaseModel extends Ardent
      */
     public function loadColumns()
     {
-        $key = 'Mothership'.get_class($this).'Properties';
+        $configKey = 'Mothership'.get_class($this).'Properties';
         $cacheTime = Config::get('mothership::cache');
 
-        if ($cacheTime and Cache::has($key)) {
-            $properties = Cache::get($key);
+        if ($cacheTime and Cache::has($configKey)) {
+            $properties = Cache::get($configKey);
         } else {
             $properties = $this->loadColumnsFromDatabase();
             if ($cacheTime) {
-                Cache::put($key, $properties, $cacheTime);
+                Cache::put($configKey, $properties, $cacheTime);
             }
         }
         $this->properties = $properties;
@@ -238,10 +238,10 @@ class BaseModel extends Ardent
         $subset = ( $subset ?: array_diff(array_keys($this->properties), $this->guarded) );
         $properties = [];
         foreach ($subset as $k => $v) {
-            if (is_callable($v)) {
-                $properties[$k] = $v;
-            } elseif (is_string($v) and isset($this->properties[$v])) {
+            if (is_string($v) and isset($this->properties[$v])) {
                 $properties[$v] = $this->properties[$v];
+            } elseif (is_callable($v)) {
+                $properties[$k] = $v;
             } else {
                 $properties[$k] = $v;
             }
