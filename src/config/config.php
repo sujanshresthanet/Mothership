@@ -12,6 +12,27 @@ return [
     */
    'appTitle' => 'Mothership',
 
+    /*
+    |--------------------------------------------------------------------------
+    | App Style
+    |--------------------------------------------------------------------------
+    |
+    | Path to the admin stylesheet
+    |
+    */
+   'appStyle' => 'packages/stwt/mothership/styles/css/mothership.css',
+
+    /*
+    |--------------------------------------------------------------------------
+    | App Script
+    |--------------------------------------------------------------------------
+    |
+    | Path to the admin javascript
+    |
+    */
+   'appScript' => 'packages/stwt/mothership/scripts/js/mothership.min.js',
+
+
    /*
 	|--------------------------------------------------------------------------
 	| Controllers

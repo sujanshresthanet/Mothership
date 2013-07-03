@@ -1,5 +1,11 @@
 # Change Log
 
+## 1st July
+
+* Added appTitle config item
+* Added appStyle config item
+* Added appScript config item
+
 ## 15th June
 
 * Added initProperties so closures can be added to $properties without the need to override the constructor

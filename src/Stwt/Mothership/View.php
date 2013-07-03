@@ -8,6 +8,8 @@ class View extends \Illuminate\Support\Facades\View
     {
         $data = Arr::s($data, 'navigation', Config::get('mothership::primaryNavigation'));
         $data = Arr::s($data, 'appTitle', Config::get('mothership::appTitle'));
+        $data = Arr::s($data, 'appStyle', Config::get('mothership::appStyle'));
+        $data = Arr::s($data, 'appScript', Config::get('mothership::appScript'));
 
         if (isset($data['resource'])) {
             $data = Arr::s($data, 'singular', $data['resource']->singular());
