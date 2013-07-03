@@ -6,7 +6,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </a>
-                        <a class="brand" href="#">Mothership</a>
+                        <a class="brand" href="#">{{ $appTitle }}</a>
                         @if (Auth::check())
                         <div class="nav-collapse collapse">
                              <ul class="nav">

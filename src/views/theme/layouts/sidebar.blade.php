@@ -7,10 +7,10 @@
     </head>
     <body>
         <header class="app-header" id="app-header">
-            @include('mothership::common.navbar')
+            @include('mothership::theme.common.navbar')
         </header>
         <div class="container" id="container">
-            @include('mothership::common.breadcrumbs')
+            {{--@include('mothership::common.breadcrumbs')--}}
             {{ Stwt\Mothership\Messages::getHtml() }}
             <div class="app-content row" id="app-content">
                 <section class="span8">
