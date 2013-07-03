@@ -30,6 +30,7 @@ class FileModel extends BaseModel
 
     /**
      * The maximum size for an uploaded file
+     * (use "B", "K", M", or "G")
      * 
      * @var string
      */

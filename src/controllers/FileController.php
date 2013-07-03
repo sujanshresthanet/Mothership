@@ -83,7 +83,7 @@ class FileController extends ResourceController
             Messages::add('error', Lang::alert('create.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
-                ->withErrors($resource->errors());
+                ->withErrors($this->errorMessages);
         }
 
         $resource->renameFile($file);
@@ -172,7 +172,7 @@ class FileController extends ResourceController
         if (!$storage) {
             return null;
         }
-
+        Log::error('max size = '.$resource->maxSize);
         try {
             $file = new \Upload\File('filename', $storage);
             $mimeTypes = $resource->mimeTypes;
