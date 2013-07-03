@@ -69,18 +69,19 @@ class HomeController extends BaseController
      *
      * @return View
      */
-    public function getIndex()
+    public function getIndex($config = [])
     {
-        $data = [];
+        $data = $config;
 
-        $data['title'] = 'Hi There!';
-        $data['content'] = 'Lorem ipsum dolor sit amet, consectetur 
+        $data = Arr::s($data, 'title', 'Hi There!');
+
+        $data = Arr::s($data, 'content', 'Lorem ipsum dolor sit amet, consectetur 
         adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore 
         magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
         ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
         irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
         fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-        sunt in culpa qui officia deserunt mollit anim id est laborum.';
+        sunt in culpa qui officia deserunt mollit anim id est laborum.');
 
         return View::make('mothership::theme.home.index')
             ->with($this->getTemplateData())
@@ -109,7 +110,7 @@ class HomeController extends BaseController
         $data['title'] = 'Your Profile';
         $data['content'] = $form;
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }
@@ -156,7 +157,7 @@ class HomeController extends BaseController
         $data['title'] = 'Change Password';
         $data['content'] = $form;
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }

@@ -5,6 +5,7 @@
 * Added appTitle config item
 * Added appStyle config item
 * Added appScript config item
+* Allow homepage overrides
 
 ## 15th June
 
