@@ -11,7 +11,9 @@
         <table class="table table-bordered table-striped table-hover">
             <caption>{{ $caption }}</caption>
             <thead>
+                @if ($selectable)
                 <th><input id="row-all" name="ids-all" type="checkbox" /></th>
+                @endif
                 @foreach ($columns as $k => $v)
                     @if (is_callable($v))
                     <th>{{ $k }}</th>
@@ -24,7 +26,9 @@
             <tbody>
                 @foreach ($collection as $r)
                 <tr>
+                @if ($selectable)
                     <td><input id="row-{{ $r->id }}" name="ids[]" type="checkbox" value="{{ $r->id }}"/></td>
+                @endif
                 @foreach ($columns as $k => $v)
                     @if (is_object($v) && !($v instanceof Closure))
                     <td><label for="row-{{ $r->id }}">{{ $v->getTable($r) }}</label></td>

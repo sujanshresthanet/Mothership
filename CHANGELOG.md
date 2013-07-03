@@ -6,6 +6,7 @@
 * Added appStyle config item
 * Added appScript config item
 * Allow homepage overrides
+* Added selectable config for table view
 
 ## 15th June
 

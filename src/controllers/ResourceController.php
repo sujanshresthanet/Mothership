@@ -115,6 +115,7 @@ class ResourceController extends BaseController
         $collection = $this->queryOrderBy($collection);
         $collection = $collection->paginate(15);
 
+        $data['selectable'] = Arr::e($config, 'selectable', true);
         $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['collection'] = $collection;
