@@ -45,7 +45,6 @@ class Messages
     public static function getHtml()
     {
         $messages = Session::get('messages');
-        error_log(print_r($messages, 1));
         $output = '';
         if ($messages) {
             foreach ($messages as $message) {

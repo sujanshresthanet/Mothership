@@ -22,6 +22,8 @@ use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
 use Validator;
 
+
+use Session;
 /**
  * MothershipResourceController
  *
@@ -358,6 +360,7 @@ class ResourceController extends BaseController
             Messages::add('error', Lang::alert('edit.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
+                //->withErrors(['title' => 'an error']);
                 ->withErrors($resource->errors());
         }
     }

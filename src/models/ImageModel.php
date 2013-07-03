@@ -113,7 +113,6 @@ class ImageModel extends FileModel
     public function src($size = null)
     {
         $size = is_null($size) ? $this->defaultSubDirectory : $size;
-        Log::error('get src '.$size);
         if ($this->id) {
             $route = $this->route;
 

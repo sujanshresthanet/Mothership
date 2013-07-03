@@ -7,6 +7,7 @@
 * Added appScript config item
 * Allow homepage overrides
 * Added selectable config for table view
+* Fixed bug allowing multiple max:size rules to be added
 
 ## 15th June
 
