@@ -7,7 +7,7 @@
     </head>
     <body>
         <header class="app-header" id="app-header">
-            @include('mothership::common.navbar')
+            @include('mothership::theme.common.navbar')
         </header>
         {{ Stwt\Mothership\Messages::getHtml() }}
         @yield('content')

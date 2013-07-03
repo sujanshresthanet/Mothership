@@ -28,7 +28,7 @@ class HomeController extends BaseController
      */
     public function getLogin()
     {
-        return View::make('mothership::home.login')->with($this->getTemplateData());
+        return View::make('mothership::theme.home.login')->with($this->getTemplateData());
     }
 
     /**
@@ -83,7 +83,7 @@ class HomeController extends BaseController
         fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
         sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($this->getTemplateData())
             ->with($data);
     }
