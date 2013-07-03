@@ -35,6 +35,11 @@ use Validator;
  */
 class ResourceController extends BaseController
 {
+    /**
+     * The model resource this controller represents
+     * 
+     * @var string
+     */
     public $model;
 
     /**
