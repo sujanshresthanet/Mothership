@@ -36,6 +36,45 @@ class ContentRegionController extends ResourceController
         ],
     ];
 
+    /*
+     * When not in a related view, limit the regions to those that have no
+     * related page. These are shared regions, that appear on many pages
+     *
+     * @param object $resource
+     *
+     * @return object
+     */
+    protected function queryRelated($resource)
+    {
+        if ($this->related) {
+            return parent::queryRelated($resource);
+        } else {
+            return $resource->where('page_id', '=', null);
+        }
+    }
+
+
+    public function create($config = [])
+    {
+        $config['fields'] = [
+            'key',
+            'type' => [
+                'form'    => 'select',
+                'label'   => 'Type',
+                'options' => [
+                    'Navigation Menu' => 'nav',
+                    'HTML'            => 'html',
+                    'Plain Text'      => 'textarea',
+                    'Text'            => 'text',
+                ],
+                'help' => ['Choose the type of content you wish to add'],
+            ],
+        ];
+
+        return parent::create($config);
+    }
+
+
     /**
      * Custom edit view of region data
      * 
