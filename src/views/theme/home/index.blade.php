@@ -1,4 +1,4 @@
-@extends('mothership::layouts.sidebar')
+@extends('mothership::theme.layouts.sidebar')
 
 @section('title')
     Welcome

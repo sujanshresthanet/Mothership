@@ -363,8 +363,7 @@ class Field
         if (!$this->type) {
             $this->type = 'text';
         }
-        $length             = $this->getConstraint($type);
-        $this->validation[] = 'max:'.$length;
+        $length = $this->getConstraint($type);
     }
 
     /**
@@ -550,5 +549,26 @@ class Field
     protected function humanize($string)
     {
         return  ucwords(str_replace('_', ' ', $string));
+    }
+
+    /**
+     * Searches array of rules to see if the given rule exists or a
+     * rule is present that starts with that rule e.g. max:12
+     *
+     * If found the array key is returned, else false
+     * 
+     * @param  string $matchRule the rule to match or start with
+     * @param  array $rules      array of rules
+     * 
+     * @return mixed
+     */
+    protected function containsRule($matchRule, $rules)
+    {
+        foreach ($rules as $key => $rule) {
+            if ($rule == $matchRule or starts_with($rule, $matchRule)) {
+                return $key;
+            }
+        }
+        return false;
     }
 }

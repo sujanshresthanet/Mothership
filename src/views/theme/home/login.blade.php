@@ -1,4 +1,4 @@
-@extends('mothership::layouts.blank')
+@extends('mothership::theme.layouts.blank')
 
 @section('title')
     Please Login

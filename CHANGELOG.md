@@ -5,6 +5,15 @@
 * Switched order getProperties detectes properties and closures to fix bug where some properties were flagged as closures
 * Added new humanize string helper
 
+## 1st July
+
+* Added appTitle config item
+* Added appStyle config item
+* Added appScript config item
+* Allow homepage overrides
+* Added selectable config for table view
+* Fixed bug allowing multiple max:size rules to be added
+
 ## 15th June
 
 * Added initProperties so closures can be added to $properties without the need to override the constructor

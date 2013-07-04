@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Config as Config;
 use Illuminate\Support\Facades\Hash as Hash;
 use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Redirect as Redirect;
-use Illuminate\Support\Facades\View as View;
 use User;
 
 /**
@@ -28,7 +27,7 @@ class HomeController extends BaseController
      */
     public function getLogin()
     {
-        return View::make('mothership::home.login')->with($this->getTemplateData());
+        return View::make('mothership::theme.home.login')->with($this->getTemplateData());
     }
 
     /**
@@ -70,20 +69,21 @@ class HomeController extends BaseController
      *
      * @return View
      */
-    public function getIndex()
+    public function getIndex($config = [])
     {
-        $data = [];
+        $data = $config;
 
-        $data['title'] = 'Hi There!';
-        $data['content'] = 'Lorem ipsum dolor sit amet, consectetur 
+        $data = Arr::s($data, 'title', 'Hi There!');
+
+        $data = Arr::s($data, 'content', 'Lorem ipsum dolor sit amet, consectetur 
         adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore 
         magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
         ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
         irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
         fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-        sunt in culpa qui officia deserunt mollit anim id est laborum.';
+        sunt in culpa qui officia deserunt mollit anim id est laborum.');
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($this->getTemplateData())
             ->with($data);
     }
@@ -110,7 +110,7 @@ class HomeController extends BaseController
         $data['title'] = 'Your Profile';
         $data['content'] = $form;
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }
@@ -157,7 +157,7 @@ class HomeController extends BaseController
         $data['title'] = 'Change Password';
         $data['content'] = $form;
 
-        return View::make('mothership::home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }

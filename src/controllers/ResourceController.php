@@ -22,6 +22,8 @@ use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
 use Validator;
 
+
+use Session;
 /**
  * MothershipResourceController
  *
@@ -35,6 +37,11 @@ use Validator;
  */
 class ResourceController extends BaseController
 {
+    /**
+     * The model resource this controller represents
+     * 
+     * @var string
+     */
     public $model;
 
     /**
@@ -110,6 +117,7 @@ class ResourceController extends BaseController
         $collection = $this->queryOrderBy($collection);
         $collection = $collection->paginate(15);
 
+        $data['selectable'] = Arr::e($config, 'selectable', true);
         $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['collection'] = $collection;
@@ -352,6 +360,7 @@ class ResourceController extends BaseController
             Messages::add('error', Lang::alert('edit.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
+                //->withErrors(['title' => 'an error']);
                 ->withErrors($resource->errors());
         }
     }
