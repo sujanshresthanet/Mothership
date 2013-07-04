@@ -340,8 +340,8 @@ class ResourceController extends BaseController
         $resource = $this->resource->find($id);
         $rules = $resource->getRules();
 
-        $resource->autoHydrateEntityFromInput   = true;
-        $resource->autoPurgeRedundantAttributes = true;
+        $resource->autoHydrateEntityFromInput    = true;
+        $resource->autoPurgeRedundantAttributes  = true;
         $resource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
         
         $callback = Arr::e($config, 'beforeSave');
@@ -360,7 +360,6 @@ class ResourceController extends BaseController
             Messages::add('error', Lang::alert('edit.error', $resource, $this->related));
             return Redirect::to(URL::current())
                 ->withInput()
-                //->withErrors(['title' => 'an error']);
                 ->withErrors($resource->errors());
         }
     }
