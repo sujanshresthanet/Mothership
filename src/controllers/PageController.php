@@ -41,29 +41,4 @@ class PageController extends NestedSetController
             ]
         ],
     ];
-
-    public function content($id, $config = [])
-    {
-        $data = [];
-
-        $this->before($config);
-
-        $resource = $this->resource->find($id);
-
-        // get template regions
-        $template = $resource->template();
-
-        $regions = $resource->contentRegions()
-                            ->with('contentItems')
-                            ->get();
-
-        $data['tabs']       = $this->getTabs($resource);
-        $data['title']      = Lang::title('edit', $resource, $this->related);
-        $data['resource']   = $resource;
-        $data['content']    = View::make('mothership::theme.page.content')
-                                  ->with('resource', $resource)
-                                  ->with('regions', $regions);
-
-        return View::makeTemplate('mothership::theme.resource.single', $data);
-    }
 }
