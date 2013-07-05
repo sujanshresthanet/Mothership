@@ -32,7 +32,6 @@ return [
     */
    'appScript' => 'packages/stwt/mothership/scripts/js/mothership.min.js',
 
-
    /*
 	|--------------------------------------------------------------------------
 	| Controllers

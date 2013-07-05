@@ -27,7 +27,7 @@ class HomeController extends BaseController
      */
     public function getLogin()
     {
-        return View::make('mothership::theme.home.login')->with($this->getTemplateData());
+        return View::makeTemplate('mothership::theme.home.login')->with($this->getTemplateData());
     }
 
     /**
@@ -83,7 +83,7 @@ class HomeController extends BaseController
         fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
         sunt in culpa qui officia deserunt mollit anim id est laborum.');
 
-        return View::make('mothership::theme.home.index')
+        return View::makeTemplate('mothership::theme.home.index')
             ->with($this->getTemplateData())
             ->with($data);
     }
@@ -110,7 +110,7 @@ class HomeController extends BaseController
         $data['title'] = 'Your Profile';
         $data['content'] = $form;
 
-        return View::make('mothership::theme.home.index')
+        return View::makeTemplate('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }
@@ -157,7 +157,7 @@ class HomeController extends BaseController
         $data['title'] = 'Change Password';
         $data['content'] = $form;
 
-        return View::make('mothership::theme.home.index')
+        return View::makeTemplate('mothership::theme.home.index')
             ->with($data)
             ->with($this->getTemplateData());
     }
