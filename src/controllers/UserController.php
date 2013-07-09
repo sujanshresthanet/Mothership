@@ -38,10 +38,6 @@ class UserController extends ResourceController
                 'label' => 'Password',
                 'uri' => '{controller}/{id}:password',
             ],
-            'view' => [
-                'label' => 'View',
-                'uri' => '{controller}/{id}',
-            ],
             'delete'  => [
                 'label' => 'Delete',
                 'uri' => '{controller}/{id}:delete',
