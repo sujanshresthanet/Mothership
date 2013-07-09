@@ -36,7 +36,7 @@ class UserController extends ResourceController
             ],
             'password' => [
                 'label' => 'Password',
-                'uri' => '{controller}/{id}/password',
+                'uri' => '{controller}/{id}:password',
             ],
             'view' => [
                 'label' => 'View',
