@@ -22,7 +22,7 @@ class FileModel extends BaseModel
     protected $guarded      = ['id', 'filename', 'mime_type', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
-     * Allowed mime types
+     * Allowed mime types http://www.webmaster-toolkit.com/mime-types.shtml
      * 
      * @var array
      */
@@ -169,5 +169,31 @@ class FileModel extends BaseModel
     public function getFile($subDirectory = null)
     {
         return File::get($this->getFilePath($subDirectory));
+    }
+
+    /**
+     * Return the files nice name including extension
+     * 
+     * @return string
+     */
+    public function nicename()
+    {
+        return $this->title.'.'.$this->extension;
+    }
+
+    /**
+     * Return the correct class name for this file type
+     * 
+     * @return string
+     */
+    public function iconClass()
+    {
+        $prefix = 'icn-';
+
+        switch ($this->extension) {
+            default:
+                return $prefix.'file';
+                break;
+        }
     }
 }

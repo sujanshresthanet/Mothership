@@ -1,5 +1,9 @@
 # Change Log
 
+## 10th July
+
+* Added iconClass and nicename methods to the FileModel
+
 ## 3rd July
 
 * Switched order getProperties detectes properties and closures to fix bug where some properties were flagged as closures
