@@ -58,6 +58,7 @@ return array(
         'create'   => 'Create a new :singular.',
         'show'     => 'View :singular: :resource',
         'edit'     => 'Edit :singular: :resource',
+        'hasOne'   => 'Update :plural :rsingular: :resource',
         // related titles
         'rindex'   => 'All :rplural :plural',
         'rcreate'   => 'Create a new :singular for :rresource.',
