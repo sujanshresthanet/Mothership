@@ -220,6 +220,9 @@ class BaseModel extends Ardent
      */
     public function getFields($subset = null)
     {
+        if (!$subset and $this->fields) {
+            $subset = $this->fields;
+        }
         return $this->getProperties($subset);
     }
 

@@ -114,6 +114,7 @@ if ($controllers) {
                 Route::put(
                     $path.'/{idMethod}',
                     function ($idMethod) use ($class) {
+                        Log::error('PUT update '.$idMethod);
                         list($id, $method) = explode(':', $idMethod);
                         $config = [
                             'controller' => $class,
@@ -121,7 +122,11 @@ if ($controllers) {
                             'id'         => $id,
                             'type'       => 'update',
                         ];
-                        return with(new $class)->update($id, $config);
+                        $method = 'update'.ucfirst($method);
+                        if (!method_exists($class, $method)) {
+                            $method = 'update';
+                        }
+                        return with(new $class)->{$method}($id, $config);
                     }
                 );
 

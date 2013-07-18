@@ -214,6 +214,47 @@ class ResourceController extends BaseController
     }
 
     /**
+     * Displays a form to add/update a hasOne related resource
+     * 
+     * @param int $id       - the id of the resource
+     * @param string $model - the related model
+     * @param array $config - array of optional data
+     * 
+     * @return View
+     */
+    public function editHasOne($id, $model, $config = [])
+    {
+        $data = [];
+
+        $this->before($config);
+
+        $resource = $this->resource->find($id);
+
+        $relatedResource = $resource->{$model};
+        if (!$relatedResource) {
+            $relatedResource = new $model;
+        }
+
+        $fields = $relatedResource->getFields(Arr::e($config, 'fields'));
+
+        $form = FormGenerator::resource($relatedResource)
+            ->method('put')
+            ->fields($fields)
+            ->saveButton(Arr::e($config, 'submitText', 'Save'))
+            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->form()
+                ->attr('action', '')
+                ->generate();
+
+        $data['tabs']       = $this->getTabs($resource);
+        $data['title']      = 'Update Address';//Lang::title('related', $resource, $relatedResource);
+        $data['resource']   = $resource;
+        $data['content']    = $form;
+
+        return View::makeTemplate('mothership::theme.resource.single', $data);
+    }
+
+    /**
      * Displays a conformation form to delete an existing resource
      * 
      * @param int $id       - the id of the resource
@@ -361,6 +402,58 @@ class ResourceController extends BaseController
             return Redirect::to(URL::current())
                 ->withInput()
                 ->withErrors($resource->errors());
+        }
+    }
+
+    /**
+     * Update an existing resource from posted data.
+     * 
+     * Posted data id automatically assigned to and validated by
+     * the Ardent class extension on the resource model
+     * On success or error redirect back to edit page
+     * 
+     * @param int $id       - the id of the resource
+     * @param string $model - the related model
+     * @param array $config - array of optional data
+     * 
+     * @return Redirect
+     */
+    public function updateHasOne($id, $model, $config = [])
+    {
+        $this->before($config);
+
+        $resource = $this->resource->find($id);
+
+        $relatedResource = $resource->{$model};
+        if (!$relatedResource) {
+            $relatedResource = new $model;
+        }
+
+        $rules = $relatedResource->getRules();
+
+        $relatedResource->autoHydrateEntityFromInput    = true;
+        $relatedResource->autoPurgeRedundantAttributes  = true;
+        $relatedResource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
+        
+        $callback = Arr::e($config, 'beforeSave');
+        if ($callback) {
+            $callback($relatedResource);
+        }
+
+        if ($relatedResource->save($rules)) {
+            $resource->{$model}()->save($relatedResource);
+            $callback = Arr::e($config, 'afterSave');
+            if ($callback) {
+                $callback($resource);
+            }
+            Messages::add('success', Lang::alert('edit.success', $resource, $this->related));
+            return Redirect::to(URL::current());
+        } else {
+            Messages::add('error', Lang::alert('edit.error', $resource, $this->related));
+            Log::error($relatedResource->errors());
+            return Redirect::to(URL::current())
+                ->withInput()
+                ->withErrors($relatedResource->errors());
         }
     }
 

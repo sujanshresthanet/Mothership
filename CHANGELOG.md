@@ -4,6 +4,11 @@
 
 * Added beforeDestoy callback to destoy method
 
+## 17th July
+
+* Added default field array to the base model
+* Added editHasOne and updateHasOne methods
+
 ## 10th July
 
 * Added iconClass and nicename methods to the FileModel
