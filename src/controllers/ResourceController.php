@@ -388,6 +388,10 @@ class ResourceController extends BaseController
             return Redirect::to(URL::current())
                 ->withErrors($v);
         } else {
+            $callback = Arr::e($config, 'beforeDestroy');
+            if ($callback) {
+                $callback($resource);
+            }
             $resource->delete();
             Messages::add('success', Lang::alert('delete.success', $resource, $this->related));
             return Redirect::to(LinkFactory::collection());

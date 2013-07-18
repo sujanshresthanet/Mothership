@@ -1,5 +1,9 @@
 # Change Log
 
+## 18th July
+
+* Added beforeDestoy callback to destoy method
+
 ## 10th July
 
 * Added iconClass and nicename methods to the FileModel
