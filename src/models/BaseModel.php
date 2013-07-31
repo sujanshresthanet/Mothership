@@ -126,6 +126,28 @@ class BaseModel extends Ardent
         return 'New '.$this->singular();
     }
 
+    /**
+     * Setup any observers of the resource. This method is called once
+     * upon the class load.
+     *
+     * We check if the resource has an "order" field. We can then observe
+     * the 'created' event and set the resources order id equal to it's id.
+     * This is then used to sort resources manually.
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        self::created(
+            function ($resource) {
+                if ($resource->hasProperty('order') and !$resource->order) {
+                    $resource->order = $resource->id;
+                    $resource->save();
+                }
+            }
+        );
+    }
+
     public function singular($uppercase = true)
     {
         $singular = ($this->singular ?: str_plural(humanize($this->table)));

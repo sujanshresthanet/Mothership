@@ -3,6 +3,7 @@
 ## 31st July
 
 * Added deleted_at to datetime fields that get auto hidden in forms
+* Added an observer on the created event that will set a resources default 'order' value to it's id
 
 ## 18th July
 
