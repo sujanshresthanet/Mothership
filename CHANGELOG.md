@@ -2,6 +2,7 @@
 
 ## 31st July
 
+* Only check posted fields in the store and update methods by default
 * Added sluggable package
 * Added deleted_at to datetime fields that get auto hidden in forms
 * Added an observer on the created event that will set a resources default 'order' value to it's id

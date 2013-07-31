@@ -318,6 +318,10 @@ class ResourceController extends BaseController
      * 
      * Posted data id automatically assigned to and validated by
      * the Ardent class extension on the resource model
+     *
+     * Fields that are to be validated can be defined in the config array,
+     * else only rules from the Input data will be checked.
+     * 
      * On success redirect to the index page, on error redirect back
      * to create page.
      * 
@@ -330,7 +334,8 @@ class ResourceController extends BaseController
         $this->before($config);
 
         $resource = $this->resource;
-        $rules = $resource->getRules();
+        $fields   = Arr::e($config, 'fields', array_keys(Input::all()));
+        $rules    = $resource->getRules($fields);
 
         $resource->autoHydrateEntityFromInput   = true;
         $resource->autoPurgeRedundantAttributes = true;
@@ -367,6 +372,10 @@ class ResourceController extends BaseController
      * 
      * Posted data id automatically assigned to and validated by
      * the Ardent class extension on the resource model
+     *
+     * Fields that are to be validated can be defined in the config array,
+     * else only rules from the Input data will be checked.
+     * 
      * On success or error redirect back to edit page
      * 
      * @param int $id       - the id of the resource
@@ -379,7 +388,8 @@ class ResourceController extends BaseController
         $this->before($config);
 
         $resource = $this->resource->find($id);
-        $rules = $resource->getRules();
+        $fields   = Arr::e($config, 'fields', array_keys(Input::all()));
+        $rules    = $resource->getRules($fields);
 
         $resource->autoHydrateEntityFromInput    = true;
         $resource->autoPurgeRedundantAttributes  = true;
