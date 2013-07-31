@@ -305,7 +305,7 @@ class Field
     private function initDatetime()
     {
         $type = $this->dataType;
-        if (in_array($this->name, ['created_at', 'updated_at'])) {
+        if (in_array($this->name, ['created_at', 'updated_at', 'deleted_at'])) {
             $this->type = 'hidden';
         } elseif (!$this->type) {
             $this->type = 'datetime';

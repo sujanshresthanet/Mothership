@@ -1,5 +1,9 @@
 # Change Log
 
+## 31st July
+
+* Added deleted_at to datetime fields that get auto hidden in forms
+
 ## 18th July
 
 * Added beforeDestoy callback to destoy method
