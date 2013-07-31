@@ -1,6 +1,6 @@
 <?php namespace Stwt\Mothership;
 
-class PageController extends NestedSetController
+class PageController extends ResourceController
 {
     /**
      * Default Action methods in this controller, also constructs the navigation
