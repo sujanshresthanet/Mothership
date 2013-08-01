@@ -34,6 +34,13 @@ class LinkFactory
     protected static $id;
 
     /**
+     * The type of action in use
+     * 
+     * @var string
+     */
+    protected static $type;
+
+    /**
      * The current related path/id
      * 
      * @var array
@@ -46,6 +53,7 @@ class LinkFactory
         self::$path       = Mothership::pathFromController(self::$controller);
         self::$action     = Arr::e($config, 'action');
         self::$id         = Arr::e($config, 'id');
+        self::$type       = Arr::e($config, 'type');
         self::$related    = Arr::e($config, 'related');
     }
 
@@ -116,5 +124,83 @@ class LinkFactory
             $url = str_replace('{'.$k.'}', $v, $url);
         }
         return $url;
+    }
+
+    public static function isRelated()
+    {
+        return (self::$related);
+    }
+
+    public static function isCollection()
+    {
+        return (self::getType() == 'collection');
+    }
+
+    public static function isResource()
+    {
+        return (self::getType() == 'resource');
+    }
+
+    public static function getController()
+    {
+        return self::$controller;
+    }
+
+    public static function getPath()
+    {
+        return self::$path;
+    }
+
+    public static function getAction()
+    {
+        return self::$action;
+    }
+
+    public static function getId()
+    {
+        return self::$id;
+    }
+
+    public static function getType()
+    {
+        return self::$type;
+    }
+
+    public static function getModel()
+    {
+        return Mothership::modelFromPath(self::$path);
+    }
+
+    public static function getResource()
+    {
+        $path = self::$path;
+        $id = self::$id;
+
+        return Mothership::resourceFromPath($path, $id);
+    }
+
+    public static function getRelated()
+    {
+        return self::$related;
+    }
+
+    public static function getRelatedPath()
+    {
+        return self::$related['path'];
+    }
+
+    public static function getRelatedId()
+    {
+        return self::$related['id'];
+    }
+
+    public static function getRelatedResource()
+    {
+        return self::$related['resource'];
+    }
+
+    public static function getRelatedUri()
+    {
+        return self::$related['uri'];
     }
 }

@@ -3,6 +3,7 @@
 use Config;
 use \Stwt\Mothership\Arr as Arr;
 use \Stwt\Mothership\Composer\Sidebar;
+use \Stwt\Mothership\Crumbs as Crumbs;
 
 class Single extends Single
 {
@@ -14,6 +15,10 @@ class Single extends Single
 
         if (!isset($view->singular)) {
             $view->singular = 'Singular';
+        }
+        
+        if (!isset($view->breadcrumbs)) {
+            $view->breadcrumbs = Crumbs::generate();
         }
 
         return $view;

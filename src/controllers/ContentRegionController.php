@@ -155,6 +155,8 @@ class ContentRegionController extends ResourceController
                 ->attr('action', '')
                 ->generate();
 
+        Crumbs::push('active', 'Edit');
+
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
@@ -209,6 +211,8 @@ class ContentRegionController extends ResourceController
             ->form()
                 ->attr('action', '')
                 ->generate();
+                
+        Crumbs::push('active', 'Edit');
 
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);

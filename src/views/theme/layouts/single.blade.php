@@ -4,6 +4,10 @@
 
     <div class="container" id="container">
         
+        @section('breadcrumbs')
+            {{ $breadcrumbs }}
+        @show
+
         {{ Stwt\Mothership\Messages::getHtml() }}
         
         @section('mainColumn')

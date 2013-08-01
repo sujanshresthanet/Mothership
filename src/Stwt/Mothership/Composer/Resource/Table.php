@@ -4,6 +4,7 @@ use Config;
 use \Stwt\Mothership\Arr as Arr;
 use \Stwt\Mothership\Composer\Single;
 use \Stwt\Mothership\Lang as Lang;
+use \Stwt\Mothership\Crumbs as Crumbs;
 
 class Table extends Single
 {
@@ -29,6 +30,10 @@ class Table extends Single
             reset($columns);
             $primaryColumn = key($columns);
             $view->primaryColumn = $primaryColumn;
+        }
+
+        if (!isset($view->breadcrumbs)) {
+            $view->breadcrumbs = Crumbs::generate();
         }
 
         return $view;

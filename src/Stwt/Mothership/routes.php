@@ -76,11 +76,12 @@ if ($controllers) {
                 // index
                 Route::get(
                     $path,
-                    function () use ($class) {
+                    function () use ($class, $path) {
                         $config = [
                             'controller' => $class,
                             'action'     => 'index',
                             'type'       => 'collection',
+                            'path'       => $path,
                         ];
                         return with(new $class)->index($config);
                     }
@@ -89,11 +90,12 @@ if ($controllers) {
                 // create / index
                 Route::get(
                     $path.'/{method}',
-                    function ($method) use ($class) {
+                    function ($method) use ($class, $path) {
                         $config = [
                             'controller' => $class,
                             'action'     => $method,
                             'type'       => 'collection',
+                            'path'       => $path,
                         ];
                         return with(new $class)->$method($config);
                     }
@@ -102,12 +104,13 @@ if ($controllers) {
                 // view
                 Route::get(
                     $path.'/{id}',
-                    function ($id) use ($class) {
+                    function ($id) use ($class, $path) {
                         $config = [
                             'controller' => $class,
                             'action'     => 'show',
                             'id'         => $id,
-                            'type'       => 'collection',
+                            'type'       => 'resource',
+                            'path'       => $path,
                         ];
                         return with(new $class)->show($id);
                     }
@@ -116,13 +119,14 @@ if ($controllers) {
                 // edit/delete
                 Route::get(
                     $path.'/{idMethod}',
-                    function ($idMethod) use ($class) {
+                    function ($idMethod) use ($class, $path) {
                         list($id, $method) = explode(':', $idMethod);
                         $config = [
                             'controller' => $class,
                             'action'     => $method,
                             'id'         => $id,
-                            'type'       => 'collection',
+                            'type'       => 'resource',
+                            'path'       => $path,
                         ];
                         if (!method_exists($class, $method)) {
                             $method = 'edit';
@@ -213,7 +217,7 @@ if ($controllers) {
                         $config = [
                             'controller' => $class,
                             'action'     => $method,
-                            'type'       => 'single',
+                            'type'       => (in_array($method, ['index', 'resource']) ? 'collection' : 'single'),
                             'related' => [
                                 'path'      => $relatedPath,
                                 'id'        => $relatedId,

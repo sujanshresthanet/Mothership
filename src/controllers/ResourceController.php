@@ -97,6 +97,8 @@ class ResourceController extends BaseController
 
         $this->related = Arr::e($config, 'related');
         $this->path    = Arr::e($config, 'path');
+        
+        $this->buildBreadcrumbs();
     }
 
     /**
@@ -125,6 +127,8 @@ class ResourceController extends BaseController
         $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['resource']   = $resource;
+
+        Crumbs::push('active', $resource->plural());
 
         // get resource collection
         $callback = Arr::e($config, 'getCollection');
@@ -181,6 +185,8 @@ class ResourceController extends BaseController
             ->form()
                 ->generate();
 
+        Crumbs::push('active', 'Create');
+
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('create', $resource, $this->related);
         $data['resource']   = $resource;
@@ -199,6 +205,8 @@ class ResourceController extends BaseController
      */
     public function show($id, $config = [])
     {
+        return $this->edit($id, $config);
+
         $r = Arr::e($config, 'related');
         if ($r) {
             return 'Show '.$id.' '.$r['path'].' - '.$r['id'];
@@ -244,6 +252,8 @@ class ResourceController extends BaseController
             ->form()
                 ->attr('action', '')
                 ->generate();
+
+        Crumbs::push('active', 'Edit');
 
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
@@ -315,6 +325,15 @@ class ResourceController extends BaseController
 
         $this->before($config);
 
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
+
         $resource = $this->resource->find($id);
 
         $form = new GoodForm();
@@ -352,12 +371,21 @@ class ResourceController extends BaseController
 
         $form = $form->generate();
 
+        Crumbs::push('active', 'Delete');
+
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
-        $data['content']       = $form;
+        $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
@@ -731,5 +759,57 @@ class ResourceController extends BaseController
             }
         }
         return $uri;
+    }
+
+    ##########################################################
+    # MOVE Breadcrumb Construction INTO SEPARATE CLASS!
+    ##########################################################
+
+
+    protected function buildBreadcrumbs()
+    {
+        Crumbs::push('/', 'Home');
+
+        if ($this->related) {
+            $uri      = LinkFactory::getRelatedUri();
+            $resource = LinkFactory::getRelatedResource();
+            $path     = LinkFactory::getRelatedPath();
+            $editUri = $uri;
+
+            Crumbs::push($path, $resource->plural());
+            Crumbs::push($editUri, $resource);
+        }
+
+
+        if (!LinkFactory::isCollection()) {
+            //$plural = LinkFactory::getResource()->plural();
+            $uri = LinkFactory::collection(true);
+            Crumbs::push(
+                $uri,
+                $this->resource->plural()
+            );
+        }
+
+        /*
+        if ($this->actionType != 'collection') {
+            $this->breadcrumbs[$this->controller] = $this->resource->plural();
+        }
+
+        if ($this->isRelatedRequest()) {
+            $model = $this->related[0]['model'];
+            $id    = $this->related[0]['id'];
+            $controller = Str::plural($model);
+
+            $controller = Mothership::getControllerClass($controller);
+            $model = $controller::$model;
+
+            $o = $model::find($id);
+
+            $this->breadcrumbs[$controller] = $o->plural();
+
+            $uri = $controller.'/'.$id.'/edit';
+            $this->breadcrumbs[$uri] = $o;
+        }
+        */
     }
 }

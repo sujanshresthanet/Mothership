@@ -2,6 +2,7 @@
 
 use Config;
 use \Stwt\Mothership\Arr as Arr;
+use \Stwt\Mothership\Crumbs as Crumbs;
 
 class Single
 {
@@ -9,6 +10,10 @@ class Single
     {
         if (!isset($view->title)) {
             $view->title = 'Single View';
+        }
+
+        if (!isset($view->breadcrumbs)) {
+            $view->breadcrumbs = Crumbs::generate();
         }
 
         return $view;
