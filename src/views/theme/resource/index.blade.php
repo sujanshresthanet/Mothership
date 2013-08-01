@@ -44,7 +44,7 @@
             </table>
             @if($selectable)
             <div class="form-actions">
-                <button name="delete" value="delete" type="submit" class="pull-right btn btn-danger">Delete Selected</button>
+                <button name="delete" value="delete" type="submit" class="pull-right btn btn-danger"><span class="glyphicon glyphicon-trash"></span>Delete Selected</button>
             </div>
             @endif
         </form>

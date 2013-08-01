@@ -33,6 +33,40 @@ if ($controllers) {
             Route::get('/', "$homeController@getIndex");
             Route::get('home', "$homeController@getIndex");
 
+
+
+            View::composer('mothership::theme.layouts.base', 'Stwt\Mothership\Composer\Base');
+            View::composer('mothership::theme.layouts.sidebar', 'Stwt\Mothership\Composer\Sidebar');
+            View::composer('mothership::theme.layouts.single', 'Stwt\Mothership\Composer\Single');
+            View::composer('mothership::theme.layouts.table', 'Stwt\Mothership\Composer\Resource\Table');
+
+            Route::get(
+                '/bug/view/base',
+                function () {
+                    return View::make('mothership::theme.layouts.base');
+                }
+            );
+            Route::get(
+                '/bug/view/single',
+                function () {
+                    return View::make('mothership::theme.layouts.single');
+                }
+            );
+            Route::get(
+                '/bug/view/sidebar',
+                function () {
+                    return View::make('mothership::theme.layouts.sidebar');
+                }
+            );
+            Route::get(
+                '/bug/view/table',
+                function () {
+                    return View::make('mothership::theme.layouts.table');
+                }
+            );
+
+
+
             Route::get('profile', "$homeController@getProfile");
             Route::put('profile', "$homeController@putProfile");
             Route::get('password', "$homeController@getPassword");

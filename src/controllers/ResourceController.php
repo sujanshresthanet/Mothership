@@ -108,6 +108,9 @@ class ResourceController extends BaseController
      */
     public function index($config = [])
     {
+        return $this->table($config);
+
+
         $data = [];
 
         $this->before($config);
@@ -124,7 +127,37 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['title']      = Lang::title('index', $resource, $this->related);
 
-        return View::makeTemplate('mothership::theme.resource.index', $data);
+        $view = Arr::e($config, 'view', 'mothership::theme.resource.index');
+        return View::makeTemplate($view, $data);
+    }
+
+    public function table($config = [])
+    {
+        $data = [];
+        
+        $this->before($config);
+
+        $resource   = $this->resource;
+        $collection = $this->queryRelated($resource);
+        $collection = $this->queryOrderBy($collection);
+        $collection = $collection->paginate(15);
+
+        // assign data to the view
+        $data['resource'] = $this->resource;
+        $data['selectable'] = Arr::e($config, 'selectable', true);
+        $data['caption']    = Lang::caption('index', $resource, $this->related);
+        $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
+        $data['collection'] = $collection;
+        $data['resource']   = $resource;
+
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view', 'mothership::theme.resource.table');
+        $viewComposer = Arr::e($config, 'viewComposer', 'Stwt\Mothership\Composer\Resource\Table');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
@@ -210,7 +243,8 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        $view = Arr::e($config, 'view', 'mothership::theme.resource.single');
+        return View::makeTemplate($view, $data);
     }
 
     /**

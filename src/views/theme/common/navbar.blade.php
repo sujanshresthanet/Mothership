@@ -1,4 +1,58 @@
-            <div class="navbar navbar-inverse navbar-static-top">
+<div class="navbar">
+    <div class="container">
+
+        <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+        <!-- Be sure to leave the brand out there if you want it shown -->
+        <a class="navbar-brand" href="#">{{ $appTitle }}</a>
+
+        @if (Auth::check())
+        <!-- Place everything within .navbar-collapse to hide it until above 768px -->
+        <div class="nav-collapse collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav">
+            @foreach ($navigation as $uri => $label)
+                <li class="{{ (Request::is('admin/'.$uri.'/*') ? 'active' : '') }}">
+                    <a href="{{ URL::to('admin/'.$uri) }}">{{ $label }}</a>
+                </li>
+            @endforeach
+            </ul>
+            <form class="navbar-form pull-right">
+                <input type="text" class="form-control" disabled placeholder="Search" />
+            </form>
+            <ul class="nav navbar-nav pull-right">
+                <li id="fat-menu" class="dropdown">
+                    <a
+                        href="#"
+                        id="meta-menu"
+                        role="button"
+                        class="dropdown-toggle"
+                        data-toggle="dropdown"
+                    >{{ Auth::user()->displayName() }}<b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="meta-menu">
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/profile') }}">Update Profile</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/password') }}">Change Password</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/logout') }}">Logout</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        @endif
+    </div>
+</div>
+
+<?php /*            <div class="navbar navbar-inverse navbar-static-top">
                 <div class="navbar-inner">
                     <div class="container">
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -34,4 +88,4 @@
                         @endif
                     </div>
                 </div>
-            </div>
+            </div>--> */

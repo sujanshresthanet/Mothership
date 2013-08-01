@@ -25,6 +25,10 @@ class PageController extends ResourceController
                 'label' => 'Detials',
                 'uri'   => '{controller}/{id}:edit',
             ],
+            'content' => [
+                'label' => 'Content',
+                'uri'   => '{controller}/{id}:content'
+            ],
             'view' => [
                 'label' => 'View',
                 'uri'   => '{controller}/{id}',
@@ -35,10 +39,16 @@ class PageController extends ResourceController
             ],
         ],
         'related' => [
-            'regions' => [
+            /*'regions' => [
                 'label' => 'Content',
                 'uri'   => '{controller}/{id}/regions/index',
-            ]
+            ]*/
         ],
     ];
+
+    public function content($id, $config = [])
+    {
+        $config['view'] = 'admin.pages.content';
+        return parent::edit($id, $config);
+    }
 }
