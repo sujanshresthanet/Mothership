@@ -17,7 +17,8 @@
             @endforeach
         </thead>
         <tbody>
-            @foreach ($collection as $r)
+    @foreach ($collection as $r)
+        @if (is_subclass_of($r, 'Stwt\Mothership\BaseModel'))
             <tr>
             @if($selectable)
                 <td><input id="row-{{ $r->id }}" name="ids[]" type="checkbox" value="{{ $r->id }}"/></td>
@@ -44,7 +45,8 @@
                 </td>
             @endforeach
             </tr>
-            @endforeach
+        @endif
+    @endforeach
         </tbody>
     </table>
 @stop
@@ -52,7 +54,7 @@
 @section('pagination')
     
     <footer>
-        {{ $collection->links() }}
+        {{ $pagination }}
     </footer>
 
 @stop

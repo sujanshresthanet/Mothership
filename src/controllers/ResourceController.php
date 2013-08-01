@@ -118,17 +118,24 @@ class ResourceController extends BaseController
         $this->before($config);
 
         $resource   = $this->resource;
-        $collection = $this->queryRelated($resource);
-        $collection = $this->queryOrderBy($collection);
-        $collection = $collection->paginate(15);
 
         // assign data to the view
         $data['resource'] = $this->resource;
         $data['selectable'] = Arr::e($config, 'selectable', true);
         $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
-        $data['collection'] = $collection;
         $data['resource']   = $resource;
+
+        // get resource collection
+        $callback = Arr::e($config, 'getCollection');
+        if ($callback) {
+            $data['collection'] = $callback($resource);
+        } else {
+            $collection = $this->queryRelated($resource);
+            $collection = $this->queryOrderBy($collection);
+            $collection = $collection->paginate(15);
+            $data['collection'] = $collection;
+        }
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view', 'mothership::theme.resource.table');
@@ -156,6 +163,15 @@ class ResourceController extends BaseController
         $resource = $this->resource;
 
         $fields = $resource->getFields(Arr::e($config, 'fields'));
+
+        // look for any prefill defaults
+        $defaults = Input::get('defaults');
+
+        foreach ($defaults as $k => $v) {
+            if (!$resource->$k) {
+                $resource->$k = $v;
+            }
+        }
 
         $form = FormGenerator::resource($resource)
             ->method('post')
@@ -389,7 +405,10 @@ class ResourceController extends BaseController
             }
             
             Messages::add('success', Lang::alert('create.success', $resource, $this->related));
-            return Redirect::to(LinkFactory::collection());
+
+            $redirectSuccess = Arr::e($config, 'redirectSuccess', LinkFactory::collection());
+
+            return Redirect::to($redirectSuccess);
         } else {
             Messages::add('error', Lang::alert('create.error', $resource, $this->related));
             return Redirect::to(URL::current())

@@ -25,10 +25,10 @@ class PageController extends ResourceController
                 'label' => 'Detials',
                 'uri'   => '{controller}/{id}:edit',
             ],
-            'content' => [
+            /*'content' => [
                 'label' => 'Content',
                 'uri'   => '{controller}/{id}:content'
-            ],
+            ],*/
             'view' => [
                 'label' => 'View',
                 'uri'   => '{controller}/{id}',
@@ -39,10 +39,10 @@ class PageController extends ResourceController
             ],
         ],
         'related' => [
-            /*'regions' => [
+            'regions' => [
                 'label' => 'Content',
                 'uri'   => '{controller}/{id}/regions/index',
-            ]*/
+            ]
         ],
     ];
 

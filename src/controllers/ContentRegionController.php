@@ -1,7 +1,12 @@
 <?php namespace Stwt\Mothership;
 
+use Content;
+use ContentItem;
+use Input;
+use Log;
 use Redirect;
 use URL;
+use Page;
 
 class ContentRegionController extends ResourceController
 {
@@ -54,6 +59,23 @@ class ContentRegionController extends ResourceController
     }
 
 
+    public function table($config = [])
+    {
+        $this->before($config);
+
+        if ($this->related) {
+            $getCollection = function ($resource) {
+                $page = Page::find($this->related['id']);
+                return $page->getAllRegions(false);
+            };
+
+            $config['getCollection'] = $getCollection;
+            $config['view'] = 'admin.regions.table';
+        }
+
+        return parent::table($config);
+    }
+
     public function create($config = [])
     {
         $config['fields'] = [
@@ -61,6 +83,7 @@ class ContentRegionController extends ResourceController
             'type' => [
                 'form'    => 'select',
                 'label'   => 'Type',
+                'name'    => 'type',
                 'options' => [
                     'Navigation Menu' => 'nav',
                     'HTML'            => 'html',
@@ -193,6 +216,46 @@ class ContentRegionController extends ResourceController
         $data['content']    = $form;
 
         return View::makeTemplate('mothership::theme.resource.single', $data);
+    }
+
+    /**
+     * Create a new content region and create the first ContentItem
+     * related resource too. Redirect to the content items edit action
+     * on succsess
+     * 
+     * @param array $config - array of optional data
+     * 
+     * @return Redirect
+     */
+    public function store($config = [])
+    {
+        $afterSave = function ($contentRegion) {
+            // create new contentItem and save to new region
+            $contentItem = new ContentItem();
+            $contentRegion->contentItems()->save($contentItem);
+            Log::error('type: '.Input::get('type'));
+            switch (Input::get('type')) {
+                case 'nav':
+                    $navigationMenu = NavigationMenu::first();
+                    $navigationMenu->contentItems()->save($contentItem);
+                    break;
+                case 'html':
+                case 'textarea':
+                case 'text':
+                    // create new content instance and save to item
+                    $content = new Content;
+                    $content->type    = Input::get('type');
+                    $content->content = "Update content";
+                    $content->save();
+
+                    $content->contentItems()->save($contentItem);
+                    break;
+            }
+        };
+
+        $config['afterSave'] = $afterSave;
+
+        return parent::store($config);
     }
 
     /**

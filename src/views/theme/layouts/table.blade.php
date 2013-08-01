@@ -2,10 +2,12 @@
 
 @section('mainColumn')
     <header class="clearfix">
+    @section('mainHeader')
         <h1>{{ $title }}</h1>
         <p class="clearfix">
-            <a class="pull-right btn btn-success" href="#"><i class="glyphicon glyphicon-plus"></i> {{ $singular }}</a>
+            <a class="pull-right btn btn-success" href="{{ mo_create() }}"><i class="glyphicon glyphicon-plus"></i> {{ $singular }}</a>
         </p>
+    @show
     </header>
     <section>
         <form action="" method="POST">

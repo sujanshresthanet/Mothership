@@ -1,6 +1,7 @@
 <?php namespace Stwt\Mothership;
 
 use URL;
+use Log;
 
 class LinkFactory
 {
