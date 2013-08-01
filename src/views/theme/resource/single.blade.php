@@ -3,7 +3,7 @@
 @section('mainColumn')
     
     @section ('header')
-    <header>
+    <header class="main-header">
         <h1>{{ $title }}</h1>
         <nav>
             <a class="pull-right btn" href="{{ mo_index() }}"><i class="icon icon-arrow-left"></i> Back to {{ $plural }}</a>
@@ -11,7 +11,7 @@
         @include('mothership::theme.common.tabs')
     </header>
     @show
-    <section>
+    <section class="main-content">
         @section('content')
             {{ $content }}
         @show
