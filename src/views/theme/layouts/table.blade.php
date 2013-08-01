@@ -1,6 +1,6 @@
 @extends('mothership::theme.layouts.single')
 
-@section('content')
+@section('mainColumn')
     <header class="clearfix">
         <h1>{{ $title }}</h1>
         <p class="clearfix">

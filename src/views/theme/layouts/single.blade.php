@@ -6,7 +6,7 @@
         
         {{ Stwt\Mothership\Messages::getHtml() }}
         
-        @section('content')
+        @section('mainColumn')
             <h1>{{ $title }}</h1>
             <p class="alert alert-info">This area is the <em>content</em> section.</p>
         @show

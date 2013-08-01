@@ -1,10 +1,8 @@
-@extends('mothership::theme.layouts.main')
+@extends('mothership::theme.layouts.single')
 
-@section('title')
-{{ $title}}
-@stop
-
-@section('content')
+@section('mainColumn')
+    
+    @section ('header')
     <header>
         <h1>{{ $title }}</h1>
         <nav>
@@ -12,7 +10,10 @@
         </nav>
         @include('mothership::theme.common.tabs')
     </header>
+    @show
     <section>
-        {{ $content }}
+        @section('content')
+            {{ $content }}
+        @show
     </section>
 @stop

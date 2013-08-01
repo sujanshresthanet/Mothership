@@ -109,32 +109,12 @@ class ResourceController extends BaseController
     public function index($config = [])
     {
         return $this->table($config);
-
-
-        $data = [];
-
-        $this->before($config);
-
-        $resource   = $this->resource;
-        $collection = $this->queryRelated($resource);
-        $collection = $this->queryOrderBy($collection);
-        $collection = $collection->paginate(15);
-
-        $data['selectable'] = Arr::e($config, 'selectable', true);
-        $data['caption']    = Lang::caption('index', $resource, $this->related);
-        $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
-        $data['collection'] = $collection;
-        $data['resource']   = $resource;
-        $data['title']      = Lang::title('index', $resource, $this->related);
-
-        $view = Arr::e($config, 'view', 'mothership::theme.resource.index');
-        return View::makeTemplate($view, $data);
     }
 
     public function table($config = [])
     {
         $data = [];
-        
+
         $this->before($config);
 
         $resource   = $this->resource;
@@ -225,6 +205,20 @@ class ResourceController extends BaseController
 
         $this->before($config);
 
+        // array of default config variable for this view
+        $defaults = [
+            'submitText'    => 'Save',
+            'cancelText'    => 'Cancel',
+            'view'          => 'mothership::theme.resource.single',
+            'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+        ];
+
+        foreach ($defaults as $k => $v) {
+            $config = Arr::s($config, $k, $v);
+        }
+
+        Log::error(print_r($config, 1));
+
         $resource = $this->resource->find($id);
 
         $fields = $resource->getFields(Arr::e($config, 'fields'));
@@ -232,8 +226,8 @@ class ResourceController extends BaseController
         $form = FormGenerator::resource($resource)
             ->method('put')
             ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText', 'Save'))
-            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->saveButton(Arr::e($config, 'submitText'))
+            ->cancelButton(Arr::e($config, 'cancelText'))
             ->form()
                 ->attr('action', '')
                 ->generate();
@@ -243,8 +237,14 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        $view = Arr::e($config, 'view', 'mothership::theme.resource.single');
-        return View::makeTemplate($view, $data);
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
