@@ -25,9 +25,27 @@ class HomeController extends BaseController
      *
      * @return View
      */
-    public function getLogin()
+    public function getLogin($config = [])
     {
-        return View::makeTemplate('mothership::theme.home.login')->with($this->getTemplateData());
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'view'          => 'mothership::theme.home.login',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Single',
+            ]
+        );
+
+        $data['title'] = 'Please Login';
+
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**

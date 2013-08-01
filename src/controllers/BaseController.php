@@ -41,4 +41,22 @@ class BaseController extends Controller
         }
         return $data;
     }
+
+    /**
+     * Set's any default config attributes that have not
+     * already been defined
+     * 
+     * @param Array $config
+     * @param Array $defaults
+     *
+     * @return  Array
+     */
+    public function setDefaults(Array &$config, Array $defaults)
+    {
+        foreach ($defaults as $k => $v) {
+            $config = Arr::s($config, $k, $v);
+        }
+
+        return $config;
+    }
 }

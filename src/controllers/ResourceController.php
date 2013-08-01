@@ -205,19 +205,16 @@ class ResourceController extends BaseController
 
         $this->before($config);
 
-        // array of default config variable for this view
-        $defaults = [
-            'submitText'    => 'Save',
-            'cancelText'    => 'Cancel',
-            'view'          => 'mothership::theme.resource.single',
-            'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
-        ];
-
-        foreach ($defaults as $k => $v) {
-            $config = Arr::s($config, $k, $v);
-        }
-
-        Log::error(print_r($config, 1));
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'submitText'    => 'Save',
+                'cancelText'    => 'Cancel',
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
 
         $resource = $this->resource->find($id);
 
