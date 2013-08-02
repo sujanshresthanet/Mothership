@@ -90,11 +90,7 @@ class UserController extends ResourceController
         if (!Arr::e($config, 'rules')) {
             $config['rules'] = $this->getPasswordFormRules();
         }
-        if (!Arr::e($config, 'beforeSave')) {
-            $config['beforeSave'] = function ($resource) {
-                $resource->password = Hash::make($resource->password);
-            };
-        }
+        
         return $this->update($id, $config);
     }
 

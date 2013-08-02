@@ -1,5 +1,6 @@
 <?php namespace Stwt\Mothership;
 
+use Hash;
 use Illuminate\Auth\UserInterface as UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface as RemindableInterface;
 
@@ -35,6 +36,17 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
     public function __toString()
     {
         return $this->email;
+    }
+
+    public function beforeSave()
+    {
+        // if there's a new password, hash it
+        if ($this->isDirty('password')) {
+            $this->password = Hash::make($this->password);
+        }
+
+        return true;
+        //or don't return nothing, since only a boolean false will halt the operation
     }
 
     /**
