@@ -1,6 +1,7 @@
 <?php namespace Stwt\Mothership;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider as ServiceProvider;
+use Illuminate\Foundation\AliasLoader as AliasLoader;
 
 class MothershipServiceProvider extends ServiceProvider
 {
@@ -32,7 +33,8 @@ class MothershipServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        AliasLoader::getInstance()->alias('GoodForm', 'Stwt\GoodForm\GoodForm');
+        AliasLoader::getInstance()->alias('Sluggable', 'Cviebrock\EloquentSluggable\Facades\Sluggable');
     }
 
     /**
@@ -43,10 +45,9 @@ class MothershipServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Basset\BassetServiceProvider',
-            'Baum\BaumServiceProvider',
             'Stwt\GoodForm\GoodFormServiceProvider',
             'Stwt\ImgYard\ImgYardServiceProvider',
+            'Cviebrock\EloquentSluggable\SluggableServiceProvider',
         ];
     }
 }
