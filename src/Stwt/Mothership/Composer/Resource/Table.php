@@ -15,7 +15,7 @@ class Table extends Single
         }
 
         if (!isset($view->singular)) {
-            $view->singular = 'Singular';
+            $view->singular = $view->resource->singular();
         }
 
         if (!isset($view->pagination)) {

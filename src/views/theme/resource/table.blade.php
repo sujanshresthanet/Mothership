@@ -1,5 +1,14 @@
 @extends('mothership::theme.layouts.table');
 
+@section('mainHeader')
+    
+    <h1>{{ $title }}</h1>
+    <p class="clearfix">
+        <a class="pull-right btn btn-success" href="{{ mo_create() }}"><i class="glyphicon glyphicon-plus"></i> Add {{ $singular }}</a>
+    </p>
+
+@stop
+
 @section('table')
 
     <table class="table table-bordered table-striped table-hover">

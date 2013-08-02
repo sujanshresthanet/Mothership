@@ -169,7 +169,7 @@ class ResourceController extends BaseController
         $fields = $resource->getFields(Arr::e($config, 'fields'));
 
         // look for any prefill defaults
-        $defaults = Input::get('defaults');
+        $defaults = Input::get('defaults', []);
 
         foreach ($defaults as $k => $v) {
             if (!$resource->$k) {

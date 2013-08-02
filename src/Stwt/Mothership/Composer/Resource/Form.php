@@ -14,11 +14,11 @@ class Form extends Single
         }
 
         if (!isset($view->singular)) {
-            $view->singular = 'Singular';
+            $view->singular = $view->resource->singular();
         }
 
         if (!isset($view->plural)) {
-            $view->plural = 'Plural';
+            $view->plural = $view->resource->plural();
         }
 
         return $view;

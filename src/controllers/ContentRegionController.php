@@ -4,6 +4,7 @@ use Content;
 use ContentItem;
 use Input;
 use Log;
+use NavigationMenu;
 use Redirect;
 use URL;
 use Page;
@@ -247,7 +248,7 @@ class ContentRegionController extends ResourceController
                 case 'textarea':
                 case 'text':
                     // create new content instance and save to item
-                    $content = new Content;
+                    $content          = new Content;
                     $content->type    = Input::get('type');
                     $content->content = "Update content";
                     $content->save();
