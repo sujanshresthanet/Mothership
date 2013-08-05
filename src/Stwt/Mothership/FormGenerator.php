@@ -268,6 +268,8 @@ class FormGenerator
 
         $form->hidden('_method', $this->method);
 
+        $form->hidden('_timezone', 0);
+
         $this->addFieldsToForm($form);
 
         $this->addErrorsToForm($form);
