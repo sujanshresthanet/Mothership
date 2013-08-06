@@ -53,6 +53,45 @@ class PageController extends ResourceController
         ],
     ];
 
+    /**
+     * Customise the fields on display for the create page
+     * 
+     * @param  array $config
+     * 
+     * @return View
+     */
+    public function create($config = [])
+    {
+        $config['fields'] = [
+            'name',
+            'status',
+            'template',
+            'page_id',
+        ];
+
+        return parent::create($config);
+    }
+
+    /**
+     * Customise the fields on display for the edit page
+     * 
+     * @param  array $config
+     * 
+     * @return View
+     */
+    public function edit($id, $config = [])
+    {
+        $config['fields'] = [
+            'name',
+            'slug',
+            'status',
+            'template',
+            'page_id',
+        ];
+
+        return parent::edit($id, $config);
+    }
+
     public function content($id, $config = [])
     {
         $config['view'] = 'admin.pages.content';
