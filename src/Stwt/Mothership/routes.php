@@ -13,8 +13,6 @@
 
 $homeController = Config::get('mothership::homeController');
 
-//Route::get('pass', function(){return Hash::make('jimpass');});
-
 Route::get('admin/login', "$homeController@getLogin");
 Route::post('admin/login', "$homeController@postLogin");
 Route::get('admin/logout', "$homeController@getLogout");

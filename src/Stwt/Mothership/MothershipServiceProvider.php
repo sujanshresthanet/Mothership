@@ -33,8 +33,7 @@ class MothershipServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        AliasLoader::getInstance()->alias('GoodForm', 'Stwt\GoodForm\GoodForm');
-        AliasLoader::getInstance()->alias('Sluggable', 'Cviebrock\EloquentSluggable\Facades\Sluggable');
+        //
     }
 
     /**
@@ -44,10 +43,6 @@ class MothershipServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [
-            'Stwt\GoodForm\GoodFormServiceProvider',
-            'Stwt\ImgYard\ImgYardServiceProvider',
-            'Cviebrock\EloquentSluggable\SluggableServiceProvider',
-        ];
+        //
     }
 }
