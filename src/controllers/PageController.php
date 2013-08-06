@@ -3,6 +3,13 @@
 class PageController extends ResourceController
 {
     /**
+     * The model resource this controller represents
+     * 
+     * @var string
+     */
+    public $model = 'Stwt\Mothership\PageModel';
+
+    /**
      * Default Action methods in this controller, also constructs the navigation
      * 
      * @var array

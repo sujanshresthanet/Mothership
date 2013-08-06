@@ -157,11 +157,12 @@ class PageModel extends BaseModel
     {
         // assuming my comments table has an $id column and a second $comment_id table
         // do I even need to specify the column name?
-        return $this->hasMany('Page', 'page_id');
+        return $this->hasMany(get_called_class(), 'page_id');
     }
+
     public function parentPage()
     {
-        return $this->belongsTo('Page', 'page_id');
+        return $this->belongsTo(get_called_class(), 'page_id');
     }
 
     // ------------------------- //
