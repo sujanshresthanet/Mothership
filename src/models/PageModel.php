@@ -55,6 +55,14 @@ class PageModel extends BaseModel
         ]
     ];
 
+
+    /**
+     * The name of the "created at" column.
+     *
+     * @var string
+     */
+    const CONTENT_REGION_MODEL = 'Stwt\Mothership\ContentRegionModel';
+
     // ------------------------- //
     // Magic Methods             //
     // ------------------------- //
@@ -84,9 +92,9 @@ class PageModel extends BaseModel
             $templates = Config::get('templates.templates', []);
             $options = [];
             foreach ($templates as $name => $spec) {
-                $options[$name] = humanize($name);
+                $options[$name] = ucfirst(humanize($name));
             }
-            return $options;
+            return array_flip($options);
         };
 
         $properties['template'] = [
@@ -140,7 +148,7 @@ class PageModel extends BaseModel
     
     public function contentRegions()
     {
-        return $this->hasMany('ContentRegion');
+        return $this->hasMany(static::CONTENT_REGION_MODEL);
     }
     
     public function navigationItems()
@@ -198,7 +206,6 @@ class PageModel extends BaseModel
     {
         $template = $this->getTemplate();
         if ($template and $template->exists()) {
-            
             $regions = $template->regions();
             return array_merge(
                 $this->getRegionPlacehoders($regions, $generate),
@@ -247,10 +254,12 @@ class PageModel extends BaseModel
     {
         $data = [];
 
-        $regions = ContentRegion::where('page_id', '=', null)
-                                ->whereIn('key', $templateRegions)
-                                ->with('contentItems')
-                                ->get();
+        $class = Config::get('mothership::models')['contentRegion'];
+
+        $regions = $class::where('page_id', '=', null)
+                         ->whereIn('key', $templateRegions)
+                         ->with('contentItems')
+                         ->get();
 
         foreach ($regions as $region) {
             $data[$region->key] = ($generate ? $region->generate() : $region);
@@ -298,7 +307,8 @@ class PageModel extends BaseModel
     public function getTemplate()
     {
         if (isset($this->template)) {
-            return Template::get($this->template);
+            $templateClass = Config::get('mothership::models')['template'];
+            return $templateClass::get($this->template);
         }
         return false;
     }

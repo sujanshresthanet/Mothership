@@ -18,7 +18,8 @@ class TemplateModel
      */
     public static function get($name)
     {
-        $template = new get_called_class();
+        $class = get_called_class();
+        $template = new $class;
         $template->name = $name;
         $template->globalRegions = Config::get('templates.globalRegions');
         $template->regions = Config::get('templates.templates.'.$name.'.regions');

@@ -1,7 +1,7 @@
 <?php namespace Stwt\Mothership;
 
-use Page;
-use ContentItem;
+use Config;
+use Log;
 use Str;
 
 class ContentRegionModel extends BaseModel
@@ -74,12 +74,15 @@ class ContentRegionModel extends BaseModel
     
     public function page()
     {
-        return $this->belongsTo('Page');
+        $class = Config::get('mothership::models')['page'];
+        return $this->belongsTo($class);
     }
 
     public function contentItems()
     {
-        return $this->hasMany('ContentItem');
+        $class = Config::get('mothership::models')['contentItem'];
+        Log::error('ContentRegion hasMany '.$class);
+        return $this->hasMany($class);
     }
 
     // ----------------------------

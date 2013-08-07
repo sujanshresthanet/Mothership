@@ -3,6 +3,7 @@
 use Page;
 use Content;
 use ContentRegion;
+use Log;
 use NavigationMenu;
 
 class ContentItemModel extends BaseModel
@@ -24,7 +25,9 @@ class ContentItemModel extends BaseModel
     
     public function contentRegion()
     {
-        return $this->belongsTo('ContentRegion');
+        $class = Config::get('mothership::models')['contentRegion'];
+        Log::error('ContentItem belongsTo '.$class);
+        return $this->belongsTo($class);
     }
 
     public function content()
@@ -45,11 +48,14 @@ class ContentItemModel extends BaseModel
             $this->content()->get();
         }
 
+        $contentClass = Config::get('mothership::models')['content'];
+        $navigationMenuClass = Config::get('mothership::models')['navigationMenu'];
+
         switch (get_class($this->content)) {
-            case 'Content':
+            case $contentClass:
                 return $this->content->type();
                 break;
-            case 'NavigationMenu':
+            case $navigationMenuClass:
                 return 'Navigation Menu';
                 break;
         }

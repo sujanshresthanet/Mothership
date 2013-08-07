@@ -122,24 +122,14 @@ class ResourceController extends BaseController
         $resource   = $this->resource;
 
         // assign data to the view
-        $data['resource'] = $this->resource;
+        $data['resource']   = $this->resource;
         $data['selectable'] = Arr::e($config, 'selectable', true);
         $data['caption']    = Lang::caption('index', $resource, $this->related);
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
         $data['resource']   = $resource;
+        $data['collection'] = $this->getCollection($resource);
 
         Crumbs::push('active', $resource->plural());
-
-        // get resource collection
-        $callback = Arr::e($config, 'getCollection');
-        if ($callback) {
-            $data['collection'] = $callback($resource);
-        } else {
-            $collection = $this->queryRelated($resource);
-            $collection = $this->queryOrderBy($collection);
-            $collection = $collection->paginate(15);
-            $data['collection'] = $collection;
-        }
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view', 'mothership::theme.resource.table');
@@ -582,6 +572,21 @@ class ResourceController extends BaseController
     ##########################################################
     # MOVE Query Logic INTO SEPARATE CLASS!
     ##########################################################
+
+    /**
+     * Return a collection of resources for a collection view
+     * 
+     * @param  object $resource
+     * 
+     * @return object
+     */
+    public function getCollection($resource)
+    {
+        $collection = $this->queryRelated($resource);
+        $collection = $this->queryOrderBy($collection);
+        $collection = $collection->paginate(15);
+        return $collection;
+    }
 
     /*
      * Checks if the current request is for related resources and

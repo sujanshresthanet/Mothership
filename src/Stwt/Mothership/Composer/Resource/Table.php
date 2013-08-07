@@ -36,6 +36,10 @@ class Table extends Single
             $view->breadcrumbs = Crumbs::generate();
         }
 
+        if (!isset($view->collection)) {
+            $view->collection = [];
+        }
+
         return $view;
     }
 }

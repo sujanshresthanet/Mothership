@@ -76,7 +76,8 @@ class ContentModel extends BaseModel
 
     public function contentItems()
     {
-        return $this->morphMany('ContentItem', 'content');
+        $class = Config::get('mothership::models')['contentItem'];
+        return $this->morphMany($class, 'content');
     }
 
     /**

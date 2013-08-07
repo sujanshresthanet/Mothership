@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash as Hash;
 use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Redirect as Redirect;
 use User;
+use Log;
 
 /**
  * HomeController

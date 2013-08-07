@@ -1,13 +1,10 @@
 <?php namespace Stwt\Mothership;
 
-use Content;
-use ContentItem;
+use Config;
 use Input;
 use Log;
-use NavigationMenu;
 use Redirect;
 use URL;
-use Page;
 
 class ContentRegionController extends ResourceController
 {
@@ -16,7 +13,7 @@ class ContentRegionController extends ResourceController
      * 
      * @var string
      */
-    public $model = 'ContentRegion';
+    public $model = 'Stwt\Mothership\ContentRegionModel';
 
     /**
      * Default Action methods in this controller, also constructs the navigation
@@ -65,16 +62,21 @@ class ContentRegionController extends ResourceController
         $this->before($config);
 
         if ($this->related) {
-            $getCollection = function ($resource) {
-                $page = Page::find($this->related['id']);
-                return $page->getAllRegions(false);
-            };
-
-            $config['getCollection'] = $getCollection;
-            $config['view'] = 'admin.regions.table';
+            $config['view'] = 'mothership::theme.regions.table';
         }
 
         return parent::table($config);
+    }
+
+    public function getCollection($resource)
+    {
+        if ($this->related) {
+            $pageClass = Config::get('mothership::models')['page'];
+            $page = $pageClass::find($this->related['id']);
+            return $page->getAllRegions(false);
+        } else {
+            return parent::getCollection($resource);
+        }
     }
 
     public function create($config = [])
@@ -235,20 +237,26 @@ class ContentRegionController extends ResourceController
     public function store($config = [])
     {
         $afterSave = function ($contentRegion) {
+            return;
             // create new contentItem and save to new region
-            $contentItem = new ContentItem();
+            $contentItemClass = Config::get('mothership::models')['contentItem'];
+            $contentItem = new $contentItemClass;
             $contentRegion->contentItems()->save($contentItem);
-            Log::error('type: '.Input::get('type'));
+            
             switch (Input::get('type')) {
                 case 'nav':
-                    $navigationMenu = NavigationMenu::first();
+                    $navigationMenuClass = Config::get('mothership::models')['navigationMenu'];
+
+                    $navigationMenu = $navigationMenuClass::first();
                     $navigationMenu->contentItems()->save($contentItem);
                     break;
                 case 'html':
                 case 'textarea':
                 case 'text':
                     // create new content instance and save to item
-                    $content          = new Content;
+                    $contentClass = Config::get('mothership::models')['content'];
+
+                    $content          = new $contentClass;
                     $content->type    = Input::get('type');
                     $content->content = "Update content";
                     $content->save();
