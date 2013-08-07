@@ -210,8 +210,11 @@ class PageModel extends BaseModel
     public function getPageMeta()
     {
         return [
-            'metaTitle'       => 'United Wind',
+            'metaTitle'       => '',
             'metaDescription' => '',
+            'metaKeywords'    => '',
+            'metaScript'      => '',
+            'metaAuthor'      => '',
             'htmlId'          => ($this->slug == '/' ? 'homepage' : $this->slug),
         ];
     }
