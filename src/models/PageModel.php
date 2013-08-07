@@ -1,9 +1,11 @@
 <?php namespace Stwt\Mothership;
 
+use App;
 use Template;
 use ContentItems;
 use ContentRegion;
 use Config;
+use Log;
 use URL;
 
 class PageModel extends BaseModel
@@ -55,14 +57,6 @@ class PageModel extends BaseModel
         ]
     ];
 
-
-    /**
-     * The name of the "created at" column.
-     *
-     * @var string
-     */
-    const CONTENT_REGION_MODEL = 'Stwt\Mothership\ContentRegionModel';
-
     // ------------------------- //
     // Magic Methods             //
     // ------------------------- //
@@ -89,12 +83,7 @@ class PageModel extends BaseModel
     protected function initProperties($properties)
     {
         $templateOptions = function () {
-            $templates = Config::get('templates.templates', []);
-            $options = [];
-            foreach ($templates as $name => $spec) {
-                $options[$name] = ucfirst(humanize($name));
-            }
-            return array_flip($options);
+            return TemplateModel::options();
         };
 
         $properties['template'] = [
@@ -148,7 +137,7 @@ class PageModel extends BaseModel
     
     public function contentRegions()
     {
-        return $this->hasMany(static::CONTENT_REGION_MODEL);
+        return $this->hasMany('ContentRegion');
     }
     
     public function navigationItems()
@@ -189,14 +178,12 @@ class PageModel extends BaseModel
         if ($template and $template->exists()) {
             
             $regions = $template->regions();
-
             $data = array_merge(
                 $this->getPageMeta(),
                 $this->getRegionPlacehoders($regions),
                 $this->getGlobalRegions($regions),
                 $this->getPageRegions($regions)
             );
-            
             return View::make($template->path(), $data);
         }
         App::abort(404, 'Template "'.$template->path().'" not found');
@@ -208,7 +195,7 @@ class PageModel extends BaseModel
         if ($template and $template->exists()) {
             $regions = $template->regions();
             return array_merge(
-                $this->getRegionPlacehoders($regions, $generate),
+                $this->≈($regions, $generate),
                 $this->getGlobalRegions($regions, $generate),
                 $this->getPageRegions($regions, $generate)
             );
