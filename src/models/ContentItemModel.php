@@ -1,8 +1,6 @@
 <?php namespace Stwt\Mothership;
 
-use Page;
-use Content;
-use ContentRegion;
+use Config;
 use Log;
 use NavigationMenu;
 
@@ -25,9 +23,7 @@ class ContentItemModel extends BaseModel
     
     public function contentRegion()
     {
-        $class = Config::get('mothership::models')['contentRegion'];
-        Log::error('ContentItem belongsTo '.$class);
-        return $this->belongsTo($class);
+        return $this->belongsTo('contentRegion');
     }
 
     public function content()
@@ -48,14 +44,11 @@ class ContentItemModel extends BaseModel
             $this->content()->get();
         }
 
-        $contentClass = Config::get('mothership::models')['content'];
-        $navigationMenuClass = Config::get('mothership::models')['navigationMenu'];
-
         switch (get_class($this->content)) {
-            case $contentClass:
+            case 'Content':
                 return $this->content->type();
                 break;
-            case $navigationMenuClass:
+            case 'NavigationMenu':
                 return 'Navigation Menu';
                 break;
         }

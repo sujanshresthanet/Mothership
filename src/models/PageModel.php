@@ -195,7 +195,7 @@ class PageModel extends BaseModel
         if ($template and $template->exists()) {
             $regions = $template->regions();
             return array_merge(
-                $this->≈($regions, $generate),
+                $this->getRegionPlacehoders($regions, $generate),
                 $this->getGlobalRegions($regions, $generate),
                 $this->getPageRegions($regions, $generate)
             );
