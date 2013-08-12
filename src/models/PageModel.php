@@ -169,10 +169,12 @@ class PageModel extends BaseModel
 
     /**
      * Generate the html for this page
+     *
+     * @param  boolean $minimise
      * 
      * @return string HTML
      */
-    public function generate()
+    public function generate($minimize = false)
     {
         $template = $this->getTemplate();
         if ($template and $template->exists()) {
@@ -184,9 +186,28 @@ class PageModel extends BaseModel
                 $this->getGlobalRegions($regions),
                 $this->getPageRegions($regions)
             );
-            return View::make($template->path(), $data);
+            $source = View::make($template->path(), $data)->render();
+
+            return ($minimize ? $this->minimize($source) : $source);
         }
         App::abort(404, 'Template "'.$template->path().'" not found');
+    }
+
+    private function minimize($data)
+    {
+        $search = array(
+            '/\>[^\S ]+/s',  // strip whitespaces after tags, except space
+            '/[^\S ]+\</s',  // strip whitespaces before tags, except space
+            '/(\s)+/s'       // shorten multiple whitespace sequences
+        );
+
+        $replace = array(
+            '>',
+            '<',
+            '\\1'
+        );
+
+        return preg_replace($search, $replace, $data);
     }
 
     public function getAllRegions($generate = true)
