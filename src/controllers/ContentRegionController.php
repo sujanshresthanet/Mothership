@@ -116,6 +116,17 @@ class ContentRegionController extends ResourceController
     {
         $this->before($config);
 
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'submitText'    => 'Save',
+                'cancelText'    => 'Cancel',
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
+
         $resource = $this->resource->find($id);
 
         switch ($resource->type()) {
@@ -152,8 +163,8 @@ class ContentRegionController extends ResourceController
         $form = FormGenerator::resource($content)
             ->method('put')
             ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText', 'Save'))
-            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->saveButton(Arr::e($config, 'submitText'))
+            ->cancelButton(Arr::e($config, 'cancelText'))
             ->form()
                 ->attr('action', '')
                 ->generate();
@@ -165,7 +176,12 @@ class ContentRegionController extends ResourceController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
     }
 
     /**
@@ -187,6 +203,7 @@ class ContentRegionController extends ResourceController
         $content = $resource->contentItems()->first()->content()->first();
 
         $fields = $content->getFields(['content']);
+        Log::error('type '.$content->type);
         switch ($content->type) {
             case 'html':
                 $fields['content']->class = 'input-block-level html';
@@ -206,15 +223,17 @@ class ContentRegionController extends ResourceController
                 break;
         }
 
+        Log::error(print_r($fields, 1));
+
         $form = FormGenerator::resource($content)
             ->method('put')
             ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText', 'Save'))
-            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->saveButton(Arr::e($config, 'submitText'))
+            ->cancelButton(Arr::e($config, 'cancelText'))
             ->form()
                 ->attr('action', '')
                 ->generate();
-                
+
         Crumbs::push('active', 'Edit');
 
         $data['tabs']       = $this->getTabs($resource);
@@ -222,7 +241,14 @@ class ContentRegionController extends ResourceController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
