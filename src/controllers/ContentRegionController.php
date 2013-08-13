@@ -203,15 +203,10 @@ class ContentRegionController extends ResourceController
         $content = $resource->contentItems()->first()->content()->first();
 
         $fields = $content->getFields(['content']);
-        Log::error('type '.$content->type);
+        
         switch ($content->type) {
             case 'html':
                 $fields['content']->class = 'input-block-level html';
-                $fields['content']->form  = 'textarea';
-                $fields['content']->rows  = '30';
-                break;
-            case 'textarea':
-                $fields['content']->class = 'input-block-level';
                 $fields['content']->form  = 'textarea';
                 $fields['content']->rows  = '30';
                 break;
@@ -220,6 +215,12 @@ class ContentRegionController extends ResourceController
                 $fields['content']->form  = 'input';
                 $fields['content']->type  = 'text';
                 $fields['content']->cols  = '10';
+                break;
+            case 'textarea':
+            default:
+                $fields['content']->class = 'input-block-level';
+                $fields['content']->form  = 'textarea';
+                $fields['content']->rows  = '30';
                 break;
         }
 
