@@ -193,7 +193,14 @@ class PageModel extends BaseModel
         App::abort(404, 'Template "'.$template->path().'" not found');
     }
 
-    private function minimize($data)
+    /**
+     * Returns minimized html
+     *
+     * @param string $html
+     *
+     * @return string
+     */
+    protected function minimize($html)
     {
         $search = array(
             '/\>[^\S ]+/s',  // strip whitespaces after tags, except space
@@ -207,7 +214,7 @@ class PageModel extends BaseModel
             '\\1'
         );
 
-        return preg_replace($search, $replace, $data);
+        return preg_replace($search, $replace, $html);
     }
 
     public function getAllRegions($generate = true)
