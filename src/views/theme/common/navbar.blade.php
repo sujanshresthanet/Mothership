@@ -20,8 +20,13 @@
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ Auth::user()->displayName() }} <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
+                                        @if (!Auth::user()->canUpdateProfile())
+                                        <li class="disabled"><a href="#">Update Profile</a></li>
+                                        <li class="disabled"><a href="#">Change Password</a></li>
+                                        @else
                                         <li><a href="{{ URL::to('admin/profile') }}">Update Profile</a></li>
                                         <li><a href="{{ URL::to('admin/password') }}">Change Password</a></li>
+                                        @endif
                                         <li class="divider"></li>
                                         <li><a href="{{ URL::to('admin/logout') }}">Logout</a></li>
                                     </ul>

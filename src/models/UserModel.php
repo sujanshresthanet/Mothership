@@ -56,6 +56,11 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
         return $date->getRelativeDate();
     }
 
+    public function canUpdateProfile()
+    {
+        return true;
+    }
+
     /**
      * Get the unique identifier for the user.
      *
