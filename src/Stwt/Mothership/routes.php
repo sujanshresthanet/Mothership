@@ -20,13 +20,14 @@ Route::post('admin/login', "$homeController@postLogin");
 Route::get('admin/logout', "$homeController@getLogout");
 
 $controllers = Config::get('mothership::controllers');
+$filter = Config::get('mothership::filter', 'mothership');
 
 if ($controllers) {
 
     Route::group(
         [
             'prefix' => 'admin',
-            'before' => 'mothership',
+            'before' => $filter,
         ],
         function () use ($controllers, $homeController) {
 
