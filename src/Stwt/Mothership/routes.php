@@ -22,6 +22,7 @@ Route::get('admin/logout', "$homeController@getLogout");
 $controllers = Config::get('mothership::controllers');
 $filter = Config::get('mothership::filter', 'mothership');
 
+
 if ($controllers) {
 
     Route::group(
