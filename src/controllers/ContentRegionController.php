@@ -182,6 +182,8 @@ class ContentRegionController extends ResourceController
         
         // Attach a composer to the view
         View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
@@ -224,8 +226,6 @@ class ContentRegionController extends ResourceController
                 break;
         }
 
-        Log::error(print_r($fields, 1));
-
         $form = FormGenerator::resource($content)
             ->method('put')
             ->fields($fields)
@@ -264,7 +264,6 @@ class ContentRegionController extends ResourceController
     public function store($config = [])
     {
         $afterSave = function ($contentRegion) {
-            return;
             // create new contentItem and save to new region
             $contentItemClass = Config::get('mothership::models')['contentItem'];
             $contentItem = new $contentItemClass;
