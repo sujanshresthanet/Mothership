@@ -5,7 +5,7 @@
 @import "vendor/redactor";
 
 body {
-    background-color: #2291CD;
+    background-color: @brand-primary;
 }
     #container {
         background-color:   white;
@@ -15,3 +15,50 @@ body {
         .main-header {
             margin-bottom: 10px;
         }
+
+    table {
+        label {
+            margin: 0;
+        }
+    }
+
+    .sign-in {
+        .make-row;
+        //padding:    @padding-large-vertical @padding-large-horizontal;
+        form {
+            .make-lg-column(6);
+            .make-lg-column-push(3);
+            .form-horizontal;
+            background:    @body-bg;
+            border-radius: 5px;
+            padding-top:   @padding-large-vertical;
+        }
+    }
+
+    .sidebar-template {
+        .container {
+            min-height: 600px;
+        }
+        .main {
+            .make-lg-column(8);
+        }
+        .sidebar {
+            .make-lg-column(4);
+        }
+    }
+
+    .app-content {
+        .make-row();
+        .content-header {
+            .make-lg-column(12);
+        }
+        .content-body {
+            .make-lg-column(12);
+            padding-top: @padding-large-vertical;
+        }
+        .collection-header,
+        .collection-body,
+        .collection-footer {
+            .make-lg-column(12);
+        }
+    }
