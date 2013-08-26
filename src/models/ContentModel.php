@@ -73,11 +73,15 @@ class ContentModel extends BaseModel
         return $columns;
     }
 
-
+    // ------------------------- //
+    // Eloquent Relationships    //
+    // ------------------------- //
+    
     public function contentItems()
     {
-        $class = Config::get('mothership::models')['contentItem'];
-        return $this->morphMany($class, 'content');
+        App::abort(501, 'Please define ContentItem relationship in you Content Model');
+        
+        return $this->morphMany('ContentItem', 'content');
     }
 
     /**

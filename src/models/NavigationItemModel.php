@@ -47,28 +47,29 @@ class NavigationItemModel extends BaseModel
         return parent::__toString();
     }
 
-    /**
-     * --------------------------------------
-     */
+    // ------------------------- //
+    // Eloquent Relationships    //
+    // ------------------------- //
     
     public function navigationItems()
     {
+        App::abort(501, 'Please define NavigationMenu relationship in you NavigationItem Model');
         return $this->belongsTo('NavigationMenu');
     }
 
     public function page()
     {
+        App::abort(501, 'Please define Page relationship in you NavigationItem Model');
         return $this->belongsTo('Page');
     }
 
     public function attributes()
     {
+        App::abort(501, 'Please define Attribute relationship in you NavigationItem Model');
         return $this->morphMany('Attribute', 'attributeable');
     }
 
-    /**
-     * --------------------------------------
-     */
+    // ----------------------------
     
     public function generate()
     {

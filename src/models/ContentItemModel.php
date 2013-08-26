@@ -19,11 +19,14 @@ class ContentItemModel extends BaseModel
         return parent::__toString();
     }
 
-    // ----------------------------
+    // ------------------------- //
+    // Eloquent Relationships    //
+    // ------------------------- //
     
     public function contentRegion()
     {
-        return $this->belongsTo('contentRegion');
+        App::abort(501, 'Please define contentRegion relationship in you ContentItem Model');
+        return $this->belongsTo('ContentRegion');
     }
 
     public function content()

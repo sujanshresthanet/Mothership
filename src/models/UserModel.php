@@ -69,6 +69,17 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
     }
 
     /**
+     * Returns true if the user can update their own profile
+     * Override this with false if you are using a third party auth system like ActiveDirectory
+     * 
+     * @return boolean
+     */
+    public function canUpdateProfile()
+    {
+        return true;
+    }
+
+    /**
      * Get the unique identifier for the user.
      *
      * @return mixed

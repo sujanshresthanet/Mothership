@@ -29,28 +29,29 @@ class NavigationMenuModel extends BaseModel
         return parent::__toString();
     }
 
-    /**
-     * --------------------------------------
-     */
+    // ------------------------- //
+    // Eloquent Relationships    //
+    // ------------------------- //
 
     public function contentItems()
     {
+        App::abort(501, 'Please define ContentItem relationship in you NavigationMenu Model');
         return $this->morphMany('ContentItem', 'content');
     }
 
     public function navigationItems()
     {
+        App::abort(501, 'Please define NavigationItem relationship in you NavigationMenu Model');
         return $this->hasMany('NavigationItem');
     }
 
     public function attributes()
     {
+        App::abort(501, 'Please define Attribute relationship in you NavigationMenu Model');
         return $this->morphMany('Attribute', 'attributeable');
     }
 
-    /**
-     * --------------------------------------
-     */
+    // ----------------------------
     
     public function generate()
     {

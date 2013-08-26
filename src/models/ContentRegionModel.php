@@ -70,19 +70,20 @@ class ContentRegionModel extends BaseModel
         ];
     }
 
-    // ----------------------------
+    // ------------------------- //
+    // Eloquent Relationships    //
+    // ------------------------- //
     
     public function page()
     {
-        $class = Config::get('mothership::models')['page'];
-        return $this->belongsTo($class);
+        App::abort(501, 'Please define Page relationship in you ContentRegion Model');
+        return $this->belongsTo('Page');
     }
 
     public function contentItems()
     {
-        $class = Config::get('mothership::models')['contentItem'];
-        Log::error('ContentRegion hasMany '.$class);
-        return $this->hasMany($class);
+        App::abort(501, 'Please define ContentItems relationship in you ContentRegion Model');
+        return $this->hasMany('ContentItem');
     }
 
     // ----------------------------
