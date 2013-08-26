@@ -1,91 +1,46 @@
-<div class="navbar">
-    <div class="container">
-
-        <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+<nav class="navbar navbar-default" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
         </button>
-
-        <!-- Be sure to leave the brand out there if you want it shown -->
         <a class="navbar-brand" href="#">{{ $appTitle }}</a>
-
-        @if (Auth::check())
-        <!-- Place everything within .navbar-collapse to hide it until above 768px -->
-        <div class="nav-collapse collapse navbar-responsive-collapse">
-            <ul class="nav navbar-nav">
-            @foreach ($navigation as $uri => $label)
-                <li class="{{ (Request::is('admin/'.$uri.'/*') ? 'active' : '') }}">
-                    <a href="{{ URL::to('admin/'.$uri) }}">{{ $label }}</a>
-                </li>
-            @endforeach
-            </ul>
-            <form class="navbar-form pull-right">
-                <input type="text" class="form-control" disabled placeholder="Search" />
-            </form>
-            <ul class="nav navbar-nav pull-right">
-                <li id="fat-menu" class="dropdown">
-                    <a
-                        href="#"
-                        id="meta-menu"
-                        role="button"
-                        class="dropdown-toggle"
-                        data-toggle="dropdown"
-                    >{{ Auth::user()->displayName() }}<b class="caret"></b></a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="meta-menu">
-                        <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/profile') }}">Update Profile</a>
-                        </li>
-                        <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/password') }}">Change Password</a>
-                        </li>
-                        <li class="divider"></li>
-                        <li role="presentation">
-                            <a role="menuitem" tabindex="-1" href="{{ URL::to('admin/logout') }}">Logout</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        @endif
     </div>
-</div>
-
-<?php /*            <div class="navbar navbar-inverse navbar-static-top">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </a>
-                        <a class="brand" href="#">{{ $appTitle }}</a>
-                        @if (Auth::check())
-                        <div class="nav-collapse collapse">
-                             <ul class="nav">
-                            @foreach ($navigation as $uri => $label)
-                                <li class="{{ (Request::is('admin/'.$uri.'/*') ? 'active' : '') }}">
-                                    <a href="{{ URL::to('admin/'.$uri) }}">{{ $label }}</a>
-                                </li>
-                            @endforeach
-                            </ul>
-                            <ul class="nav pull-right">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ Auth::user()->displayName() }} <b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="{{ URL::to('admin/profile') }}">Update Profile</a></li>
-                                        <li><a href="{{ URL::to('admin/password') }}">Change Password</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="{{ URL::to('admin/logout') }}">Logout</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <form class="navbar-search pull-right">
-                                <input type="text" class="search-query" placeholder="Search">
-                            </form>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>--> */
+    @if (Auth::check())
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+        @foreach ($navigation as $uri => $label)
+            <li class="{{ (Request::is('admin/'.$uri.'/*') ? 'active' : '') }}">
+                <a href="{{ URL::to('admin/'.$uri) }}">{{ $label }}</a>
+            </li>
+        @endforeach
+        </ul>
+        <form class="navbar-form navbar-left" role="search">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ Auth::user()->displayName() }} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    @if (!Auth::user()->canUpdateProfile())
+                    <li class="disabled"><a href="#">Update Profile</a></li>
+                    <li class="disabled"><a href="#">Change Password</a></li>
+                    @else
+                    <li><a href="{{ URL::to('admin/profile') }}">Update Profile</a></li>
+                    <li><a href="{{ URL::to('admin/password') }}">Change Password</a></li>
+                    @endif
+                    <li class="divider"></li>
+                    <li><a href="{{ URL::to('admin/logout') }}">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /.navbar-collapse -->
+    @endif
+</nav>
