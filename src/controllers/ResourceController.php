@@ -87,6 +87,13 @@ class ResourceController extends BaseController
      */
     protected $columns = [];
 
+    /**
+     * Default array of fields that will be used in the create and edit forms
+     * 
+     * @var array
+     */
+    protected $fields = [];
+
     protected $resource;
     protected $related = null;
     protected $path;
@@ -163,7 +170,7 @@ class ResourceController extends BaseController
 
         $resource = $this->resource;
 
-        $fields = $resource->getFields(Arr::e($config, 'fields'));
+        $fields = $resource->getFields(Arr::e($config, 'fields', $this->fields));
 
         // look for any prefill defaults
         $defaults = Input::get('defaults', []);
@@ -239,7 +246,7 @@ class ResourceController extends BaseController
 
         $resource = $this->resource->find($id);
 
-        $fields = $resource->getFields(Arr::e($config, 'fields'));
+        $fields = $resource->getFields(Arr::e($config, 'fields', $this->fields));
 
         $form = FormGenerator::resource($resource)
             ->method('put')

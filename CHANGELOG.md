@@ -3,6 +3,7 @@
 ## 27th Aug
 
 * Added columns property to the resource controller
+* Added fields property to the resource controller
 
 ## 31st July
 
