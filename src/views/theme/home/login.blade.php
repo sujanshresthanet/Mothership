@@ -6,6 +6,7 @@
 
 
 @section('body')
+  {{ Stwt\Mothership\Messages::getHtml() }}
   <main class="sign-in" id="sign-in">
       <form action="{{ URL::to('admin/login') }}" class="form-signin" method="POST" style="margin-top:30px;" role="form">
           <legend>Please Sign In</legend>

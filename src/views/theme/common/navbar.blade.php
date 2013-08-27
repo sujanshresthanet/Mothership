@@ -9,7 +9,7 @@
         </button>
         <a class="navbar-brand" href="#">{{ $appTitle }}</a>
     </div>
-    @if (Auth::check())
+    @if (Sentry::check())
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav">
@@ -27,15 +27,10 @@
         </form>
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ Auth::user()->displayName() }} <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ Sentry::getUser()->first_name }} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    @if (!Auth::user()->canUpdateProfile())
-                    <li class="disabled"><a href="#">Update Profile</a></li>
-                    <li class="disabled"><a href="#">Change Password</a></li>
-                    @else
                     <li><a href="{{ URL::to('admin/profile') }}">Update Profile</a></li>
                     <li><a href="{{ URL::to('admin/password') }}">Change Password</a></li>
-                    @endif
                     <li class="divider"></li>
                     <li><a href="{{ URL::to('admin/logout') }}">Logout</a></li>
                 </ul>

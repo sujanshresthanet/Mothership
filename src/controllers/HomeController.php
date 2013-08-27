@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Redirect as Redirect;
 use User;
 use Log;
+use Sentry;
 
 /**
  * HomeController
@@ -56,18 +57,32 @@ class HomeController extends BaseController
      */
     public function postLogin()
     {
-        $credentials = ['email' => Input::get('email'), 'password' => Input::get('password')];
-
-        if (Auth::attempt($credentials)) {
+        try {
+            // Set login credentials
+            $credentials = [
+                'email'    => Input::get('email'),
+                'password' => Input::get('password'),
+            ];
+            // Try to authenticate the user
+            $user = Sentry::authenticate($credentials, false);
             Messages::add('success', 'You are now logged in');
-            
-            $user = Auth::user();
-            $user->last_login = date('Y-m-d H:i:s');
-            $user->save();
-
             return Redirect::to('admin');
+
+        } catch (\Cartalyst\Sentry\Users\LoginRequiredException $e) {
+            Messages::add('error', 'Email field is required.');
+        } catch (\Cartalyst\Sentry\Users\PasswordRequiredException $e) {
+            Messages::add('error', 'Password field is required.');
+        } catch (\Cartalyst\Sentry\Users\WrongPasswordException $e) {
+            Messages::add('error', 'Wrong password, try again.');
+        } catch (\Cartalyst\Sentry\Users\UserNotFoundException $e) {
+            Messages::add('error', 'User was not found.');
+        } catch (\Cartalyst\Sentry\Users\UserNotActivatedException $e) {
+            Messages::add('error', 'User is not activated.');
+        } catch (\Cartalyst\Sentry\Throttling\UserSuspendedException $e) {
+            Messages::add('error', 'User is suspended.');
+        } catch (\Cartalyst\Sentry\Throttling\UserBannedException $e) {
+            Messages::add('error', 'User is banned.');
         }
-        Messages::add('error', 'Login incorrect, please try again');
         return Redirect::to('admin/login');
     }
 
@@ -94,13 +109,17 @@ class HomeController extends BaseController
 
         $data = Arr::s($data, 'title', 'Hi There!');
 
-        $data = Arr::s($data, 'content', 'Lorem ipsum dolor sit amet, consectetur 
+        $data = Arr::s(
+            $data,
+            'content',
+            'Lorem ipsum dolor sit amet, consectetur 
         adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore 
         magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
         ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
         irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
         fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-        sunt in culpa qui officia deserunt mollit anim id est laborum.');
+        sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        );
 
         return View::makeTemplate('mothership::theme.home.index')
             ->with($this->getTemplateData())

@@ -13,8 +13,8 @@
 @stop
 
 @section('sidebar')
-<h2>Welcome {{ $user->username }}</h2>
-<p>You last logged in <span class="label">{{ $user->lastLogin() }}</span></p>
+<h2>Welcome {{ Sentry::getUser()->first_name }}</h2>
+<p>You last logged in <span class="label">{{ Sentry::getUser()->last_login }}</span></p>
 <ul>
     <li><a href="{{ URL::to('admin') }}">Home</a></li>
     <li><a href="{{ URL::to('admin/profile') }}">Update profile</a></li>

@@ -13,7 +13,7 @@
 Route::filter(
     'mothership',
     function () {
-        if (Auth::guest()) {
+        if (!Sentry::check()) {
             return Redirect::to('admin/login');
         }
     }

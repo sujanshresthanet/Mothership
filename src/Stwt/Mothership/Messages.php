@@ -49,6 +49,7 @@ class Messages
         if ($messages) {
             foreach ($messages as $message) {
                 foreach ($message as $t => $m) {
+                    $t = ($t == 'error' ? 'danger' : $t);
                     $output .= '<div class="alert alert-'.$t.'"><a class="close" data-dismiss="alert">×</a>'.$m;
                     $output .= '</div>';
                 }

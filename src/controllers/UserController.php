@@ -47,6 +47,18 @@ class UserController extends ResourceController
         ],
     ];
 
+    public function edit($id, $config = [])
+    {
+        $config = [
+            /*'fields' => [
+                'email',
+                'first_name',
+                'last_name'
+            ],*/
+        ];
+        return parent::edit($id, $config);
+    }
+
     /**
      * A custom update action that provides the user with a form
      * to change their password.
@@ -74,7 +86,7 @@ class UserController extends ResourceController
             $config['submitText'] = 'Change Password';
         }
 
-        return $this->edit($id, $config);
+        return parent::edit($id, $config);
     }
 
     /**
