@@ -24,10 +24,7 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
      *
      * @var array
      */
-    protected $hidden = array('password', 'last_login');
-
-    protected $guarded = [
-        'id',
+    protected $hidden = [
         'password',
         'last_login',
         'permissions',
@@ -36,6 +33,11 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
         'persist_code',
         'reset_password_code',
         'reset_token',
+    ];
+
+    protected $guarded = [
+        'id',
+        'password',
         'created_at',
         'updated_at',
         'deleted_at'
