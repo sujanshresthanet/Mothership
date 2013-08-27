@@ -1,5 +1,9 @@
 # Change Log
 
+## 27th Aug
+
+* Added columns property to the resource controller
+
 ## 31st July
 
 * Only check posted fields in the store and update methods by default

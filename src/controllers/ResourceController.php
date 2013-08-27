@@ -80,6 +80,13 @@ class ResourceController extends BaseController
         ],
     ];
     
+    /**
+     * Default array of columns that will be used in tables
+     * 
+     * @var array
+     */
+    protected $columns = [];
+
     protected $resource;
     protected $related = null;
     protected $path;
@@ -125,7 +132,7 @@ class ResourceController extends BaseController
         $data['resource']   = $this->resource;
         $data['selectable'] = Arr::e($config, 'selectable', true);
         $data['caption']    = Lang::caption('index', $resource, $this->related);
-        $data['columns']    = $resource->getColumns(Arr::e($config, 'columns'));
+        $data['columns']    = $resource->getColumns(Arr::e($config, 'columns', $this->columns));
         $data['resource']   = $resource;
         $data['collection'] = $this->getCollection($resource);
 
