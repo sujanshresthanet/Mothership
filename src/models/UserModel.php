@@ -35,6 +35,7 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
         'activated_at',
         'persist_code',
         'reset_password_code',
+        'reset_token',
         'created_at',
         'updated_at',
         'deleted_at'

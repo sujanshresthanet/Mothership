@@ -50,11 +50,12 @@ class UserController extends ResourceController
     public function edit($id, $config = [])
     {
         $config = [
-            /*'fields' => [
+            'fields' => [
                 'email',
                 'first_name',
-                'last_name'
-            ],*/
+                'last_name',
+                'activated',
+            ],
         ];
         return parent::edit($id, $config);
     }
