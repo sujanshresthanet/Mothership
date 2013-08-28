@@ -167,6 +167,17 @@ class ResourceController extends BaseController
         $data = [];
 
         $this->before($config);
+        
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'submitText'    => 'Save',
+                'cancelText'    => 'Cancel',
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
 
         $resource = $this->resource;
 
@@ -184,9 +195,10 @@ class ResourceController extends BaseController
         $form = FormGenerator::resource($resource)
             ->method('post')
             ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText', 'Save'))
-            ->cancelButton(Arr::e($config, 'cancelText', 'Cancel'))
+            ->saveButton(Arr::e($config, 'submitText'))
+            ->cancelButton(Arr::e($config, 'cancelText'))
             ->form()
+                ->attr('action', '')
                 ->generate();
 
         Crumbs::push('active', 'Create');
@@ -196,7 +208,14 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
@@ -416,14 +435,13 @@ class ResourceController extends BaseController
         $fields   = Arr::e($config, 'fields', array_keys(Input::all()));
         $rules    = $resource->getRules($fields);
 
-        $resource->autoHydrateEntityFromInput   = true;
-        $resource->autoPurgeRedundantAttributes = true;
+        $resource->autoHydrateEntityFromInput    = true;
+        $resource->autoPurgeRedundantAttributes  = true;
         
         $callback = Arr::e($config, 'beforeSave');
         if ($callback) {
             $callback($resource);
         }
-
         if ($resource->save($rules)) {
             if ($this->related) {
                 $related = $this->related['resource'];
@@ -435,9 +453,8 @@ class ResourceController extends BaseController
             if ($callback) {
                 $callback($resource);
             }
-            
-            Messages::add('success', Lang::alert('create.success', $resource, $this->related));
 
+            Messages::add('success', Lang::alert('create.success', $resource, $this->related));
             $redirectSuccess = Arr::e($config, 'redirectSuccess', LinkFactory::collection());
 
             return Redirect::to($redirectSuccess);
