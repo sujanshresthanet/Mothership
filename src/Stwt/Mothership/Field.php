@@ -309,7 +309,6 @@ class Field
             $this->type = 'hidden';
         } elseif (!$this->type) {
             $this->type = 'datetime';
-            //$this->class = 'datetime';
         }
         $this->validation[] = 'date_format:Y-m-d H:i:s';
     }
