@@ -60,7 +60,7 @@ class HomeController extends BaseController
         try {
             // Set login credentials
             $credentials = [
-                'email'    => Input::get('email'),
+                'username' => Input::get('username'),
                 'password' => Input::get('password'),
             ];
             // Try to authenticate the user

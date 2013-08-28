@@ -11,9 +11,9 @@
       <form action="{{ URL::to('admin/login') }}" class="form-signin" method="POST" style="margin-top:30px;" role="form">
           <legend>Please Sign In</legend>
           <div class="form-group">
-              <label for="inputEmail1" class="col-lg-2 control-label">Email</label>
+              <label for="inputEmail1" class="col-lg-2 control-label">Username</label>
               <div class="col-lg-10">
-                  <input type="email" name="email" class="form-control" id="inputEmail1" placeholder="Email">
+                  <input type="text" name="username" class="form-control" id="username" placeholder="Username">
               </div>
           </div>
           <div class="form-group">
