@@ -65,9 +65,18 @@ class HomeController extends BaseController
             ];
             // Try to authenticate the user
             $user = Sentry::authenticate($credentials, false);
-            Messages::add('success', 'You are now logged in');
-            return Redirect::to('admin');
+            // Find the Administrator group
+            $admin = Sentry::getGroupProvider()->findByName('Administrator');
 
+            if ($user->inGroup($admin)) {
+                // User is in Administrator group
+                Messages::add('success', 'You are now logged in');
+                return Redirect::to('admin');
+            } else {
+                // User is not in Administrator group - log out
+                Sentry::logout();
+                Messages::add('error', 'Access is restricted to Administrators.');
+            }
         } catch (\Cartalyst\Sentry\Users\LoginRequiredException $e) {
             Messages::add('error', 'Email field is required.');
         } catch (\Cartalyst\Sentry\Users\PasswordRequiredException $e) {
@@ -93,7 +102,7 @@ class HomeController extends BaseController
      */
     public function getLogout()
     {
-        Auth::logout();
+        Sentry::logout();
         Messages::add('success', 'You have been logged out');
         return Redirect::to('admin/login');
     }
