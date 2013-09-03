@@ -1299,4 +1299,4 @@
   }
 
 
-})(window.jQuery)
+})(window.jQuery);

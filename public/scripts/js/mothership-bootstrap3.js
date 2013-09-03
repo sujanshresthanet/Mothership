@@ -89,5 +89,5 @@ $(function() {
     moImagePicker();
     moDateTimePicker();
     moHtml();
-    $('[data-toggle="tooltip"]').tooltip();
+    //$('[data-toggle="tooltip"]').tooltip();
 });
