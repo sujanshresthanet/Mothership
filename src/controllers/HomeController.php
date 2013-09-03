@@ -63,8 +63,10 @@ class HomeController extends BaseController
                 'username' => Input::get('username'),
                 'password' => Input::get('password'),
             ];
+            // get the remember me value
+            $rememberMe = Input::has('remember_me');
             // Try to authenticate the user
-            $user = Sentry::authenticate($credentials, false);
+            $user = Sentry::authenticate($credentials, $rememberMe);
             // Find the Administrator group
             $admin = Sentry::getGroupProvider()->findByName('Administrator');
 
