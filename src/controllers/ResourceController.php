@@ -267,21 +267,14 @@ class ResourceController extends BaseController
 
         $fields = $resource->getFields(Arr::e($config, 'fields', $this->fields));
 
-        $form = FormGenerator::resource($resource)
-            ->method('put')
-            ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText'))
-            ->cancelButton(Arr::e($config, 'cancelText'))
-            ->form()
-                ->attr('action', '')
-                ->generate();
+        $form = $this->makeForm($resource, $fields, $config);
 
         Crumbs::push('active', 'Edit');
 
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
-        $data['content']    = $form;
+        $data['content']    = $form->generate();
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view');
@@ -291,6 +284,17 @@ class ResourceController extends BaseController
         View::composer($view, $viewComposer);
 
         return View::make($view, $data);
+    }
+
+    protected function makeForm($resource, $fields = [], $config = [])
+    {
+        return FormGenerator::resource($resource)
+            ->method('put')
+            ->fields($fields)
+            ->saveButton(Arr::e($config, 'submitText'))
+            ->cancelButton(Arr::e($config, 'cancelText'))
+            ->form()
+                ->attr('action', '');
     }
 
     /**

@@ -205,42 +205,15 @@ class ContentRegionController extends ResourceController
         $content = $resource->contentItems()->first()->content()->first();
 
         $fields = $content->getFields(['content']);
-        
-        switch ($content->type) {
-            case 'html':
-                $fields['content']->class = 'input-block-level html';
-                $fields['content']->form  = 'textarea';
-                $fields['content']->rows  = '30';
-                break;
-            case 'text':
-                $fields['content']->class = 'input-block-level';
-                $fields['content']->form  = 'input';
-                $fields['content']->type  = 'text';
-                $fields['content']->cols  = '10';
-                break;
-            case 'textarea':
-            default:
-                $fields['content']->class = 'input-block-level';
-                $fields['content']->form  = 'textarea';
-                $fields['content']->rows  = '30';
-                break;
-        }
-
-        $form = FormGenerator::resource($content)
-            ->method('put')
-            ->fields($fields)
-            ->saveButton(Arr::e($config, 'submitText'))
-            ->cancelButton(Arr::e($config, 'cancelText'))
-            ->form()
-                ->attr('action', '')
-                ->generate();
+        $fields = $this->setContentFields($content->type, $fields);
+        $form = $this->makeForm($content, $fields, $config);
 
         Crumbs::push('active', 'Edit');
 
         $data['tabs']       = $this->getTabs($resource);
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
-        $data['content']    = $form;
+        $data['content']    = $form->generate();
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view');
@@ -250,6 +223,39 @@ class ContentRegionController extends ResourceController
         View::composer($view, $viewComposer);
 
         return View::make($view, $data);
+    }
+
+    /**
+     * Customise the resources field so it adapts to the type of content we are updateing
+     * 
+     * @param string $type
+     * @param array $fields
+     * @param string $fieldName
+     *
+     * @return array
+     */
+    protected function setContentFields($type, $fields, $fieldName = 'content')
+    {
+        switch ($type) {
+            case 'html':
+                $fields[$fieldName]->class = 'input-block-level html';
+                $fields[$fieldName]->form  = 'textarea';
+                $fields[$fieldName]->rows  = '30';
+                break;
+            case 'text':
+                $fields[$fieldName]->class = 'input-block-level';
+                $fields[$fieldName]->form  = 'input';
+                $fields[$fieldName]->type  = 'text';
+                $fields[$fieldName]->cols  = '10';
+                break;
+            case 'textarea':
+            default:
+                $fields[$fieldName]->class = 'input-block-level';
+                $fields[$fieldName]->form  = 'textarea';
+                $fields[$fieldName]->rows  = '30';
+                break;
+        }
+        return $fields;
     }
 
     /**
