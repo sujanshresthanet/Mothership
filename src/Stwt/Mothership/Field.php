@@ -422,6 +422,8 @@ class Field
     {
         if ($this->model) {
             return $instance->{$this->model};
+        } elseif ($this->isBoolean()) {
+            return $instance->{$this->name} ? 'Yes' : 'No';
         } elseif ($this->isDate()) {
             $date = new \ExpressiveDate($instance->{$this->name});
             return $date->getRelativeDate();
@@ -518,6 +520,11 @@ class Field
     public function isString()
     {
         return in_array($this->dataType, ['varchar', 'text']);
+    }
+
+    public function isBoolean()
+    {
+        return $this->type == 'checkbox_bool';
     }
 
     public function allowsNull()
