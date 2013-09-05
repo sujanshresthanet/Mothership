@@ -47,6 +47,20 @@ class UserController extends ResourceController
         ],
     ];
 
+    protected $columns;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->columns = [
+            'username',
+            'email',
+            'activated',
+            'last_login',
+        ];
+    }
+
     public function edit($id, $config = [])
     {
         $config = [
