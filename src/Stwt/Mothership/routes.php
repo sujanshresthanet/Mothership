@@ -166,6 +166,21 @@ if ($controllers) {
                     }
                 );
 
+
+                // multi destroy
+                Route::delete(
+                    $path,
+                    function () use ($class) {
+
+                        $config = [
+                            'controller' => $class,
+                            'action'     => 'delete',
+                            'type'       => 'destroy',
+                        ];
+                        return with(new $class)->multiDestroy($config);
+                    }
+                )->where('id', '[0-9]+');
+
                 // destroy
                 Route::delete(
                     $path.'/{id}:delete',

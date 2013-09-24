@@ -604,6 +604,15 @@ class ResourceController extends BaseController
         }
     }
 
+    public function multiDestroy($config = [])
+    {
+        $this->before($config);
+
+        $this->resource->destroy(Input::get('ids'));
+        Messages::add('success', Lang::alert('delete.success', $this->resource, $this->related));
+        return Redirect::to(LinkFactory::collection());
+    }
+
     ##########################################################
     # MOVE Query Logic INTO SEPARATE CLASS!
     ##########################################################
