@@ -101,18 +101,8 @@ class PageModel extends BaseModel
      */
     protected function initColumns($columns)
     {
-        $name = function ($page) {
-            if ($page->parentPage) {
-                $depth = 1;
-            } else {
-                $depth = 0;
-            }
-            $depth = str_repeat('— ', $depth);
-            return $depth.$page->name;
-        };
-
         $columns = [
-            'Name' => $name,
+            'name',
             'slug',
             'status',
             'template',
