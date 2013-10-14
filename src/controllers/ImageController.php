@@ -64,7 +64,7 @@ class ImageController extends FileController
      */
     public function store($config = [])
     {
-        $config = Arr::s(
+       $config = Arr::s(
             $config,
             'afterSave',
             function ($image) {
