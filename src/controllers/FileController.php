@@ -1,7 +1,7 @@
 <?php namespace Stwt\Mothership;
 
 use GoodForm;
-use Log;
+use \Log;
 use Input;
 use Request;
 use Redirect;
@@ -73,14 +73,16 @@ class FileController extends ResourceController
     public function store($config = [])
     {
         $this->before($config);
-
         $resource = $this->resource;
         $rules = $resource->getRules();
 
-        $file = $this->uploadFile($resource);
+        $filename = Arr::e($config, 'filename', 'filename');
+
+        $file = $this->uploadFile($resource, $filename);
         
         if ($this->errorMessages) {
             Messages::add('error', Lang::alert('create.error', $resource, $this->related));
+            Log::error(print_r($this->errorMessages, 1));
             return Redirect::to(URL::current())
                 ->withInput()
                 ->withErrors($this->errorMessages);
@@ -92,16 +94,26 @@ class FileController extends ResourceController
         if ($callback) {
             $callback($resource);
         }
+        if ($resource->save($rules)) {
+            if ($this->related) {
+                $related = $this->related['resource'];
+                $plural   = $resource->hasManyName();
+                $resource  = $related->{$plural}()->save($resource);
+            }
+            $callback = Arr::e($config, 'afterSave');
+            if ($callback) {
+                $callback($resource);
+            }
 
-        $resource->save();
-
-        $callback = Arr::e($config, 'afterSave');
-        if ($callback) {
-            $callback($resource);
+            Messages::add('success', Lang::alert('create.success', $resource, $this->related));
+            return Redirect::to(LinkFactory::collection());
+        } else {
+            Log::error(print_r($resource->errors(), 1));
+            Messages::add('error', Lang::alert('create.error', $resource, $this->related));
+            return Redirect::to(URL::current())
+                ->withInput()
+                ->withErrors($resource->errors());
         }
-
-        Messages::add('success', Lang::alert('create.success', $resource, $this->related));
-        return Redirect::to(LinkFactory::collection());
     }
 
     /**
@@ -161,10 +173,10 @@ class FileController extends ResourceController
      * @param  object $resource
      * @return \Upload\File
      */
-    protected function uploadFile($resource)
+    protected function uploadFile($resource, $filename = 'filename')
     {
-        if (!Input::hasFile('filename')) {
-            $this->errorMessages = ['filename' => 'Please choose a file to upload'];
+        if (!Input::hasFile($filename)) {
+            $this->errorMessages = [$filename => 'Please choose a file to upload'];
             return;
         }
 
@@ -172,9 +184,8 @@ class FileController extends ResourceController
         if (!$storage) {
             return null;
         }
-        Log::error('max size = '.$resource->maxSize);
         try {
-            $file = new \Upload\File('filename', $storage);
+            $file = new \Upload\File($filename, $storage);
             $mimeTypes = $resource->mimeTypes;
             $maxSize   = $resource->maxSize;
             $rules = [
@@ -188,7 +199,7 @@ class FileController extends ResourceController
             $errors = $file->getErrors();
             $errorString = implode(', ', $errors);
             $this->errorMessages = [
-                'filename' => $errorString,
+                $filename => $errorString,
             ];
             return null;
         }
