@@ -80,7 +80,8 @@ function moHtml() {
     $('form .html').redactor({
         iframe:     true,
         minHeight:  500,
-        css:        '/redactor/style.css'
+        css:        '/redactor/style.css',
+        convertDivs: false
     });
 }
 
