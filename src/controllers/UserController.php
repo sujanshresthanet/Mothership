@@ -54,23 +54,33 @@ class UserController extends ResourceController
         parent::__construct();
 
         $this->columns = [
-            'username',
             'email',
             'activated',
             'last_login',
         ];
     }
 
+    public function create($config = [])
+    {
+        $fields = [
+            'email',
+            'first_name',
+            'last_name',
+            'activated',
+        ];
+        Arr::s($config, 'fields', $fields);
+        return parent::create($config);
+    }
+
     public function edit($id, $config = [])
     {
-        $config = [
-            'fields' => [
-                'email',
-                'first_name',
-                'last_name',
-                'activated',
-            ],
+        $fields = [
+            'email',
+            'first_name',
+            'last_name',
+            'activated',
         ];
+        Arr::s($config, 'fields', $fields);
         return parent::edit($id, $config);
     }
 
