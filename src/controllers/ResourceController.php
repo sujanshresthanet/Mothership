@@ -17,6 +17,7 @@ use Input;
 use Log;
 use Redirect;
 use Request;
+use File;
 use Stwt\GoodForm\GoodForm as GoodForm;
 use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
@@ -498,6 +499,24 @@ class ResourceController extends BaseController
         $resource->autoPurgeRedundantAttributes  = true;
         $resource->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
         
+        // check for images
+        foreach ($fields as $key => $field) {
+            // check if field is a file?
+            if (Input::hasFile($field)) {
+                Log::error("$field is a file");
+
+                $destinationPath = public_path().'/images/';
+
+                $original  = Input::file($field)->getClientOriginalName();
+                $extension = Input::file($field)->getClientOriginalExtension();
+                $fileName  = str_random(20).".$extension";
+                Input::file($field)->move($destinationPath, $fileName);
+
+                $resource->{$field} = $fileName;
+                unset($rules[$field]);
+            }
+        }
+
         $callback = Arr::e($config, 'beforeSave');
         if ($callback) {
             $callback($resource);

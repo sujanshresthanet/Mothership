@@ -80,9 +80,33 @@ function moHtml() {
     $('form .html').redactor({
         iframe:     true,
         minHeight:  500,
-        css:        '/redactor/style.css',
-        convertDivs: false
+        css:        '/redactor/style.css'
     });
+}
+
+
+function moFileUploadField () {
+    $('.file-input-group')
+        .find('.remove-file')
+            .not('disabled')
+            .click(
+                function (event) {
+                    event.preventDefault();
+
+                    $btn = $(this);
+                    $btn.attr('disabled', true);
+
+                    $parent = $btn.parents('.file-input-group');
+
+                    $text = $parent.find('input[type=text]');
+                    $text.attr('disabled', true);
+                    $text.addClass('hidden')
+
+                    $file = $parent.find('input[type=file]');
+                    $file.attr('disabled', false);
+                    $file.removeClass('hidden');
+                }
+            );
 }
 
 $(function() {
@@ -90,5 +114,6 @@ $(function() {
     moImagePicker();
     moDateTimePicker();
     moHtml();
+    moFileUploadField();
     //$('[data-toggle="tooltip"]').tooltip();
 });
