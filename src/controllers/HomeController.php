@@ -253,7 +253,7 @@ class HomeController extends BaseController
      */
     protected function getPasswordFields($user)
     {
-        $rules = $user->getPropery('password')->validation;
+        $rules = $user->getProperty('password')->validation;
         $user->addRule('password', 'confirmed');
         return [
             'password',
@@ -282,7 +282,7 @@ class HomeController extends BaseController
      */
     public function getPasswordRules($user)
     {
-        $passwordRules = $user->getPropery('password')->validation;
+        $passwordRules = $user->getProperty('password')->validation;
 
         $confirmationRules = $passwordRules;
         $passwordRules[]   = 'confirmed';
