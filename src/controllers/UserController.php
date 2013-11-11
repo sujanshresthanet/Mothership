@@ -54,23 +54,33 @@ class UserController extends ResourceController
         parent::__construct();
 
         $this->columns = [
-            'username',
             'email',
             'activated',
             'last_login',
         ];
     }
 
+    public function create($config = [])
+    {
+        $fields = [
+            'email',
+            'first_name',
+            'last_name',
+            'activated',
+        ];
+        Arr::s($config, 'fields', $fields);
+        return parent::create($config);
+    }
+
     public function edit($id, $config = [])
     {
-        $config = [
-            'fields' => [
-                'email',
-                'first_name',
-                'last_name',
-                'activated',
-            ],
+        $fields = [
+            'email',
+            'first_name',
+            'last_name',
+            'activated',
         ];
+        Arr::s($config, 'fields', $fields);
         return parent::edit($id, $config);
     }
 
@@ -135,7 +145,7 @@ class UserController extends ResourceController
     {
         // get current rules assigned to the password property
         // our confirmation property will also need to match these rules
-        $rules = $this->resource->getPropery('password')->validation;
+        $rules = $this->resource->getProperty('password')->validation;
 
         // add 'confirmed' rule to password - so it must match the new field
         $this->resource->addRule('password', 'confirmed');
@@ -161,7 +171,7 @@ class UserController extends ResourceController
      */
     protected function getPasswordFormRules()
     {
-        $passwordRules = $this->resource->getPropery('password')->validation;
+        $passwordRules = $this->resource->getProperty('password')->validation;
         $confirmationRules = $passwordRules;
         $passwordRules[] = 'confirmed';
 

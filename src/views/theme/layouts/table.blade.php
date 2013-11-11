@@ -47,7 +47,7 @@
         
         @section('actions')
             <div class="form-actions">
-                <button name="_method" value="delete" type="submit" class="pull-right btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete Selected</button>
+                <button name="_method" value="delete" type="submit" class="pull-right btn btn-danger hide"><span class="glyphicon glyphicon-trash"></span> Delete Selected</button>
             </div>
         @show
 

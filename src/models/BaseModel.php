@@ -373,9 +373,23 @@ class BaseModel extends Ardent
      *
      * @return object Field
      */
-    public function getPropery($property)
+    public function getProperty($property)
     {
         return $this->properties[$property];
+    }
+
+    /**
+     * Attribute fields that contain files can have a
+     * custom upload directory
+     * @param  string $property
+     * @return string
+     */
+    public function getUploadPath($property)
+    {
+        $spec = $this->getProperty($property);
+        $dir  = ($spec->directory ?: '/uploads/');
+
+        return storage_path().$dir;
     }
 
     /*
@@ -423,7 +437,7 @@ class BaseModel extends Ardent
             // Set each given attribute on the model
             foreach ($attributes as $key => $value) {
                 // check if "" posted and property is allows null values
-                if ($this->getPropery($key)->allowsNull() and empty($value)) {
+                if ($this->getProperty($key)->allowsNull() and empty($value)) {
                     // set attribure to null
                     $this->setAttribute($key, null);
                 } else {

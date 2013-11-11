@@ -74,14 +74,14 @@ class UserModel extends BaseModel implements UserInterface, RemindableInterface
         return $this->first_name.' '.$this->last_name;
     }
 
-    public function lastLogin()
+    /*public function lastLogin()
     {
         if (!$this->last_login) {
             return 'never…';
         }
         $date = new \ExpressiveDate($this->last_login);
         return $date->getRelativeDate();
-    }
+    }*/
 
     /**
      * Returns true if the user can update their own profile
