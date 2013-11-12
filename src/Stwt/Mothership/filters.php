@@ -13,8 +13,15 @@
 Route::filter(
     'mothership',
     function () {
-        if (!Sentry::check()) {
-            return Redirect::to('admin/login');
+        if (Sentry::check()) {
+            $user = Sentry::getUser();
+            if ($user->hasAccess('admin')) {
+                return;
+            } else {
+                return Redirect::to('/');
+            }
         }
+        return Redirect::to('admin/login');
+        
     }
 );
