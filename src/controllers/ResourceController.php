@@ -68,10 +68,10 @@ class ResourceController extends BaseController
                 'label' => 'Edit',
                 'uri' => '{controller}/{id}:edit',
             ],
-            'view' => [
+            /*'view' => [
                 'label' => 'View',
                 'uri' => '{controller}/{id}',
-            ],
+            ],*/
             'delete'  => [
                 'label' => 'Delete',
                 'uri' => '{controller}/{id}:delete',
