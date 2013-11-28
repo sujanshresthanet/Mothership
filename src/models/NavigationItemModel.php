@@ -85,8 +85,17 @@ class NavigationItemModel extends BaseModel
 
     protected function generatePage()
     {
+        $attributes = [];
         $page = $this->page()->first();
-        return '<li '.$this->generateAttributes().'><a href="'.$page->url().'">'.$this->title.'</a></li>';
+        $url = $page->url();
+
+        if(\Request::url() == $url) {
+            $attributes['class'] = 'active';
+        }
+
+        $attributes = $this->generateAttributes($attributes);
+
+        return '<li '.$attributes.'><a href="'.$url.'">'.$this->title.'</a></li>';
     }
 
     protected function generateURL()
@@ -94,12 +103,21 @@ class NavigationItemModel extends BaseModel
         return '<li '.$this->generateAttributes().'><a href="'.$this->url.'">'.$this->title.'</a></li>';
     }
 
-    public function generateAttributes()
+    public function generateAttributes($attributes = [])
     {
-        $attributes = [];
         foreach ($this->attributes()->get() as $a) {
-            $attributes[] = $a->generate();
+            if (isset($attributes[$a->key])) {
+                $attributes[$a->key] = $attributes[$a->key].' '.$a->value;
+            } else {
+                $attributes[$a->key] = $a->value;
+            }
         }
-        return implode(' ', $attributes);
+
+        $_attributes = [];
+        foreach ($attributes as $k => $v) {
+            $_attributes[] = "$k=\"$v\"";
+        }
+
+        return implode(' ', $_attributes);
     }
 }
