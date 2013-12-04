@@ -142,17 +142,25 @@ class HomeController extends BaseController
      * 
      * @return View
      */
-    public function getProfile()
+    public function getProfile($config = [])
     {
         $data = [];
 
         $userClass = Config::get('auth.model');
 
-        $userId = Auth::user()->id;
+        $userId = \Sentry::getUser()->id;
         $user   = $userClass::find($userId);
+
+        $fields = [
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+        ];
 
         $form = FormGenerator::resource($user)
             ->method('put')
+            ->fields($fields)
             ->form()
             ->generate();
 
@@ -172,7 +180,7 @@ class HomeController extends BaseController
     public function putProfile()
     {
         $userClass = Config::get('auth.model');
-        $userId = Auth::user()->id;
+        $userId = \Sentry::getUser()->id;
         $user   = $userClass::find($userId);
 
         return FormGenerator::resource($user)
@@ -192,7 +200,7 @@ class HomeController extends BaseController
         $data = [];
 
         $userClass = Config::get('auth.model');
-        $userId = Auth::user()->id;
+        $userId = \Sentry::getUser()->id;
         $user   = $userClass::find($userId);
 
         $fields = $this->getPasswordFields($user);
@@ -219,7 +227,7 @@ class HomeController extends BaseController
     public function putPassword()
     {
         $userClass = Config::get('auth.model');
-        $userId = Auth::user()->id;
+        $userId = \Sentry::getUser()->id;
         $user   = $userClass::find($userId);
 
         $rules = $this->getPasswordRules($user);
