@@ -461,6 +461,9 @@ class FormGenerator
             if ($this->resource->isProperty($name)) {
                 $field->value = $this->resource->{$name};
             }
+            if ($name == 5) {
+                \Log::error('add field to form '.$field);
+            }
             $form->add($field);
         }
     }
