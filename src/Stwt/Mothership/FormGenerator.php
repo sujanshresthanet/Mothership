@@ -460,9 +460,9 @@ class FormGenerator
         foreach ($this->fields as $name => $field) {
             if ($this->resource->isProperty($name)) {
                 $field->value = $this->resource->{$name};
-            }
-            if ($name == 5) {
-                \Log::error('add field to form '.$field);
+            } else if (is_array($field) and isset($field['relationship'])) {
+                $rel = $field['relationship'];
+                $field['value'] = $this->resource->{$rel}()->lists('id');
             }
             $form->add($field);
         }
