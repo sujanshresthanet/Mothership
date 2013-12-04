@@ -68,7 +68,7 @@ class UserController extends ResourceController
             'last_name',
             'activated',
         ];
-        Arr::s($config, 'fields', $fields);
+        $config = Arr::s($config, 'fields', $fields);
         return parent::create($config);
     }
 
@@ -80,7 +80,7 @@ class UserController extends ResourceController
             'last_name',
             'activated',
         ];
-        Arr::s($config, 'fields', $fields);
+        $config = Arr::s($config, 'fields', $fields);
         return parent::edit($id, $config);
     }
 
