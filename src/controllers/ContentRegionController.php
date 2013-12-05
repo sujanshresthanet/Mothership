@@ -54,7 +54,7 @@ class ContentRegionController extends ResourceController
     protected function queryRelated($resource)
     {
         if ($this->related) {
-            return parent::queryRelated($resource)->where('page_id', '!=', null);
+            return parent::queryRelated($resource);
         } else {
             return $resource->where('page_id', '=', null);
         }
