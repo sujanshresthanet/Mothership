@@ -107,10 +107,10 @@ if ($controllers) {
                             $name     = "$filename.$ext";
                             $path     = public_path().$storagePath;
 
-                            Input::file('file')->move($path, $filename);
+                            Input::file('file')->move($path, $name);
 
                             $data = array(
-                                'filelink' => URL::asset($storagePath.$filename),
+                                'filelink' => URL::asset($storagePath.$name),
                             );
                             return Response::json($data, 200);
                         } else {
