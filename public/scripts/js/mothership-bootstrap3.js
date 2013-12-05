@@ -1,4 +1,4 @@
-// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap3/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js", "vendor/redactor.min.js";
+// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap3/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js", "vendor/redactor.js";
 
 /**
  * Attaches the color picer to input elements
@@ -80,33 +80,19 @@ function moHtml() {
     $('form .html').redactor({
         iframe:     true,
         minHeight:  500,
-        css:        '/redactor/style.css'
+        css:        '/redactor/style.css',
+        convertDivs: false,
+        fileUpload: '/admin/upload/file',
+        fileUploadErrorCallback: function(json)
+        {
+            window.alert(json.error);
+        },
+        imageUpload: '/admin/upload/image',
+        imageUploadErrorCallback: function(json)
+        {
+            window.alert(json.error);
+        }
     });
-}
-
-
-function moFileUploadField () {
-    $('.file-input-group')
-        .find('.remove-file')
-            .not('disabled')
-            .click(
-                function (event) {
-                    event.preventDefault();
-
-                    $btn = $(this);
-                    $btn.attr('disabled', true);
-
-                    $parent = $btn.parents('.file-input-group');
-
-                    $text = $parent.find('input[type=text]');
-                    $text.attr('disabled', true);
-                    $text.addClass('hidden')
-
-                    $file = $parent.find('input[type=file]');
-                    $file.attr('disabled', false);
-                    $file.removeClass('hidden');
-                }
-            );
 }
 
 $(function() {
@@ -114,6 +100,5 @@ $(function() {
     moImagePicker();
     moDateTimePicker();
     moHtml();
-    moFileUploadField();
-    //$('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip();
 });

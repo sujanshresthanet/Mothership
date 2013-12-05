@@ -1,4 +1,5 @@
-// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js", "vendor/redactor.min.js";
+// @codekit-prepend "vendor/jquery.js", "vendor/bootstrap.js", "vendor/image-picker.js", "vendor/bootstrap-colorpicker.js", "vendor/bootstrap-datetimepicker.js", "vendor/redactor.js";
+
 
 /**
  * Attaches the color picer to input elements
