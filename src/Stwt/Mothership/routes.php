@@ -82,7 +82,7 @@ if ($controllers) {
                             Input::file('file')->move($path, $filename);
 
                             $data = array(
-                                'filelink' => URL::asset('uploads/files/'.$filename),
+                                'filelink' => 'uploads/files/'.$filename,
                                 'filename' => $name,
                             );
                             return Response::json($data, 200);
@@ -110,7 +110,7 @@ if ($controllers) {
                             Input::file('file')->move($path, $name);
 
                             $data = array(
-                                'filelink' => URL::asset($storagePath.$name),
+                                'filelink' => $storagePath.$name,
                             );
                             return Response::json($data, 200);
                         } else {
