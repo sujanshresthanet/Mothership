@@ -63,12 +63,37 @@ if ($controllers) {
                 }
             );
 
-
-
             Route::get('profile', "$homeController@getProfile");
             Route::put('profile', "$homeController@putProfile");
             Route::get('password', "$homeController@getPassword");
             Route::put('password', "$homeController@putPassword");
+
+            Route::post(
+                'upload/file',
+                function () {
+                    try {
+                        if (Input::hasFile('file')) {
+                            $file     = Input::file('file');
+                            $ext      = $file->getClientOriginalExtension();
+                            $filename = $file->getClientOriginalName();
+                            $name     = Input::get('filename', $filename);
+                            $path     = public_path()."/uploads/files/";
+
+                            Input::file('file')->move($path, $filename);
+
+                            $data = array(
+                                'filelink' => URL::asset('uploads/files/'.$filename),
+                                'filename' => $name,
+                            );
+                            return Response::json($data, 200);
+                        } else {
+                            return Response::json(['error' => 'Error uploading file'], 400);
+                        }
+                    } catch (Exception $e) {
+                        return Response::json(['error' => 'Error uploading file'], 500);
+                    }
+                }
+            );
 
             foreach ($controllers as $path => $class) {
                 // index
