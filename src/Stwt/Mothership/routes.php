@@ -95,6 +95,33 @@ if ($controllers) {
                 }
             );
 
+            Route::post(
+                'upload/image',
+                function () {
+                    try {
+                        if (Input::hasFile('file')) {
+                            $storagePath = "/uploads/images/";
+                            $file     = Input::file('file');
+                            $ext      = $file->getClientOriginalExtension();
+                            $filename = Str::random(15);
+                            $name     = "$filename.$ext";
+                            $path     = public_path().$storagePath;
+
+                            Input::file('file')->move($path, $filename);
+
+                            $data = array(
+                                'filelink' => URL::asset($storagePath.$filename),
+                            );
+                            return Response::json($data, 200);
+                        } else {
+                            return Response::json(['error' => 'Error uploading image'], 400);
+                        }
+                    } catch (Exception $e) {
+                        return Response::json(['error' => 'Error uploading image'], 500);
+                    }
+                }
+            );
+
             foreach ($controllers as $path => $class) {
                 // index
                 Route::get(
