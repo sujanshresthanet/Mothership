@@ -34,6 +34,10 @@ class ContentRegionController extends ResourceController
                 'label' => 'Edit',
                 'uri' => '{controller}/{id}:edit',
             ],
+            'delete'  => [
+                'label' => 'Delete',
+                'uri' => '{controller}/{id}:delete',
+            ],
         ],
         'related' => [
         ],
@@ -50,7 +54,7 @@ class ContentRegionController extends ResourceController
     protected function queryRelated($resource)
     {
         if ($this->related) {
-            return parent::queryRelated($resource);
+            return parent::queryRelated($resource)->where('page_id', '!=', null);
         } else {
             return $resource->where('page_id', '=', null);
         }
@@ -71,6 +75,7 @@ class ContentRegionController extends ResourceController
     public function getCollection($resource)
     {
         if ($this->related) {
+            return parent::getCollection($resource);
             $pageClass = Config::get('mothership::models')['page'];
             $page = $pageClass::find($this->related['id']);
             return $page->getAllRegions(false);
@@ -81,21 +86,9 @@ class ContentRegionController extends ResourceController
 
     public function create($config = [])
     {
-        $config['fields'] = [
-            'key',
-            'type' => [
-                'form'    => 'select',
-                'label'   => 'Type',
-                'name'    => 'type',
-                'options' => [
-                    'Navigation Menu' => 'nav',
-                    'HTML'            => 'html',
-                    'Plain Text'      => 'textarea',
-                    'Text'            => 'text',
-                ],
-                'help' => ['Choose the type of content you wish to add'],
-            ],
-        ];
+        $this->before($config);
+        
+        $config['fields'] = $this->getRegionFields();
 
         return parent::create($config);
     }
@@ -140,6 +133,49 @@ class ContentRegionController extends ResourceController
                 return $this->editContent($resource, $config);
                 break;
         }
+    }
+
+    protected function getRegionFields()
+    {
+        $fields = [];
+
+        if ($this->related) {
+            $pageClass = Config::get('mothership::models')['page'];
+            $page = $pageClass::find($this->related['id']);
+            $template = $page->getTemplate();
+            $regions = $template->pageRegions();
+
+            $options = [];
+
+            foreach ($regions as $region) {
+                $options[ucfirst(humanize($region))] = $region;
+            }
+
+            $fields['key'] = [
+                'form'    => 'select',
+                'label'   => 'Region',
+                'name'    => 'key',
+                'options' => $options,
+                'help' => ['Choose the type of content you wish to add'],
+            ];
+        } else {
+            $fields[] = 'key';
+        }
+
+        $fields['type'] = [
+            'form'    => 'select',
+            'label'   => 'Type',
+            'name'    => 'type',
+            'options' => [
+                'Navigation Menu' => 'nav',
+                'HTML'            => 'html',
+                'Plain Text'      => 'textarea',
+                'Text'            => 'text',
+            ],
+            'help' => ['Choose the type of content you wish to add'],
+        ];
+
+        return $fields;
     }
 
     /**

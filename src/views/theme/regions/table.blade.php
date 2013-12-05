@@ -36,7 +36,7 @@
                                 href="{{ mo_edit($region->id) }}"
                                 data-toggle="tooltip"
                                 title="Edit the {{ $name }} region"
-                            >{{ $name }}</a>
+                            >{{ ucwords(humanize($region->key)) }}</a>
                         </td>
                         <td>{{ $region->type() }}</td>
                         <td>{{ $region->excerpt() }}</td>

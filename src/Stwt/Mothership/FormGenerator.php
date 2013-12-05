@@ -1,5 +1,4 @@
 <?php namespace Stwt\Mothership;
-
 use Illuminate\Support\Facades\Input as Input;
 use Stwt\GoodForm\GoodForm as GoodForm;
 use Illuminate\Support\Facades\Log as Log;
@@ -459,7 +458,11 @@ class FormGenerator
     {
         foreach ($this->fields as $name => $field) {
             if ($this->resource->isProperty($name)) {
-                $field->value = $this->resource->{$name};
+                if (is_object($field)) {
+                    $field->value = $this->resource->{$name};
+                } else {
+                    $field['value'] = $this->resource->{$name};
+                }
             } else if (is_array($field) and isset($field['relationship'])) {
                 $rel = $field['relationship'];
                 $field['value'] = $this->resource->{$rel}()->lists('id');
