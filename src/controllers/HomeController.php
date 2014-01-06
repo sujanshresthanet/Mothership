@@ -132,9 +132,7 @@ class HomeController extends BaseController
         sunt in culpa qui officia deserunt mollit anim id est laborum.'
         );
 
-        return View::makeTemplate('mothership::theme.home.index')
-            ->with($this->getTemplateData())
-            ->with($data);
+        return View::makeTemplate('mothership::theme.home.index')->with($data);
     }
 
     /**
@@ -168,8 +166,7 @@ class HomeController extends BaseController
         $data['content'] = $form;
 
         return View::makeTemplate('mothership::theme.home.index')
-            ->with($data)
-            ->with($this->getTemplateData());
+            ->with($data);
     }
 
     /**
@@ -215,8 +212,7 @@ class HomeController extends BaseController
         $data['content'] = $form;
 
         return View::makeTemplate('mothership::theme.home.index')
-            ->with($data)
-            ->with($this->getTemplateData());
+            ->with($data);
     }
 
     /**

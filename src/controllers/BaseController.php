@@ -24,21 +24,6 @@ class BaseController extends Controller
         $this->breadcrumbs  = ['/'  => 'Home'];
     }
 
-    /*
-     * Sets up common data required for the layout views
-     *
-     * @return array 
-     */
-    protected function getTemplateData()
-    {
-        $data = [];
-        
-        if (Auth::check()) {
-            $data['user'] = Auth::user();
-        }
-        return $data;
-    }
-
     /**
      * Set's any default config attributes that have not
      * already been defined
