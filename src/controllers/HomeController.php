@@ -132,7 +132,7 @@ class HomeController extends BaseController
         sunt in culpa qui officia deserunt mollit anim id est laborum.'
         );
 
-        return View::makeTemplate('mothership::theme.home.index')->with($data);
+        return View::make('mothership::theme.home.index')->with($data);
     }
 
     /**
@@ -165,7 +165,7 @@ class HomeController extends BaseController
         $data['title'] = 'Your Profile';
         $data['content'] = $form;
 
-        return View::makeTemplate('mothership::theme.home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data);
     }
 
@@ -211,7 +211,7 @@ class HomeController extends BaseController
         $data['title'] = 'Change Password';
         $data['content'] = $form;
 
-        return View::makeTemplate('mothership::theme.home.index')
+        return View::make('mothership::theme.home.index')
             ->with($data);
     }
 

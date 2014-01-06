@@ -1,22 +1,9 @@
 <?php namespace Stwt\Mothership;
 
-use Auth;
 use Controller;
-use Config;
-use Input;
-use Redirect;
-use Log;
-use Hash;
-use View;
-use URI;
-use URL;
-use Session;
-use Stwt\GoodForm\GoodForm as GoodForm;
-use Validator;
 
 class BaseController extends Controller
 {
-    
     protected $breadcrumbs;
 
     public function __construct ()

@@ -22,7 +22,7 @@ use Stwt\GoodForm\GoodForm as GoodForm;
 use Stwt\Mothership\LinkFactory as LinkFactory;
 use URL;
 use Validator;
-
+use \Illuminate\Support\Facades\View as View;
 
 use Session;
 /**
@@ -149,7 +149,7 @@ class ResourceController extends BaseController
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view', 'mothership::theme.resource.table');
         $viewComposer = Arr::e($config, 'viewComposer', 'Stwt\Mothership\Composer\Resource\Table');
-        
+
         // Attach a composer to the view
         View::composer($view, $viewComposer);
         return View::make($view, $data);
@@ -335,7 +335,7 @@ class ResourceController extends BaseController
         $data['resource']   = $resource;
         $data['content']    = $form;
 
-        return View::makeTemplate('mothership::theme.resource.single', $data);
+        return View::make('mothership::theme.resource.single', $data);
     }
 
     /**
