@@ -32,10 +32,6 @@ class BaseController extends Controller
     protected function getTemplateData()
     {
         $data = [];
-
-        //$data['breadcrumbs'] = $this->breadcrumbs;
-        //$data['app_name']    = Config::get('mothership::appTitle');
-        //$data['navigation']  = Config::get('mothership::primaryNavigation');
         
         if (Auth::check()) {
             $data['user'] = Auth::user();

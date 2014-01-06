@@ -31,3 +31,13 @@ View::composer(
         $view->with('navigation', Config::get('mothership::primaryNavigation'));
     }
 );
+
+/*
+ * Composer for single layout view
+ */
+View::composer(
+    'mothership::theme.layouts.single',
+    function ($view) {
+        $view->with('breadcrumbs', Stwt\Mothership\Crumbs::generate());
+    }
+);
