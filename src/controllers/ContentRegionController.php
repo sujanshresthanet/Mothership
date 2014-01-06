@@ -156,7 +156,7 @@ class ContentRegionController extends ResourceController
                 'label'   => 'Region',
                 'name'    => 'key',
                 'options' => $options,
-                'help' => ['Choose the type of content you wish to add'],
+                'help' => ['Choose the page region you want to place the new content'],
             ];
         } else {
             $fields[] = 'key';
