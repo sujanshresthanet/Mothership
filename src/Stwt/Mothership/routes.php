@@ -30,14 +30,7 @@ if ($controllers) {
 
             Route::get('/', "$homeController@getIndex");
             Route::get('home', "$homeController@getIndex");
-
-
-
-            View::composer('mothership::theme.layouts.base', 'Stwt\Mothership\Composer\Base');
-            View::composer('mothership::theme.layouts.sidebar', 'Stwt\Mothership\Composer\Sidebar');
-            View::composer('mothership::theme.layouts.single', 'Stwt\Mothership\Composer\Single');
-            View::composer('mothership::theme.layouts.table', 'Stwt\Mothership\Composer\Resource\Table');
-
+           
             Route::get(
                 '/bug/view/base',
                 function () {

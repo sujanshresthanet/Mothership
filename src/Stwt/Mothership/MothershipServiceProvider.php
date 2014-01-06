@@ -23,6 +23,7 @@ class MothershipServiceProvider extends ServiceProvider
 
         include __DIR__.'/routes.php';
         include __DIR__.'/filters.php';
+        include __DIR__.'/composers.php';
         include __DIR__.'/helpers.php';
     }
 

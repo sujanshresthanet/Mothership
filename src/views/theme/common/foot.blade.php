@@ -1,4 +1,4 @@
         
-        <script src="{{ URL::to($appScript) }}"></script>
+        <script src="@yield('app_script', $app_script)"></script>
     </body>
 </html>

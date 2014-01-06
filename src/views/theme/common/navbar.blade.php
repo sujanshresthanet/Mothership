@@ -7,7 +7,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">{{ $appTitle }}</a>
+        <a class="navbar-brand" href="#">{{ $app_name }}</a>
     </div>
     @if (Sentry::check())
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -21,9 +21,9 @@
         </ul>
         <form class="navbar-form navbar-left" role="search">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
+            <input disabled type="text" class="form-control" placeholder="Search">
           </div>
-          <button type="submit" class="btn btn-default">Submit</button>
+          <button disabled type="submit" class="btn btn-default">Submit</button>
         </form>
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
