@@ -92,6 +92,42 @@ class PageController extends ResourceController
         return parent::edit($id, $config);
     }
 
+    public function show($id, $config = [])
+    {
+        $data = [];
+
+        $this->before($config);
+
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'submitText'    => 'Save',
+                'cancelText'    => 'Cancel',
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
+
+        $resource = $this->resource->find($id);
+
+        Crumbs::push('active', 'View');
+
+        $data['tabs']       = $this->getTabs($resource);
+        $data['title']      = Lang::title('show', $resource, $this->related);
+        $data['resource']   = $resource;
+        $data['content']    = '<iframe style="resize:vertical;" src="'.$resource->url().'" frameborder="0" width="100%" height="600px" />';
+
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
+        
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
+    }
+
     public function content($id, $config = [])
     {
         $config['view'] = 'admin.pages.content';
