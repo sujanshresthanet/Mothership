@@ -47,12 +47,15 @@ class ContentItemModel extends BaseModel
             $this->content()->get();
         }
 
-        switch (get_class($this->content)) {
+        switch (class_basename(get_class($this->content))) {
             case 'Content':
                 return $this->content->type();
                 break;
             case 'NavigationMenu':
                 return 'Navigation Menu';
+                break;
+            default:
+                return class_basename(get_class($this->content));
                 break;
         }
     }
