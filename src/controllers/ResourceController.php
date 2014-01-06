@@ -152,7 +152,6 @@ class ResourceController extends BaseController
         
         // Attach a composer to the view
         View::composer($view, $viewComposer);
-
         return View::make($view, $data);
     }
 

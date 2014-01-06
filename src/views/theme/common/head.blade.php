@@ -7,3 +7,4 @@
         <link href="@yield('app_style', $app_style)" rel="stylesheet" />
     </head>
     <body>
+    </body>

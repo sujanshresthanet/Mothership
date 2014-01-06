@@ -7,7 +7,7 @@ View::composer(
     'mothership::theme.common.head',
     function ($view) {
         $view->with('app_name', Config::get('mothership::appTitle'));
-        $view->with('app_style', Config::get('mothership::appStyle'));
+        $view->with('app_style',  URL::asset(Config::get('mothership::appStyle')));
     }
 );
 
@@ -17,7 +17,7 @@ View::composer(
 View::composer(
     'mothership::theme.common.foot',
     function ($view) {
-        $view->with('app_script', Config::get('mothership::appScript'));
+        $view->with('app_script', URL::asset(Config::get('mothership::appScript')));
     }
 );
 
