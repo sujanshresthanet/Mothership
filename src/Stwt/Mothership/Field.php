@@ -199,14 +199,15 @@ class Field
         if (Str::endsWith($this->name, '_id')) {
             $relatedModel = Str::studly(substr($this->name, 0, strlen($this->name) - 3));
             if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\BaseModel')) {
-
+                $this->model = $relatedModel;
+            }
+            if ($this->model) {
                 if (class_exists($relatedModel) and is_subclass_of($relatedModel, 'Stwt\Mothership\ImageModel')) {
                     $this->form = $this->form ?: 'image';
                 } else {
                     $this->form = $this->form ?: 'select';
                 }
                 $this->options = [];
-                $this->model = $relatedModel;
                 $this->max  = null;
                 $this->min  = null;
                 $this->step = null;
