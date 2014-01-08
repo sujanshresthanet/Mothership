@@ -39,6 +39,15 @@ class NavigationItemModel extends BaseModel
         'type',
     ];
 
+    protected $fields = [];
+
+    protected $properties = [
+        'type' => [
+            'form'       => 'input',
+            'type'       => 'radio',
+        ],
+    ];
+
     public function __toString()
     {
         if ($this->id) {
