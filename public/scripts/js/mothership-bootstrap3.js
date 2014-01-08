@@ -95,10 +95,50 @@ function moHtml() {
     });
 }
 
+/**
+ * Toggle the url/page field
+ * 
+ * @return void
+ */
+function moNavItemForm() {
+    if ( ! $('.create-item, .edit-item').length)
+        return;
+
+    $('[name=url], [name=page_id]')
+        .parents('.form-group')
+            .hide();
+
+    if ($('[name=type]:checked').val() == 'page') {
+        $('[name=page_id]')
+            .parents('.form-group')
+                .show();
+    }
+    if ($('[name=type]:checked').val() == 'url') {
+        $('[name=url]')
+            .parents('.form-group')
+                .show();
+    }
+
+    $('[name=type]').on(
+        'change',
+        function () {
+            if ($(this).val() == 'page') {
+                $('[name=page_id]').parents('.form-group').show();
+                $('[name=url]').parents('.form-group').hide();
+            }
+            if ($(this).val() == 'url') {
+                $('[name=url]').parents('.form-group').show();
+                $('[name=page_id]').parents('.form-group').hide();
+            }
+        }
+    )
+}
+
 $(function() {
     moColorPicker();
     moImagePicker();
     moDateTimePicker();
     moHtml();
-    $('[data-toggle="tooltip"]').tooltip();
+    moNavItemForm();
+    //$('[data-toggle="tooltip"]').tooltip();
 });
