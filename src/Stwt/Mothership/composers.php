@@ -8,6 +8,11 @@ View::composer(
     function ($view) {
         $view->with('app_name', Config::get('mothership::appTitle'));
         $view->with('app_style',  URL::asset(Config::get('mothership::appStyle')));
+
+        if (!isset($view->html_class))
+            $view->with('html_class', '');
+        if (!isset($view->html_id))
+            $view->with('html_id', '');
     }
 );
 

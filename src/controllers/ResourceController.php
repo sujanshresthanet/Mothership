@@ -143,6 +143,8 @@ class ResourceController extends BaseController
         $data['columns']    = $resource->getColumns(Arr::e($config, 'columns', $this->columns));
         $data['resource']   = $resource;
         $data['collection'] = $this->getCollection($resource);
+        $data['html_id']    = 'table-'.$resource->singular(false);
+        $data['html_class'] = 'table-form table-'.$resource->singular(false).' resource-'.$resource->plural(false);
 
         Crumbs::push('active', $resource->plural());
 
@@ -207,6 +209,8 @@ class ResourceController extends BaseController
         $data['title']      = Lang::title('create', $resource, $this->related);
         $data['resource']   = $resource;
         $data['content']    = $form;
+        $data['html_id']    = 'create-'.$resource->singular(false);
+        $data['html_class'] = 'create-form create-'.$resource->singular(false).' resource-'.$resource->plural(false);
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view');
@@ -275,6 +279,8 @@ class ResourceController extends BaseController
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
         $data['content']    = $form->generate();
+        $data['html_id']    = 'edit-'.$resource->singular(false);
+        $data['html_class'] = 'edit-form edit-'.$resource->singular(false).' resource-'.$resource->plural(false);
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view');
@@ -404,6 +410,8 @@ class ResourceController extends BaseController
         $data['title']      = Lang::title('edit', $resource, $this->related);
         $data['resource']   = $resource;
         $data['content']    = $form;
+        $data['html_id']    = 'delete-'.$resource->singular(false);
+        $data['html_class'] = 'delete-form delete-'.$resource->singular(false).' resource-'.$resource->plural(false);
 
         // get the view template and view composer to use
         $view         = Arr::e($config, 'view');
@@ -438,7 +446,6 @@ class ResourceController extends BaseController
         $resource = $this->resource;
         $fields   = Arr::e($config, 'fields', array_keys(Input::all()));
         $rules    = $resource->getRules($fields);
-
         $resource->autoHydrateEntityFromInput    = true;
         $resource->autoPurgeRedundantAttributes  = true;
         

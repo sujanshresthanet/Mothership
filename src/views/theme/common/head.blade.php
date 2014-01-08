@@ -1,5 +1,7 @@
 <!doctype html>
-<html>
+<html 
+    class="@yield('html_class', $html_class)" 
+    id="@yield('html_id', $html_id)">
     <head>
         <title>@yield('meta_title', $app_name)</title>
         <meta charset="utf-8" />
