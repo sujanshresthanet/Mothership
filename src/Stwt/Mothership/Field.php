@@ -426,8 +426,8 @@ class Field
         } elseif ($this->isBoolean()) {
             return $instance->{$this->name} ? 'Yes' : 'No';
         } elseif ($this->isDate()) {
-            $date = new \ExpressiveDate($instance->{$this->name});
-            return $date->getRelativeDate();
+            $date = new \Carbon\Carbon($instance->{$this->name});
+            return $date->diffForHumans();
         } elseif ($this->isString()) {
             return Str::words($instance->{$this->name}, 9);
         }
