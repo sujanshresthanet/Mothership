@@ -12,7 +12,7 @@
         "illuminate/support": "4.1.*",
         "cartalyst/sentry": "2.0.*",
         "laravelbook/ardent": "dev-master",
-        "cviebrock/eloquent-sluggable": "1.0.*"
+        "cviebrock/eloquent-sluggable": "dev-master"
     },
     "autoload": {
         "classmap": [

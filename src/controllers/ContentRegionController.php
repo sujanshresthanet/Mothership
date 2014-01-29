@@ -123,14 +123,14 @@ class ContentRegionController extends ResourceController
         $resource = $this->resource->find($id);
 
         switch ($resource->type()) {
-            case 'Navigation Menu':
-                return $this->editMenu($resource, $config);
-                break;
             case 'HTML':
             case 'text':
             case 'textarea':
-            default:
                 return $this->editContent($resource, $config);
+                break;
+            default:
+                //dd($resource->type());
+                return '';
                 break;
         }
     }
@@ -195,6 +195,9 @@ class ContentRegionController extends ResourceController
         $fields = $content->getFields(['content_id']);
 
         $fields['content_id']->model = $content->content_type;
+        $fields['content_id']->label = 'Navigation Menu';
+        $fields['content_id']->form = 'select';
+        $fields['content_id']->help  = 'Select the menu to use in this region';
 
         $form = FormGenerator::resource($content)
             ->method('put')
@@ -334,7 +337,8 @@ class ContentRegionController extends ResourceController
             }
         };
 
-        $config['afterSave'] = $afterSave;
+        if ( ! array_get($config, 'afterSave'))
+            $config['afterSave'] = $afterSave;
 
         return parent::store($config);
     }
@@ -357,14 +361,14 @@ class ContentRegionController extends ResourceController
         $resource = $this->resource->find($id);
 
         switch ($resource->type()) {
-            case 'Navigation Menu':
-                return $this->updateMenu($resource, $config);
-                break;
             case 'HTML':
             case 'text':
             case 'textarea':
-            default:
                 return $this->updateContent($resource, $config);
+                break;
+            case 'Navigation Menu':
+            default:
+                return $this->updateRelated($resource, $config);
                 break;
         }
     }
@@ -377,7 +381,7 @@ class ContentRegionController extends ResourceController
      * 
      * @return Redirect      [description]
      */
-    protected function updateMenu($resource, $config = [])
+    protected function updateRelated($resource, $config = [])
     {
         $contentItem = $resource->contentItems()->first();
         $rules = $contentItem->getRules(['content_id']);
@@ -396,8 +400,7 @@ class ContentRegionController extends ResourceController
                 ->withErrors($resource->errors());
         }
     }
-
-
+ 
     /**
      * [update description]
      * 

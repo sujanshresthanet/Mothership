@@ -286,13 +286,15 @@ class PageModel extends BaseModel
         $data = [];
 
         $regions = $this->contentRegions()
-                        ->whereIn('key', $templateRegions)
-                        ->with('contentItems')
-                        ->get();
+            ->whereIn('key', $templateRegions)
+            ->with('contentItems')
+            ->get();
 
         foreach ($regions as $region) {
             $data[$region->key] = ($generate ? $region->generate() : $region);
         }
+
+        //dd($data);
 
         return $data;
     }

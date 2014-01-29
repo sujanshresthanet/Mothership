@@ -98,7 +98,8 @@ class ContentRegionModel extends BaseModel
         if (!$this->contentItems) {
             $this->contentItems()->get();
         }
-        return $this->contentItems[0]->type();
+        $firstItem = array_get($this->contentItems, 0);
+        return $firstItem ? $firstItem->type() : '';
     }
 
     public function excerpt()

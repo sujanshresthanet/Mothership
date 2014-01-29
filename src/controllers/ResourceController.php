@@ -131,7 +131,6 @@ class ResourceController extends BaseController
     public function table($config = [])
     {
         $data = [];
-
         $this->before($config);
 
         $resource   = $this->resource;
