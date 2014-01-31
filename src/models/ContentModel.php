@@ -108,6 +108,12 @@ class ContentModel extends BaseModel
             case 'html':
                 return 'HTML';
                 break;
+            case 'text':
+                return 'Text';
+                break;
+            case 'string':
+                return 'String';
+                break;
             default:
                 return ucfirst($this->type);
                 break;

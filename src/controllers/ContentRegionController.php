@@ -125,7 +125,7 @@ class ContentRegionController extends ResourceController
         switch ($resource->type()) {
             case 'HTML':
             case 'text':
-            case 'textarea':
+            case 'string':
                 return $this->editContent($resource, $config);
                 break;
             default:
@@ -281,13 +281,13 @@ class ContentRegionController extends ResourceController
                 $fields[$fieldName]->form  = 'textarea';
                 $fields[$fieldName]->rows  = '30';
                 break;
-            case 'text':
+            case 'string':
                 $fields[$fieldName]->class = 'input-block-level';
                 $fields[$fieldName]->form  = 'input';
                 $fields[$fieldName]->type  = 'text';
                 $fields[$fieldName]->cols  = '10';
                 break;
-            case 'textarea':
+            case 'text':
             default:
                 $fields[$fieldName]->class = 'input-block-level';
                 $fields[$fieldName]->form  = 'textarea';
@@ -362,8 +362,8 @@ class ContentRegionController extends ResourceController
 
         switch ($resource->type()) {
             case 'HTML':
-            case 'text':
-            case 'textarea':
+            case 'Text':
+            case 'String':
                 return $this->updateContent($resource, $config);
                 break;
             case 'Navigation Menu':
@@ -417,7 +417,7 @@ class ContentRegionController extends ResourceController
         $content->autoHydrateEntityFromInput    = true;
         $content->autoPurgeRedundantAttributes  = true;
         $content->forceEntityHydrationFromInput = true;    // force hydrate on existing attributes
-
+        
         if ($content->save($rules)) {
             Messages::add('success', Lang::alert('edit.success', $resource, $this->related));
             return Redirect::to(URL::current());
