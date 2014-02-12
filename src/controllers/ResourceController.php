@@ -317,6 +317,17 @@ class ResourceController extends BaseController
 
         $this->before($config);
 
+        // set default config variable for this view
+        $this->setDefaults(
+            $config,
+            [
+                'submitText'    => 'Save',
+                'cancelText'    => 'Cancel',
+                'view'          => 'mothership::theme.resource.single',
+                'viewComposer'  => 'Stwt\Mothership\Composer\Resource\Form',
+            ]
+        );
+
         $resource = $this->resource->find($id);
 
         $relatedResource = $resource->{$model};
@@ -339,8 +350,15 @@ class ResourceController extends BaseController
         $data['title']      = 'Update Address';//Lang::title('related', $resource, $relatedResource);
         $data['resource']   = $resource;
         $data['content']    = $form;
+        
+        // get the view template and view composer to use
+        $view         = Arr::e($config, 'view');
+        $viewComposer = Arr::e($config, 'viewComposer');
 
-        return View::make('mothership::theme.resource.single', $data);
+        // Attach a composer to the view
+        View::composer($view, $viewComposer);
+
+        return View::make($view, $data);
     }
 
     /**
@@ -537,13 +555,14 @@ class ResourceController extends BaseController
                 Log::error("$field is a file");
 
                 $destinationPath = $resource->getUploadPath($field);
-
                 $original  = Input::file($field)->getClientOriginalName();
                 $extension = Input::file($field)->getClientOriginalExtension();
                 $fileName  = str_random(20).".$extension";
                 Input::file($field)->move($destinationPath, $fileName);
 
                 $resource->{$field} = $fileName;
+
+                //dd("$field = $fileName");
                 unset($rules[$field]);
             }
         }
